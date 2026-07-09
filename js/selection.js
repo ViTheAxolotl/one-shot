@@ -20,6 +20,7 @@ let firstRun = true;
 let firstRunCustom = true;
 let imgs = {};
 let oldToken = {};
+let firstLoad = true;
 
 const charRef = ref(database, 'playerChar/');
 onValue(charRef, (snapshot) => 
@@ -47,6 +48,13 @@ onValue(filesRef, (snapshot) =>
 {
     const data = snapshot.val();
     imgs = data;
+
+    if(firstLoad)
+    {
+        let temp = imgs["borders"];
+        for(let border of Object.keys(temp)){if(border != "invisible"){borders.push(border);}} //Populates the borders with each border
+        firstLoad = false;
+    }
 });
 
 onAuthStateChanged(auth, (user) => 
@@ -86,9 +94,6 @@ function init()
 
     enter.onclick = setUpCharacters;
     go.onclick = handleGoButton;
-    
-    let temp = imgs["borders"];
-    for(let border of Object.keys(temp)){if(border != "invisible"){borders.push(border);}} //Populates the borders with each border
 }
 
 function setUpCharacters()
