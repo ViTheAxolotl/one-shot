@@ -53,7 +53,7 @@ function login(email, password)
 
 function handleBackBtn()
 {
-    window.location.href= "https://infused.axol-apps.com/";
+    window.location.href= "https://drunk.axol-apps.com/";
 }
 
 init();
