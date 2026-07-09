@@ -42,8 +42,8 @@ onValue(dbRef, (snapshot) =>
     wholeDb = data;
 });
 
-const dbRef = ref(database, 'files/');
-onValue(dbRef, (snapshot) => 
+const filesRef = ref(database, 'files/');
+onValue(filesRef, (snapshot) => 
 {
     const data = snapshot.val();
     imgs = data;
