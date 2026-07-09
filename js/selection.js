@@ -42,6 +42,13 @@ onValue(dbRef, (snapshot) =>
     wholeDb = data;
 });
 
+const dbRef = ref(database, 'files/');
+onValue(dbRef, (snapshot) => 
+{
+    const data = snapshot.val();
+    imgs = data;
+});
+
 onAuthStateChanged(auth, (user) => 
 {
     if (!user) 
@@ -404,5 +411,3 @@ function createChar(curCharacter, curBorder)
     setDoc(`playerChar/${player}/charName`, char["id"]);
     setDoc(`playerChar/${player}/currentToken`, char["id"]);
 }
-
-fetch('https://vitheaxolotl.github.io/Infused/src/files.json').then(res => res.json()).then((json) => imgs = json);
