@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name = "description" content = "List of Deities.">
+    <link rel="shortcut icon" href="images/favicon.png">
+
+    <!-- CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href = "css/Styles.css" rel = "stylesheet" />
+
+    <title>Session Recaps</title>
+  </head>
+  
+  <body>
+    <nav class="navbar navbar-expand-lg bg-dark navbar-primary"> 
+        <script src="js/pageSetup.js" class="noParent" type="module"></script>
+    </nav>
+
+    <div class="container">
+      <div class="row align-items-top">
+        <div id = "header" class = "col-12 bg-UP-blue">
+          <h1>Session Recaps</h1><br>
+        </div>
+
+        <div id = "list" class = "bg-UP-purple color-UP-black col-md-5 col-sm-12">
+          <table>
+            <tr><td><h3>Episodes</h3><hr></td></tr>
+            <button class = "mt-auto recapButton" id="ep1"><b>Ep: 1 New World</b></button>
+            <button class = "mt-auto recapButton" id="ep2"><b>Ep: 2 Icy Drugs</b></button>
+            <button class = "mt-auto recapButton" id="ep3"><b>Ep: 3 Rebirth</b></button>
+            <button class = "mt-auto recapButton" id="ep4"><b>Ep: 4 Draco Tablet</b></button>
+            <button class = "mt-auto recapButton" id="ep5"><b>Ep: 5 Garrett Dies Again</b></button>
+          </table>
+        </div>
+
+        <div id = "display" class = " bg-UP-purple color-UP-black col-md-7 col-sm-12 d-flex flex-column">
+          <h3>Description</h3> <hr>
+          <h3 id = "name"></h3>
+          <p id = "description"><b>Click On An Episode To Begin!</b></p>
+          <button class = "mt-auto" id="bringToTop"><b>Back To Top</b></button>
+          <button class = "m-bottom-margin" id="reset"><b>Reset</b></button>
+        </div>
+      
+        <div id = "footer" class = "col-12 bg-UP-blue"> 
+        </div>
+      </div>
+	</div>
+
+      <!-- Bootstrap JavaScript Components-LOAD LAST -->
+      <script scr="js/bootstrap/scripts.js"></script>
+      <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+      <script src="js/recapDisplays.js"></script>
+  </body>
+</html>

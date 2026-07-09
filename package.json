@@ -1,0 +1,23 @@
+{
+  "name": "unbalanced-powers",
+  "version": "1.0.0",
+  "description": "Place where site is posted",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ViTheAxolotl/Unbalanced-Powers.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ViTheAxolotl/Unbalanced-Powers/issues"
+  },
+  "homepage": "https://github.com/ViTheAxolotl/Unbalanced-Powers#readme",
+  "dependencies": {
+    "firebase": "^9.15.0"
+  }
+}

@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en"> 
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name = "description" content = "List of Deities.">
+    <link rel="shortcut icon" href="images/favicon.png">
+
+    <!-- CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href = "css/Styles.css" rel = "stylesheet" />
+
+    <title>Stats</title>
+  </head>
+  
+  <body style ="-webkit-text-size-adjust: none;">
+    <div id="spellFrame" class = "invisible" style="z-index: 1011;">
+        <div style="display: inline;">
+          <button id="exitIframe" style="z-index: 1011; float: right; width: 5%;">X</button>
+          <div id="frame" draggable="false" style="height: 100%; display: none;">
+            <iframe id="spellLookup" src="https://www.axol-apps.com/" title="stats" style="-webkit-text-size-adjust: none; transform-origin:left top; width: 100%; height: 100%;" draggable="false"></iframe>
+          </div>
+          <div id="spellCard" draggable="false" style="height:100%; width: 100%; align-items: center; display: none;">
+            <div class = "card-body notes" style="padding: 10px;">
+              <h5 class = "card-title" id = "spellTitle"></h5>
+              <p class= "card-text" id="CT" style="margin:3px;"></p>
+              <p class= "card-text" id="R" style="margin:3px;"></p>
+              <p class= "card-text" id = "C" style="margin:3px;"></p>
+              <p class= "card-text" id = "D" style="margin:3px;"></p>
+              <p class= "card-text" id = "concentration" style="margin:3px; display: none;">Concentration</p>
+              <p class= "card-text" id = "spellText" style="margin:3px;"></p>
+            </div> 
+          </div>
+        </div>
+    </div>
+    
+    <div id = "story" class = "bg-UP-purple color-UP-black center stats" style="margin: 0px; border: none; min-width:1800px; background-size: 100% 100%; -webkit-text-size-adjust: none;">
+      <table style="width: 100%; margin-bottom: 10px;" class="statSheet paper">
+        <tbody>
+          <tr>
+            <td style="width: 33%;"><p>Character Name:</p><h6 class = "stat" id="name"></h6></td>
+            <td style="width: 34%;"><p>Class, Race, and Lv:</p><input class = "stat" id="class"/><input class = "stat" id="race"/><select class="stat" id="lv"><option value = "1">1</option><option value = "2">2</option><option value = "3">3</option><option value = "4">4</option><option value = "5">5</option><option value = "6">6</option><option value = "7">7</option><option value = "8">8</option><option value = "9">9</option><option value = "10">10</option><option value = "11">11</option><option value = "12">12</option><option value = "13">13</option><option value = "14">14</option><option value = "15">15</option><option value = "16">16</option><option value = "17">17</option><option value = "18">18</option><option value = "19">19</option><option value = "20">20</option></select></td>
+            <td style="width: 33%;"><p>Background & Alignment:</p><input class = "stat" id="background"/><input class = "stat" id="alignment"/></td>
+          </tr>
+
+          <tr>
+            <td style="width: 33%;">
+              <table style="width: 100%;">
+                <tr>
+                  <td>
+                    <div style="display: inline-block; width: 28%;">
+                      <table style="width: 65%; transform: translate(0%, -2.5%);">
+                        <tr><td><p>Str:</p><input class = "stat base6" id="Strength-ext"><br><h6 class="stat" style="border: 2px solid;" id="Strength">+0</h6></td></tr>
+                        <tr><td><p>Dex:</p><input class = "stat base6" id="Dexterity-ext"><br><h6 class="stat" style="border: 2px solid;" id="Dexterity">+0</h6></td></tr>
+                        <tr><td><p>Con:</p><input class = "stat base6" id="Constitution-ext"><br><h6 class="stat" style="border: 2px solid;" id="Constitution">+0</h6></td></tr>
+                        <tr><td><p>Int:</p><input class = "stat base6" id="Intelligence-ext"><br><h6 class="stat" style="border: 2px solid;" id="Intelligence">+0</h6></td></tr>
+                        <tr><td><p>Wis:</p><input class = "stat base6" id="Wisdom-ext"><br><h6 class="stat" style="border: 2px solid;" id="Wisdom">+0</h6></td></tr>
+                        <tr><td><p>Char:</p><input class = "stat base6" id="Charisma-ext"><br><h6 class="stat" style="border: 2px solid;" id="Charisma">+0</h6></td></tr>
+                      </table>
+                    </div>
+            
+                    <div style="text-align: left; display: inline-block; width: 70%;">
+                      <table style="width: 90%;">
+                        <tr style="text-align: center;"><td><input class = "stat" id="inspiration"/><p style="display: inline;">  Inspiration</p></td></tr>
+                        <tr style="text-align: center;"><td><h6 class = "stat" id="proficiency" style="display: inline;"></h6><p style="display: inline;">  Proficiency</p></td></tr>
+                        <tr>
+                          <td>
+                            <input class = "stat" type="checkbox" id="StrengthSave-btn"><p id="StrengthSave" class = "stat expertise" style="display: inline;">Strength</p><br>
+                            <input class = "stat" type="checkbox" id="DexteritySave-btn"><p id="DexteritySave" class = "stat expertise" style="display: inline;">Dexterity</p><br>
+                            <input class = "stat" type="checkbox" id="ConstitutionSave-btn"><p id="ConstitutionSave" class = "stat expertise" style="display: inline;">Constitution</p><br>
+                            <input class = "stat" type="checkbox" id="IntelligenceSave-btn"><p id="IntelligenceSave" class = "stat expertise" style="display: inline;">Intelligence</p><br>
+                            <input class = "stat" type="checkbox" id="WisdomSave-btn"><p id="WisdomSave" class = "stat expertise" style="display: inline;">Wisdom</p><br>
+                            <input class = "stat" type="checkbox" id="CharismaSave-btn"><p id="CharismaSave" class = "stat expertise" style="display: inline;">Charisma</p><br>
+                            <h6 class="center">Saving Throws</h6> 
+                          </td>
+                        </tr>
+                        
+                        <tr>
+                          <td>
+                            <input class = "stat" type="checkbox" id="acrobatics-btn"><p class = "expertise"  id="acrobatics" style="display: inline;" title="Dexterity">Acrobatics</p><br>
+                            <input class = "stat" type="checkbox" id="animalHandling-btn"><p class = "expertise" id="animalHandling" style="display: inline;" title="Wisdom">Animal Handling</p><br>
+                            <input class = "stat" type="checkbox" id="arcana-btn"><p class = "expertise" id="arcana" style="display: inline;" title="Intelligence">Arcana</p><br>
+                            <input class = "stat" type="checkbox" id="athletics-btn"><p class = "expertise" id="athletics" style="display: inline;" title="Strength">Athletics</p><br>
+                            <input class = "stat" type="checkbox" id="deception-btn"><p class = "expertise" id="deception" style="display: inline;" title="Charisma">Deception</p><br>
+                            <input class = "stat" type="checkbox" id="history-btn"><p class = "expertise" id="history" style="display: inline;" title="Intelligence">History</p><br>
+                            <input class = "stat" type="checkbox" id="insight-btn"><p class = "expertise" id="insight" style="display: inline;" title="Wisdom">Insight</p><br>
+                            <input class = "stat" type="checkbox" id="intimidation-btn"><p class = "expertise" id="intimidation" style="display: inline;" title="Charisma">Intimidation</p><br>
+                            <input class = "stat" type="checkbox" id="investigation-btn"><p class = "expertise" id="investigation" style="display: inline;" title="Intelligence">Investigation</p><br>
+                            <input class = "stat" type="checkbox" id="medicine-btn"><p class = "expertise" id="medicine" style="display: inline;" title="Wisdom">Medicine</p><br>
+                            <input class = "stat" type="checkbox" id="nature-btn"><p class = "expertise" id="nature" style="display: inline;" title="Intelligence">Nature</p><br>
+                            <input class = "stat" type="checkbox" id="perception-btn"><p class = "expertise" id="perception" style="display: inline;" title="Wisdom">Perception</p><br>
+                            <input class = "stat" type="checkbox" id="performance-btn"><p class = "expertise" id="performance" style="display: inline;" title="Charisma">Performance</p><br>
+                            <input class = "stat" type="checkbox" id="persuasion-btn"><p class = "expertise" id="persuasion" style="display: inline;" title="Charisma">Persuasion</p><br>
+                            <input class = "stat" type="checkbox" id="religion-btn"><p class = "expertise" id="religion" style="display: inline;" title="Intelligence">Religion</p><br>
+                            <input class = "stat" type="checkbox" id="slightOfHand-btn"><p class = "expertise" id="slightOfHand" style="display: inline;" title="Dexterity">Slight of Hand</p><br>
+                            <input class = "stat" type="checkbox" id="stealth-btn"><p class = "expertise" id="stealth" style="display: inline;" title="Dexterity">Stealth</p><br>
+                            <input class = "stat" type="checkbox" id="survival-btn"><p class = "expertise" id="survival" style="display: inline;" title="Wisdom">Survival</p><br>
+                            <h6 class="center">Skills<h6>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <p style="display: inline;">Passive Perception:</p><input class = "stat" id="passivePerception"><br><br>
+                    <textarea class="stat" id="profAndLang" style="width: 80%; height: 190px; padding: 10px;"></textarea>
+                    <h6 class="center">Proficiencies and Languages</h6>
+                  </td>
+                </tr>
+              </table>
+            </td>
+
+            <td style="width: 34%;">
+              <table style = "width: 100%;">
+                <tr>
+                  <td style="padding-top: 15px; padding-bottom: 15px;">
+                    <div style="width: 33%; display: inline;" class="center"><p style="display: inline;">AC: </p><input class = "stat" id="AC"/></div>
+                    <div style="width: 33%; display: inline;" class="center"><p style="display: inline;" id = "initLabel">Initiative: </p><input class = "stat" id="Initiative"/></div>
+                    <div style="width: 33%; display: inline;" class="center"><p style="display: inline;">Speed: </p><input class = "stat" id="Speed"/></div><br>
+    
+                    <div style="width: 33%; display: inline;" class="center"><p style="display: inline;">Hp: </p><input class = "stat" id="currentHp"/> / <input class = "stat" id="maxHp"></div>
+                    <div style="width: 33%; display: inline;" class="center"><p style="display: inline;">Temp Hp: </p><input class = "stat" id="tempHp"/></div><br>
+                  
+                    <table style="width: 100%;">
+                      <tr>
+                        <td>Hit Dice:</td>
+                        <td>Death Saves:</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p>Total:</p>
+                            <input type="button" id="add-hd" value="+" style="width: 25px; height: 22px; padding: 0; line-height: 1; margin-left: 4px;" />
+                            <input type="button" id="remove-hd" value="Clear" style="width: 25px; height: 22px; padding: 0; line-height: 1; margin-left: 2px;" /><br>
+                            <div id="hd-div"></div>
+                            <p>Current:</p>
+                            <div id="hd-current"></div>
+                        </td>
+    
+                        <td>
+                          <p>Success:</p>
+                          <input class = "stat" type="checkbox" id="success1">-<input class = "stat" type="checkbox" id="success2">-<input class = "stat" type="checkbox" id="success3"><br>
+                          <p>Failures:</p>
+                          <input class = "stat" type="checkbox" id="fail1">-<input class = "stat" type="checkbox" id="fail2">-<input class = "stat" type="checkbox" id="fail3"> 
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+  
+                <tr>
+                  <td>
+                    <h6>Attacks & Spell Casting:</h6>
+                    
+                    <table style="width: 100%;">
+                      <tr>
+                        <td>Name</td>
+                        <td style="width: 20%;">Attack Bonus</td>
+                        <td>Damage</td>
+                      </tr>
+    
+                      <tr>
+                        <td><input class = "stat" id="actionName1"/></td>
+                        <td><input class = "stat" id="actionBonus1"/></td>
+                        <td><input class = "stat" id="actionDamage1"/></td>
+                      </tr>
+    
+                      <tr>
+                        <td><input class = "stat" id="actionName2"/></td>
+                        <td><input class = "stat" id="actionBonus2"/></td>
+                        <td><input class = "stat" id="actionDamage2"/></td>
+                      </tr>
+    
+                      <tr>
+                        <td><input class = "stat" id="actionName3"/></td>
+                        <td><input class = "stat" id="actionBonus3"/></td>
+                        <td><input class = "stat" id="actionDamage3"/></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <tr>
+                  <td>
+                    <h6>Money:</h6>
+                    <table style="width: 100%;">
+                      <td><p>CP</p><input class="stat" id="copperP"></td>
+                      <td><p>SP</p><input class="stat" id="silverP"></td>
+                      <td><p>EP</p><input class="stat" id="electrumP"></td>
+                      <td><p>GP</p><input class="stat" id="goldP"></td>
+                      <td><p>PP</p><input class="stat" id="platinumP"></td>
+                    </table>
+
+                    <textarea class="stat" id="equipment" style="width: 80%; height: 392px; padding: 10px;"></textarea>
+                    <h6>Equipment</h6>
+                  </td>
+                </tr>
+              </table>
+            </td>
+
+            <td style="width: 33%;">
+              <table style="width: 100%;">
+                <tr>
+                  <td>
+                    <table style="width: 100%;">
+                      <tr><td><input class="stat" id="personalityTraits"/><br><h6>Personality Traits</h6></td></tr>
+                      <tr><td><input class="stat" id="ideals"/><br><h6>Ideals</h6></td></tr>
+                      <tr><td><input class="stat" id="bonds"/><br><h6>Bonds</h6></td></tr>
+                      <tr><td><input class="stat" id="flaws"/><br><h6>Flaws</h6></td></tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <textarea class="stat" id="feats" style="width: 100%; height: 705px; padding: 10px;"></textarea>
+                    <h6>Features & Traits</h6>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class = "paper" style="width:100%; margin-top: 10px;">
+        <tbody>
+          <tr>
+            <td style="width: 50%;">
+              <table style="width: 100%; height: 100%;">
+                <tr>
+                  <td style="height: 202px;">
+                    <textarea class="stat" id = "apperance" style="width: 100%; height: 202px; padding: 10px;"></textarea>
+                    <h6>Character Appearance</h6>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="height: 800px;">
+                    <textarea class="stat" id="characterBackstory" style="height: 800px; width: 100%; padding: 10px;"></textarea>
+                    <h6>Character Backstory</h6>
+                  </td>
+                </tr>
+              </table>
+            </td>
+
+            <td style="width: 49%;">
+              <table style="width: 100%;">
+                <tr>
+                  <td>
+                    <table style="width: 100%; height: 245px;">
+                      <tr>
+                        <td>
+                          <textarea class="stat" id="ally1" style="width: 100%; height: 245px; padding: 10px;"></textarea>
+                        </td>
+
+                        <td>
+                          <h6>Name</h6>
+                          <textarea class="stat" id="ally2" style="width: 100%; height: 230px; padding: 10px;"></textarea>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <h6>Alliances & Organizations</h6>
+                  </td>
+                </tr>
+                
+                <tr>
+                  <td style="height: 334px;">
+                    <textarea class="stat" id="additionalFeat&Traits" style="width: 100%; height: 334px; padding: 10px;"></textarea>
+                    <h6>Additional Features & Traits</h6>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="height: 334px;">
+                    <textarea class="stat" id="treasure" style="width: 100%; height: 334px; padding: 10px;"></textarea>
+                    <h6>Treasure</h6>
+                  </td>
+                </tr>
+              </table> 
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class ="paper" style="width:100%;margin-top: 10px;">
+        <tr>
+          <td>
+            <table style="width: 1750px">
+            <td><p style="display: inline;">Spellcasting Class: <input class="stat" id="spellClass"/></p></td>
+            <td><p style="display: inline;">Spellcasting Ability:</p> <select class="stat" id="spellAbility"><option value = "Strength">Strength</option><option value = "Dexterity">Dexterity</option><option value = "Constitution">Constitution</option><option value = "Intelligence">Intelligence</option><option value = "Wisdom">Wisdom</option><option value = "Charisma">Charisma</option></select></td>
+            <td><p style="display: inline;">DC:</p><h6 style="display: inline;" class="stat" id="spellDC"></h6></td>
+            <td><p style="display: inline;">Spell Attack Bonus:</p><h6 style="display: inline;" class="stat" id="spellBonus"></h6></td>
+            </table>
+          </td>
+        </tr>
+        
+        <tr>
+          <td>
+            <table>
+              <tr>
+                <td style="width: 583px;">
+                  <h6>Cantrips</h6>
+                  <span style="display: block;"><input class="stat" id="can-1"/><img src="images/seeIcon.png" id="can-1-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input class="stat" id="can-2"/><img src="images/seeIcon.png" id="can-2-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input class="stat" id="can-3"/><img src="images/seeIcon.png" id="can-3-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input class="stat" id="can-4"/><img src="images/seeIcon.png" id="can-4-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input class="stat" id="can-5"/><img src="images/seeIcon.png" id="can-5-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input class="stat" id="can-6"/><img src="images/seeIcon.png" id="can-6-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input class="stat" id="can-7"/><img src="images/seeIcon.png" id="can-7-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input class="stat" id="can-8"/><img src="images/seeIcon.png" id="can-8-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input class="stat" id="can-9"/><img src="images/seeIcon.png" id="can-9-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input class="stat" id="can-10"/><img src="images/seeIcon.png" id="can-10-See" class = "viewSpell" style="width: 6%;"></span>
+                  <hr>
+                  <h6>Level 1:</h6><h6 style="display: inline;">Max Slots:</h6><input class="stat" id="level1-slot" type="number" min="0" max="20"><div id="level1-slot-display" style="display: inline; vertical-align: middle;"></div>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-1-btn"><input class="stat" id="lvl1-1"><img src="images/seeIcon.png" id="lvl1-1-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-2-btn"><input class="stat" id="lvl1-2"><img src="images/seeIcon.png" id="lvl1-2-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-3-btn"><input class="stat" id="lvl1-3"><img src="images/seeIcon.png" id="lvl1-3-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-4-btn"><input class="stat" id="lvl1-4"><img src="images/seeIcon.png" id="lvl1-4-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-5-btn"><input class="stat" id="lvl1-5"><img src="images/seeIcon.png" id="lvl1-5-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-6-btn"><input class="stat" id="lvl1-6"><img src="images/seeIcon.png" id="lvl1-6-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-7-btn"><input class="stat" id="lvl1-7"><img src="images/seeIcon.png" id="lvl1-7-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-8-btn"><input class="stat" id="lvl1-8"><img src="images/seeIcon.png" id="lvl1-8-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-9-btn"><input class="stat" id="lvl1-9"><img src="images/seeIcon.png" id="lvl1-9-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-10-btn"><input class="stat" id="lvl1-10"><img src="images/seeIcon.png" id="lvl1-10-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-11-btn"><input class="stat" id="lvl1-11"><img src="images/seeIcon.png" id="lvl1-11-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-12-btn"><input class="stat" id="lvl1-12"><img src="images/seeIcon.png" id="lvl1-12-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-13-btn"><input class="stat" id="lvl1-13"><img src="images/seeIcon.png" id="lvl1-13-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-14-btn"><input class="stat" id="lvl1-14"><img src="images/seeIcon.png" id="lvl1-14-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl1-15-btn"><input class="stat" id="lvl1-15"><img src="images/seeIcon.png" id="lvl1-15-See" class = "viewSpell" style="width: 6%;"></span>
+                  <hr>
+                  <h6>Level 2:</h6><h6 style="display: inline;">Max Slots:</h6><input class="stat" id="level2-slot" type="number" min="0" max="20"><div id="level2-slot-display" style="display: inline; vertical-align: middle;"></div>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl2-1-btn"><input class="stat" id="lvl2-1"><img src="images/seeIcon.png" id="lvl2-1-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl2-2-btn"><input class="stat" id="lvl2-2"><img src="images/seeIcon.png" id="lvl2-2-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl2-3-btn"><input class="stat" id="lvl2-3"><img src="images/seeIcon.png" id="lvl2-3-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl2-4-btn"><input class="stat" id="lvl2-4"><img src="images/seeIcon.png" id="lvl2-4-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl2-5-btn"><input class="stat" id="lvl2-5"><img src="images/seeIcon.png" id="lvl2-5-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl2-6-btn"><input class="stat" id="lvl2-6"><img src="images/seeIcon.png" id="lvl2-6-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl2-7-btn"><input class="stat" id="lvl2-7"><img src="images/seeIcon.png" id="lvl2-7-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl2-8-btn"><input class="stat" id="lvl2-8"><img src="images/seeIcon.png" id="lvl2-8-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl2-9-btn"><input class="stat" id="lvl2-9"><img src="images/seeIcon.png" id="lvl2-9-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl2-10-btn"><input class="stat" id="lvl2-10"><img src="images/seeIcon.png" id="lvl2-10-See" class = "viewSpell" style="width: 6%;"></span>
+                </td>
+
+                <td style="width: 583px;">
+                  <h6>Level 3:</h6><h6 style="display: inline;">Max Slots:</h6><input class="stat" id="level3-slot" type="number" min="0" max="20"><div id="level3-slot-display" style="display: inline; vertical-align: middle;"></div>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl3-1-btn"><input class="stat" id="lvl3-1"><img src="images/seeIcon.png" id="lvl3-1-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl3-2-btn"><input class="stat" id="lvl3-2"><img src="images/seeIcon.png" id="lvl3-2-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl3-3-btn"><input class="stat" id="lvl3-3"><img src="images/seeIcon.png" id="lvl3-3-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl3-4-btn"><input class="stat" id="lvl3-4"><img src="images/seeIcon.png" id="lvl3-4-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl3-5-btn"><input class="stat" id="lvl3-5"><img src="images/seeIcon.png" id="lvl3-5-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl3-6-btn"><input class="stat" id="lvl3-6"><img src="images/seeIcon.png" id="lvl3-6-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl3-7-btn"><input class="stat" id="lvl3-7"><img src="images/seeIcon.png" id="lvl3-7-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl3-8-btn"><input class="stat" id="lvl3-8"><img src="images/seeIcon.png" id="lvl3-8-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl3-9-btn"><input class="stat" id="lvl3-9"><img src="images/seeIcon.png" id="lvl3-9-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl3-10-btn"><input class="stat" id="lvl3-10"><img src="images/seeIcon.png" id="lvl3-10-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl3-11-btn"><input class="stat" id="lvl3-11"><img src="images/seeIcon.png" id="lvl3-11-See" class = "viewSpell" style="width: 6%;"></span>
+                  <hr>
+                  <h6>Level 4:</h6><h6 style="display: inline;">Max Slots:</h6><input class="stat" id="level4-slot" type="number" min="0" max="20"><div id="level4-slot-display" style="display: inline; vertical-align: middle;"></div>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl4-1-btn"><input class="stat" id="lvl4-1"><img src="images/seeIcon.png" id="lvl4-1-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl4-2-btn"><input class="stat" id="lvl4-2"><img src="images/seeIcon.png" id="lvl4-2-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl4-3-btn"><input class="stat" id="lvl4-3"><img src="images/seeIcon.png" id="lvl4-3-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl4-4-btn"><input class="stat" id="lvl4-4"><img src="images/seeIcon.png" id="lvl4-4-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl4-5-btn"><input class="stat" id="lvl4-5"><img src="images/seeIcon.png" id="lvl4-5-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl4-6-btn"><input class="stat" id="lvl4-6"><img src="images/seeIcon.png" id="lvl4-6-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl4-7-btn"><input class="stat" id="lvl4-7"><img src="images/seeIcon.png" id="lvl4-7-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl4-8-btn"><input class="stat" id="lvl4-8"><img src="images/seeIcon.png" id="lvl4-8-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl4-9-btn"><input class="stat" id="lvl4-9"><img src="images/seeIcon.png" id="lvl4-9-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl4-10-btn"><input class="stat" id="lvl4-10"><img src="images/seeIcon.png" id="lvl4-10-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl4-11-btn"><input class="stat" id="lvl4-11"><img src="images/seeIcon.png" id="lvl4-11-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl4-12-btn"><input class="stat" id="lvl4-12"><img src="images/seeIcon.png" id="lvl4-12-See" class = "viewSpell" style="width: 6%;"></span>
+                  <hr>
+                  <h6>Level 5:</h6><h6 style="display: inline;">Max Slots:</h6><input class="stat" id="level5-slot" type="number" min="0" max="20"><div id="level5-slot-display" style="display: inline; vertical-align: middle;"></div>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl5-1-btn"><input class="stat" id="lvl5-1"><img src="images/seeIcon.png" id="lvl5-1-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl5-2-btn"><input class="stat" id="lvl5-2"><img src="images/seeIcon.png" id="lvl5-2-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl5-3-btn"><input class="stat" id="lvl5-3"><img src="images/seeIcon.png" id="lvl5-3-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl5-4-btn"><input class="stat" id="lvl5-4"><img src="images/seeIcon.png" id="lvl5-4-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl5-5-btn"><input class="stat" id="lvl5-5"><img src="images/seeIcon.png" id="lvl5-5-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl5-6-btn"><input class="stat" id="lvl5-6"><img src="images/seeIcon.png" id="lvl5-6-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl5-7-btn"><input class="stat" id="lvl5-7"><img src="images/seeIcon.png" id="lvl5-7-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl5-8-btn"><input class="stat" id="lvl5-8"><img src="images/seeIcon.png" id="lvl5-8-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl5-9-btn"><input class="stat" id="lvl5-9"><img src="images/seeIcon.png" id="lvl5-9-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl5-10-btn"><input class="stat" id="lvl5-10"><img src="images/seeIcon.png" id="lvl5-10-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl5-11-btn"><input class="stat" id="lvl5-11"><img src="images/seeIcon.png" id="lvl5-11-See" class = "viewSpell" style="width: 6%;"></span>
+                </td>
+
+                <td style="width: 583px;">
+                  <h6>Level 6:</h6><h6 style="display: inline;">Max Slots:</h6><input class="stat" id="level6-slot" type="number" min="0" max="20"><div id="level6-slot-display" style="display: inline; vertical-align: middle;"></div>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl6-1-btn"><input class="stat" id="lvl6-1"><img src="images/seeIcon.png" id="lvl6-1-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl6-2-btn"><input class="stat" id="lvl6-2"><img src="images/seeIcon.png" id="lvl6-2-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl6-3-btn"><input class="stat" id="lvl6-3"><img src="images/seeIcon.png" id="lvl6-3-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl6-4-btn"><input class="stat" id="lvl6-4"><img src="images/seeIcon.png" id="lvl6-4-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl6-5-btn"><input class="stat" id="lvl6-5"><img src="images/seeIcon.png" id="lvl6-5-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl6-6-btn"><input class="stat" id="lvl6-6"><img src="images/seeIcon.png" id="lvl6-6-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl6-7-btn"><input class="stat" id="lvl6-7"><img src="images/seeIcon.png" id="lvl6-7-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl6-8-btn"><input class="stat" id="lvl6-8"><img src="images/seeIcon.png" id="lvl6-8-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl6-9-btn"><input class="stat" id="lvl6-9"><img src="images/seeIcon.png" id="lvl6-9-See" class = "viewSpell" style="width: 6%;"></span>
+                  <hr>
+                  <h6>Level 7:</h6><h6 style="display: inline;">Max Slots:</h6><input class="stat" id="level7-slot" type="number" min="0" max="20"><div id="level7-slot-display" style="display: inline; vertical-align: middle;"></div>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl7-1-btn"><input class="stat" id="lvl7-1"><img src="images/seeIcon.png" id="lvl7-1-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl7-2-btn"><input class="stat" id="lvl7-2"><img src="images/seeIcon.png" id="lvl7-2-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl7-3-btn"><input class="stat" id="lvl7-3"><img src="images/seeIcon.png" id="lvl7-3-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl7-4-btn"><input class="stat" id="lvl7-4"><img src="images/seeIcon.png" id="lvl7-4-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl7-5-btn"><input class="stat" id="lvl7-5"><img src="images/seeIcon.png" id="lvl7-5-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl7-6-btn"><input class="stat" id="lvl7-6"><img src="images/seeIcon.png" id="lvl7-6-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl7-7-btn"><input class="stat" id="lvl7-7"><img src="images/seeIcon.png" id="lvl7-7-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl7-8-btn"><input class="stat" id="lvl7-8"><img src="images/seeIcon.png" id="lvl7-8-See" class = "viewSpell" style="width: 6%;"></span>
+                  <hr>
+                  <h6>Level 8:</h6><h6 style="display: inline;">Max Slots:</h6><input class="stat" id="level8-slot" type="number" min="0" max="20"><div id="level8-slot-display" style="display: inline; vertical-align: middle;"></div>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl8-1-btn"><input class="stat" id="lvl8-1"><img src="images/seeIcon.png" id="lvl8-1-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl8-2-btn"><input class="stat" id="lvl8-2"><img src="images/seeIcon.png" id="lvl8-2-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl8-3-btn"><input class="stat" id="lvl8-3"><img src="images/seeIcon.png" id="lvl8-3-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl8-4-btn"><input class="stat" id="lvl8-4"><img src="images/seeIcon.png" id="lvl8-4-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl8-5-btn"><input class="stat" id="lvl8-5"><img src="images/seeIcon.png" id="lvl8-5-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl8-6-btn"><input class="stat" id="lvl8-6"><img src="images/seeIcon.png" id="lvl8-6-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl8-7-btn"><input class="stat" id="lvl8-7"><img src="images/seeIcon.png" id="lvl8-7-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl8-8-btn"><input class="stat" id="lvl8-8"><img src="images/seeIcon.png" id="lvl8-8-See" class = "viewSpell" style="width: 6%;"></span>
+                  <hr>
+                  <h6>Level 9:</h6><h6 style="display: inline;">Max Slots:</h6><input class="stat" id="level9-slot" type="number" min="0" max="20"><div id="level9-slot-display" style="display: inline; vertical-align: middle;"></div>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl9-1-btn"><input class="stat" id="lvl9-1"><img src="images/seeIcon.png" id="lvl9-1-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl9-2-btn"><input class="stat" id="lvl9-2"><img src="images/seeIcon.png" id="lvl9-2-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl9-3-btn"><input class="stat" id="lvl9-3"><img src="images/seeIcon.png" id="lvl9-3-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl9-4-btn"><input class="stat" id="lvl9-4"><img src="images/seeIcon.png" id="lvl9-4-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl9-5-btn"><input class="stat" id="lvl9-5"><img src="images/seeIcon.png" id="lvl9-5-See" class = "viewSpell" style="width: 6%;"></span>
+                  <span style="display: block;"><input type="checkbox" class="stat" id="lvl9-6-btn"><input class="stat" id="lvl9-6"><img src="images/seeIcon.png" id="lvl9-6-See" class = "viewSpell" style="width: 6%;"></span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <div class="paper">
+        <h6>Infusion & Other:</h6>
+        <textarea class="stat" id="infusion" style="width: 70%; height: 1000px; padding: 10px;"></textarea>
+      </div>
+    </div>
+
+     <!-- Bootstrap JavaScript Components-LOAD LAST -->
+     <script scr="js/bootstrap/scripts.js"></script>
+     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+     <script src="js/stats.js" type = "module"></script>
+  </body>
+</html>

@@ -1,0 +1,1036 @@
+body
+{
+    background: url(../images/background.jpg) black;
+}
+
+.paper
+{
+    background: url(../images/bigPaper.jpg) lightgray 100% 100%;
+}
+
+body * { -webkit-text-size-adjust: none !important; }
+
+.bg-UP-purple
+{
+    background-color: #2A6E8F !important;
+}
+
+.bg-UP-blue
+{
+    background-color: #5AADE6 !important;
+}
+
+.bg-UP-yellow
+{
+    background-color: #411759 !important;
+}
+
+.bg-UP-grey
+{
+    background-color: rgb(70, 70, 70) !important;
+}
+
+.bg-UP-white
+{
+    background-color: white !important;
+}
+
+.color-UP-purple
+{
+    color: #2A6E8F;
+}
+
+.color-UP-blue
+{
+    color: #5AADE6;
+}
+
+.color-UP-yellow
+{
+    color: #88008B;
+}
+
+.color-UP-black
+{
+    color: #000000;
+}
+
+.color-I-button
+{
+    color: #0D6DFC;
+}
+
+.color-I-label
+{
+    color: #455B7D;
+}
+
+#corkBoard
+{
+    background: url(../images/cork-board.jpg) brown;
+}
+
+#header
+{
+    text-align: center;
+    margin-top: 20px;
+}
+
+#footer
+{
+    text-align: center;
+    padding-bottom: 10px;
+    margin: 20px 0px;
+}
+
+#hometown, #info, #quests, #notes
+{
+    text-align: center;
+}
+
+#hometown, #display, #notes
+{
+    margin: 20px 0px 0px 10px;
+}
+
+#search, #item
+{
+    margin-top: 20px;
+}
+
+#info, #list, #quests
+{
+    margin: 20px 10px 0px 0px;
+}
+
+#story, #map, #towns, #controls, #discDisplay, #gridMapWrapper, #login
+{
+    margin-top: 20px;
+}
+
+p
+{
+    text-indent: 30px;
+}
+
+#info, #hometown, #footer, #header, #story, #list, #display, #map, #towns, #search, #item, #quests, #notes, #controls, #discDisplay, #gridMapWrapper, #login
+{
+    border: #555555 4px solid;
+    padding: 10px;
+}
+
+.objectBorder
+{
+    border: #555555 4px solid;
+    padding: 10px 10px 0px 10px;
+}
+
+h1, h3, h5, h6
+{
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+h5
+{
+    text-decoration: underline;
+}
+
+
+button
+{
+    text-align: center;
+    width: 100%;
+    padding: 5px;
+    margin: 5px 0px;
+    background-color: #411759;
+    color: #5AADE6;
+}
+
+table, .itemSearch, #itemImg, #charImg
+{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.itemSearch
+{
+    width: 40%;
+    display: block;
+}
+
+.m-bottom-margin
+{
+    margin-bottom: 20px;
+}
+
+#map, #towns
+{
+    text-align: center;
+}
+
+#map img, #towns img
+{
+    width: 550px;
+    height: 425px;
+    border: solid black 4px;
+}
+
+table, .itemSearch, #itemImg
+{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#itemImg
+{
+    display: block;
+    width: 300px;
+    height: 300px;
+    margin: 10px 0px 20px 0px;
+    border: solid black 4px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#charImg
+{
+    display: none;
+    width: 300px;
+    height: 400px;
+    margin: 10px 0px 20px 0px;
+    border: solid black 4px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.nav-item
+{
+    text-align: center;
+}
+
+#hometown img, #info img
+{
+    height: fit-content;
+    margin: 10px 0px 20px 0px;
+    border: solid black 4px;
+}
+
+#towns p, #info p, #hometown p, #quests p, #notes p
+{
+    text-align: left;
+}
+
+.navbar-primary .navbar-toggler-icon 
+{
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(81,0,134, 1)' stroke-width='4' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
+  
+.navbar-primary .navbar-toggler 
+{
+    border-color: #FCC90D; 
+    width: 56px;
+} 
+
+.navbar-nav .nav-link.active, .nav-link
+{
+    color: #0d6efd;
+}
+
+.d-block
+{
+    width: 150vh;
+}
+
+.complete
+{
+    background: green;
+    border-color: black;
+    border-radius: 10%;
+}
+
+.incomplete
+{
+    background: #555555;
+    border-color: black;
+    border-radius: 10%;
+}
+
+.card
+{
+    margin: 10px;
+    border-color: black;
+    border-radius: 10%;
+}
+
+.notes
+{
+    background: url(../images/paper.PNG) #00098C no-repeat;
+    background-size: 800%;    
+    border-color: black;
+    border-radius: 10%;
+    color: black;
+}
+
+.notes h5
+{
+    color: black;
+}
+
+.center
+{
+    text-align: center !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sLink
+{
+    text-decoration: none;
+    margin-left: -25px;
+}
+
+.hide
+{
+    display: none;
+}
+
+#map ul
+{
+    text-align: left;
+}
+
+.unhide
+{
+    display: block;
+}
+
+#deleteButton, #text, #favoriteBtn
+{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+}
+
+#deleteButton, #addButton, #favoriteBtn
+{
+    width: 75px;
+    height: 75px;
+}
+
+#jaun
+{
+    width: 413px;
+}
+
+#havenport
+{
+    height: 300px;
+    width: 313px;
+}
+
+#flyer
+{
+    height: 300px;
+    width: 325px;
+}
+
+.qBCol
+{
+    width: 49%; 
+}
+#qBCol1
+{
+    float: left;
+}
+
+#qBCol2
+{
+    float: right;
+}
+
+.nail
+{
+    width: 4%;
+    height: 4%;
+}
+
+#arrows img
+{
+    width: 60%;
+    height: 60%;
+}
+
+#grid
+{
+    cursor: pointer;
+}
+
+#gridMap, #statSheet
+{
+    position: relative;
+    height: 80vh;
+    width: 100%;
+    overflow: scroll;
+    object-fit: cover;
+}
+
+#gridMap .tokens
+{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+#story .tokens, #turnOrder .tokens
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.eOrD
+{
+    width: 20%;
+    margin: 5px;
+}
+
+.arrows
+{
+    touch-action: manipulation;
+}
+
+.selected, .selected-temp, .selected-dice
+{
+    border: solid #20b2aa 3px;
+}
+
+.blo
+{
+    display: block;
+}
+
+.tokens
+{
+    z-index: 800;
+}
+
+.border_
+{
+    z-index: 1000;
+}
+
+.hp
+{
+    z-index: 900;
+}
+
+.inOrDe
+{
+    display: inline;
+    background-color: rgb(70, 70, 70);
+    color: white;
+    width: 10%;
+    touch-action: manipulation;
+}
+
+.numberInput 
+{
+    margin: 5px;
+    width: 15%;
+}
+
+.labelS
+{
+    display: inline;
+    margin: 5px;
+}
+
+#story span
+{
+    text-align: left;
+}
+
+#cover, #spellFrame
+{
+    background-color: grey; 
+    opacity: .95; 
+    position: fixed; 
+    top: 0px; 
+    left: 0px;
+    width: 100%;
+    height: 100%;
+}
+
+.veiwTokens
+{
+    position: absolute;
+    top: 20%;
+    left: 34%;
+    width: 24%;
+}
+
+#viewTitle
+{
+    position: absolute;
+    top: 70%;
+    left: 30%;
+    color: black;
+}
+
+#hideCover, #quickAction
+{
+    background-color: #FCC90D;
+    color: white;
+    width: 20%;
+    position: absolute;
+    top: 0px;
+    left: 80%;
+}
+
+#quickAction
+{
+    left: 59%;
+}
+
+.gridButton
+{
+    display: inline;
+    width: 23%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#turn
+{
+    border: 4px black solid;
+    margin: 5px;
+}
+
+#status
+{
+    width: 50%
+}
+
+#arrows img, #arrows svg
+{
+    width: 40%;
+    height: 40%;
+    margin-left: -25%;
+}
+
+.center input
+{
+    width: 7%;
+}
+
+#helpBtn
+{
+    position: fixed;
+    bottom: 3%;
+    left: 3%;
+}
+
+.customImg, #story .tokens
+{
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+}
+
+.noCircle
+{
+    -moz-border-radius: 0% !important;
+    -webkit-border-radius: 0% !important;
+    border-radius: 0% !important;
+}
+
+#gridMap .customImg
+{
+    width: 4.5%;
+    height: 4.5%;
+}
+
+#gridMap
+{
+    transition: transform 0.3s ease;
+    transform-origin: center center;
+}
+
+#story .tokens
+{
+    width: 12vh;
+    height: 12vh;
+}
+
+.dropbtn 
+{
+    background-color: #cccccc;
+    -moz-border-radius: 30%;
+    -webkit-border-radius: 30%;
+    border-radius: 30%;
+    width: 48%;
+}
+
+.ddown 
+{
+    position: relative;
+}
+
+.ddown-content 
+{
+    display: none;
+    position: absolute;
+    background-color: #797878;
+    box-shadow: 0px 8px 16px 0px #00000033;
+    z-index: 1;
+    -moz-border-radius: 10%;
+    -webkit-border-radius: 10%;
+    border-radius: 10%;
+}
+
+.ddown-content img 
+{
+    margin: 5px;
+    width: 20%;
+    padding-left: 10px;
+}
+
+.ddown-content img:hover 
+{
+    background-color: #888888;
+}
+
+.ddown:hover .dropbtn 
+{
+    background-color: #797878;
+}
+
+.ddownShow .ddown-content 
+{
+    display: block;
+}
+
+.ddownHide .ddown-content 
+{
+    display: none;
+}
+
+.area 
+{
+    position: relative;
+}
+
+.col-md-7
+{
+    flex:0 0 auto;
+    width: 56.8% !important;
+}
+
+.basicMargin
+{
+    margin: 5px;
+}
+
+/*
+#story input
+{
+    display: inline;
+    width: 25vw;
+}
+*/
+
+.stats table, .stats td, .stats tr
+{
+    border: 1px solid black;
+    padding: 5px;
+}
+
+.stats input
+{
+    width: 4vw !important;
+    text-align: center;
+    margin: 5px;
+}
+
+.topHalf input
+{
+    width: 9vw !important;
+    text-align: center;
+}
+
+.stats input[type=radio]
+{
+    width: 2.5vw !important;
+    text-align: center;
+}
+
+.stats p
+{
+    text-indent: 0px;
+    padding: 5px;
+}
+
+.statSheet p
+{
+    margin-bottom: 0px;
+}
+
+.inlineDisplay
+{
+    display: inline;
+}
+
+#siteList p
+{
+    text-indent: 0px;
+}
+
+/* The default 'Unchecked' state */
+.spell-slot-label 
+{
+    display: inline-block; 
+    width: 50px; 
+    height: 50px;          
+    background-image: url('../images/spellSlot.png'); 
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    margin: 2px;
+}
+
+/* Hover effect so players know it's clickable */
+.spell-slot-label:hover 
+{
+    transform: scale(1.1);
+}
+
+/* The 'Checked' (Used) state */
+/* The '+' selector looks for the label immediately following a checked input */
+.spell-check-hidden:checked + .spell-slot-label 
+{
+    background-image: url('../images/usedSpellSlot.png');
+}
+
+@media (max-width: 1399px) {
+    .col-md-6
+    {
+        width: 47%;
+    }
+
+    .col-md-9
+    {
+        width: 73.2%;
+    }
+
+    .col-md-7
+    {
+        flex:0 0 auto;
+        width: 56.5% !important;
+    }
+
+    #arrows img
+    {
+        width: 13%;
+        height: 13%;
+    }
+
+    #arrows #up
+    {
+        margin-left: 14%;
+    }
+
+    .tODiv
+    {
+        width: 10%;
+        height: 10%;
+    }
+
+    .veiwTokens
+    {
+        top: 20%;
+        left: 34%;
+        width: 24%;
+    }
+
+    #turn
+    {
+        width: 70%;
+    }
+
+    #status
+    {
+        width: 50%
+    }
+
+    #arrows img, #arrows svg
+    {
+        width: 40%;
+        height: 40%;
+        margin-left: -25%;
+    }
+
+    #login h5
+    {
+        text-align: left;
+        display: inline;
+        margin: 5%;
+    }
+
+    #login span 
+    {
+        display: block;
+        margin: 1% 0px;
+    }
+  }
+
+@media (max-width: 1199px) {
+    .col-md-6
+    {
+        width: 48.9%;
+    }
+
+    .col-md-7
+    {
+        flex:0 0 auto;
+        width: 56.2% !important;
+    }
+
+    .col-md-9
+    {
+        width: 72.8%;
+    }
+
+    #hp .labelS
+    {
+        display: inline;
+    }
+
+    .inOrDe
+    {
+        width: 10%;
+        height: 10%;
+    }
+
+    .numberInput 
+    {
+        width: 15%;
+    }
+  }
+
+@media (max-width: 991px) {
+    .col-md-6
+    {
+        width: 48.6%;
+    }
+
+    .col-md-9
+    {
+        width: 72.2%;
+    }
+
+    .col-md-7
+    {
+        flex:0 0 auto;
+        width: 55.5% !important;
+    }
+
+    #grid
+    {
+        margin: 0%; 
+        width: 2200px;
+        height: 2200px;
+    }
+
+    #arrows img
+    {
+        width: 27%;
+        height: 27%;
+    }
+
+    .center input, a button
+    {
+        min-width: 11%;
+    }
+
+    #arrows #left
+    {
+        margin-left: 10%;
+    }
+
+    #arrows #up
+    {
+        margin-left: 41%;
+    }
+
+    #info img, #havenport 
+    {
+        height: 140px;
+        width: 290px;
+    }
+
+    #flyer
+    {
+        width: 300px;
+        height: 204px;
+    }
+
+    #helpBtn
+    {
+        position: fixed;
+        bottom: 0%;
+        left: 0%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .col-md-7
+    {
+        flex:0 0 auto;
+        width: 100% !important;
+    }
+    
+    .col-md-6  
+    {
+        width: 47.9% !important;
+    }
+
+    .col-md-9
+    {
+        width: 100%;
+    }
+
+    .col-sm-12
+    {
+        margin: 10px 0px 0px 0px !important;
+    }
+
+    #charImg
+    {
+        height: 250px;
+        width: 180px;
+    }
+
+    #flyer 
+    {
+        width: 220px;
+        height: 282px;
+    }
+  }
+
+@media (max-width: 574px) {
+    .col-md-7
+    {
+        flex:0 0 auto;
+        width: 100% !important;
+    }
+
+    .col-md-6  
+    {
+        width: 100%;
+    }
+
+    #info img, #havenport 
+    {
+        height: 201px !important;
+        width: 363px;
+    }
+
+    #flyer 
+    {
+        width: 280px;
+        height: 282px !important;
+    }
+  }
+
+  @media (max-width: 574px) {
+    #info, #hometown, #story, #list, #display, #quests, #notes, #controls, #discDisplay, #gridMap
+    {
+        margin: 0px;
+        margin-top: 20px;
+    }
+
+    #map img, #towns img
+    {
+        height: 225px;
+        width: 325px;
+    }
+
+    #itemImg
+    {
+        height: 250px;
+        width: 250px;
+    }
+
+    #charImg
+    {
+        height: 250px;
+        width: 180px;
+    }
+
+    .qBCol
+    {
+        float: none !important;
+        width: 100%;
+    }
+
+    .nail
+    {
+        width: 10%;
+        height: 10%;
+    }
+
+    #hp .labelS
+    {
+        display: block;
+    }
+
+    .inOrDe
+    {
+        width: 15%;
+        height: 30%;
+    }
+
+    .numberInput 
+    {
+        width: 30%;
+    }
+
+    .veiwTokens
+    {
+        top: 30%;
+        left: 22%;
+        width: 55%;
+    }
+
+    #turn
+    {
+        width: 70%;
+    }
+
+    #status
+    {
+        width: 60%
+    }
+
+    #arrows img, #arrows svg
+    {
+        width: 70%;
+        height: 70%;
+        margin-left: 0.1%;
+    }
+
+    .ddown-content img 
+    {
+        width: 25%;
+    }
+
+    #CharacterButton
+    {
+        width: 38%;
+    }
+  }

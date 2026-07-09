@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name = "keywords" content = "Creation Story">
+    <link rel="shortcut icon" href="images/favicon.png">
+
+    <!-- CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href = "css/Styles.css" rel = "stylesheet" />
+
+    <title>Dashboard</title>
+  </head>
+  
+  <body style="-webkit-text-size-adjust: none;">
+    <nav class="navbar navbar-expand-lg bg-dark navbar-primary"> 
+        <script src="js/pageSetup.js" class = "noParent" type="module"></script>
+    </nav>
+
+    <div class="container">
+      <div id="cover" class = "invisible" style="z-index: 1011;">
+        <div style="display: inline;">
+          <button id="quickAction" class="invisible hbhbhbhb" style="z-index: 1011;">Quick Action</button>
+          <button id="hideCover" class="invisible hbhbhbhb" style="z-index: 1012;">Exit</button>
+          <img id = "viewToken" class="invisible veiwTokens" style="z-index: 1013;" src=""/>
+          <img id = "viewBorder" class="invisible veiwTokens"  style="z-index: 1014;" src=""/>
+          <img id = "viewHp" class="invisible veiwTokens" style="z-index: 1015;" src=""/>
+          <h3 id = "viewTitle" class="invisible center" style="z-index: 1016;"></h3>
+          <p class="invisible hbhbhbhb" id = "showInstructions" style="padding:10px;"></p>
+        </div>
+
+        <div id="quickDiv" style="display: inline;">
+          <div class="center invisible">
+            <button name="spellsFQ" class = "gridButton secondMenu">Spells</button>
+            <button name="abilityFQ" class = "gridButton secondMenu">Abilities</button>
+          </div>
+
+          <div id="spellsFQ" style="display: none;"></div>
+          <div id="abilityFQ" style="display: none;"></div>
+          <div id="qaCards"></div>
+        </div>
+      </div>
+
+      <img id="helpBtn" src="images/helpBtn.png"/>
+
+      <div class="row align-items-top">
+        <div id = "header" class = "col-12 bg-UP-blue">
+          <h1>Dashboard</h1><br>
+        </div>
+
+        <div id = "gridMapWrapper" class = "bg-UP-purple color-UP-white col-md-12 col-sm-12 center" style="height: 90vh; -webkit-text-size-adjust: none;">      
+          <div id = "gridMap" style="height: 90%; border: solid black 5px;" >
+            <img id = "grid" src = "images/grid.png" draggable="false"/>
+          </div>
+
+          <button name="zoom" class = "gridButton inOrDe" style="color: white; height: 50px;">+</button>
+		      <button name="zoom" class = "gridButton inOrDe" style="color: white; height: 50px;">-</button>
+        </div>
+
+        <div id = "controls" class = "bg-UP-purple color-UP-black col-md-12 col-sm-12">
+          <h3 id = "name"></h3>
+          <div class="center">
+            <button name="stats" class = "gridButton firstMenu selected">Stats</button>
+            <button name="actions" class = "gridButton firstMenu">Actions</button>
+            <button name="favorites" class = "gridButton firstMenu"><img src="images/favorited.png" height="20px"/></button>
+            <button name="sheet" class = "gridButton firstMenu">Sheet</button>
+            <button name="skills" class = "gridButton firstMenu">Skill Tree</button>
+            <button name="notes" class = "gridButton firstMenu">Notes</button>
+            <button name="maps" class = "gridButton firstMenu">Maps</button>
+            <button name="itemLookup" class = "gridButton firstMenu">Item Lookup</button>
+            <button name="DmSite" class="gridButton firstMenu isVi">DmSite</button>
+          </div>
+          
+          <hr>
+          
+          <div id = "stats">
+            <table>
+              <tr>
+                <td>
+                  <div id = "arrows" class = "center">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100">
+                      <image width="100" height="100" xlink:href="images/dPad.png"></image> 
+                      <a id="up">
+                        <rect x="32" y="0" fill="#fff" opacity="0" width="35" height="35"></rect>
+                      </a>
+                      <a id = "left">
+                        <rect x="0" y="33" fill="#fff" opacity="0" width="35" height="35"></rect>
+                      </a>
+                      <a id="right">
+                        <rect x="65" y="33" fill="#fff" opacity="0" width="35" height="35"></rect>
+                      </a> 
+                      <a id="down">
+                        <rect x="33" y="65" fill="#fff" opacity="0" width="35" height="35"></rect>
+                      </a>
+                    </svg>
+                  </div>
+
+                  <div id = "titles">
+                    <h6 class="labelS" id="title">Status: </h6>
+                    <span class="blo"></span>
+                    <button class="inOrDe" name="title">+</button>
+                    <input type = "text" id="status"/>
+                    <button class="inOrDe" name="title">-</button>
+                  </div>
+                </td>
+
+                <td>
+                  <div id = "hp">
+                    <h6 class="labelS">Current Hp:</h6>
+                    <button class="inOrDe" name="current">+</button>
+                    <input class = "numberInput" type = "number" value = "" min = "0" step="1" id = "current"/>
+                    <button class="inOrDe" name="current">-</button>
+                    <h6 id = "max" class="labelS"></h6>
+                    <spam class="blo"></spam>
+                    <h6 class="labelS">Temp Hp:</h6> 
+                    <button class="inOrDe" name="temp">+</button>
+                    <input class = "numberInput" type = "number" value = "" min = "0" step="1" id = "temp"/>
+                    <button class="inOrDe" name="temp">-</button>
+                    <spam class="blo"></spam>
+                    <h6 id="ac" title="AC:" class="labelS" style="display: block; text-align: left;"></h6>
+                    <h6 id="infusionRate" title="Infusion Rate:" class="labelS" style="display: block; text-align: left;"></h6>
+                    <h6 id="inspo" title="Inspiration Dice: " class="labelS hidden" style="display: block; text-align: left;"></h6>
+                  </div>
+                </td>
+              </tr>
+            
+              <tr>
+                <td>
+                  <hr>
+                  <div id="turn">
+                    <h3 class="center">Turn Order:</h3>
+                    <h6 class = "center" id = "currentTurn">Turn: 1</h6>
+                    <hr/>
+                    <div id="turnOrder"></div>
+                  </div>
+                  
+                  <div>
+                    <button class="inOrDe isVi" style="display: inline;" name="turn">↓</button>
+                    <h6 class="center isVi" style="display: inline;">Current Turn</h6>
+                    <button class="inOrDe isVi" name="turn"style="display: inline;">↑</button>
+                  </div>
+                </td>
+                
+                <td style="vertical-align: top; width: 50%;">
+                  <hr>
+                  <div id = "changeToken">
+                    <button id="changeTokenBtn">Change Token</button>
+                  </div>
+
+                  <hr>
+
+                  <div id="quest">
+                    <h6>Quests:</h6>
+                    <div class="card incomplete" id="questCard">
+                      <div class="card-body incomplete">
+                          <h5 id="questTitle" class="card-title color-UP-black"></h5>
+                          <p id="questText" class="card-text incomplete"></p>
+                          <p id="questInstructions"><em><b>Click To See All Quest...</b></em></p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div> 
+
+          <div id = "favorites" style="display: none;">
+            <div class="center">
+              <button name="spellsF" class = "gridButton secondMenu selected">Spells</button>
+              <button name="abilityF" class = "gridButton secondMenu">Abilities</button>
+            </div>
+
+            <div id="spellsF">
+              <button name="0" class = "gridButton spell create">Create New Spell</button>
+            </div>
+
+            <div id="abilityF" style="display: none;">
+              <button name="0" class = "gridButton spell create">Create New Ability</button>
+            </div>
+          </div>
+
+          <div id = "actions" style="display: none;">
+            <div class="center">
+              <button name="spells" class = "gridButton secondMenu selected">Spells</button>
+              <button name="ability" class = "gridButton secondMenu">Abilities</button>
+            </div>
+
+            <div id="spells">
+              <button name="0" class = "gridButton spell">Cantrips</button>
+              <button name="1" class = "gridButton spell">Lvl 1</button>
+              <button name="2" class = "gridButton spell">Lvl 2</button>
+              <button name="3" class = "gridButton spell">Lvl 3</button>
+              <button name="4" class = "gridButton spell">Lvl 4</button>
+              <button name="5" class = "gridButton spell">Lvl 5</button>
+              <button name="6" class = "gridButton spell">Lvl 6</button>
+              <button name="7" class = "gridButton spell">Lvl 7</button>
+              <button name="8" class = "gridButton spell">Lvl 8</button>
+              <button name="9" class = "gridButton spell">Lvl 9</button>
+            </div>
+
+            <div id="ability" style="display: none;">
+              <button name="Artificer" class = "gridButton action">Artificer</button>
+              <button name="Barbarian" class = "gridButton action">Barbarian</button>
+              <button name="Bard" class = "gridButton action">Bard</button>
+              <button name="Cleric" class = "gridButton action">Cleric</button>
+              <button name="Druid" class = "gridButton action">Druid</button>
+              <button name="Fighter" class = "gridButton action">Fighter</button>
+              <button name="Monk" class = "gridButton action">Monk</button>
+              <button name="Paladin" class = "gridButton action">Paladin</button>
+              <button name="Ranger" class = "gridButton action">Ranger</button>
+              <button name="Rogue" class = "gridButton action">Rogue</button>
+              <button name="Sorcerer" class = "gridButton action">Sorcerer</button>
+              <button name="Warlock" class = "gridButton action">Warlock</button>
+              <button name="Witch" class = "gridButton action">Witch</button>
+              <button name="Wizard" class = "gridButton action">Wizard</button>
+              <button name="Weapons" class = "gridButton action">Weapons</button>
+              <button name="Misc" class = "gridButton action">Misc</button>
+              <button name="Infused" class = "gridButton action">Infused Abilities</button>
+            </div>
+          </div>
+
+          <div id = "maps" style="display: none;">
+            <div id="carousel" class="carousel slide" data-ride="carousel">
+              <div class="carousel-inner" style="overflow: scroll;">
+                <div class="carousel-item active">
+                  <img class="d-block center" src="images/maps/mapOfPasc.jpg" alt="Pasc" style="width: 70vw;">
+                </div>
+                <div class="carousel-item">
+                  <img class="d-block center" src="images/maps/Celiso.jpg" alt="Celiso" style="width: 70vw;" >
+                </div>
+                <div class="carousel-item">
+                  <img class="d-block center" src="images/maps/pavv.jpg" alt="Pavv" style="width: 70vw;">
+                </div>
+                <div class="carousel-item">
+                  <img class="d-block center" src="images/maps/icemeet.jpg" alt="Icemeet" style="width: 70vw;">
+                </div>
+              </div>
+              
+               <button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+
+            <hr>
+
+            <div style="margin: 5px;"> 
+                <h6>Waypoints:</h6>
+                <p style="text-indent: 0px;">•  Penrith (Jason's Lab)<br>•  Celiso (Ice Trial)<br>•  Golden Bridge (On the bridge)</p>
+            </div>
+          </div>
+
+          <div id = "skills" style="opacity: 0;">
+            <iframe class="skillTree.html" title="Skill Tree" style="width: 100%; height: 80vh; overflow-x: hidden; overflow-y: scroll;" data-isLoaded="0" id="iFrameSkill"></iframe>
+          </div>
+
+          <div id = "DmSite" style="display: none;">
+            <iframe class="dmSite.html" title="dmSite" style="width: 100%; height: 80vh; overflow-x: hidden; overflow-y: scroll;"></iframe>
+          </div>
+
+          <div id = "notes" style="display: none;">
+            <iframe class="notes.html" title="notes" style="width: 100%; height: 80vh; overflow-x: hidden; overflow-y: scroll;"></iframe>
+          </div>
+
+          <div id = "itemLookup" style="display: none;">
+            <iframe class="itemIndex.html" title="itemLookup" style="width: 100%; height: 80vh; overflow-x: hidden; overflow-y: scroll;"></iframe>
+          </div>
+
+          <div id = "sheet" style="display: none; -webkit-text-size-adjust: none;" draggable="false" class="center">
+            <iframe id="statSheet" class="stats.html" title="stats" style="-webkit-text-size-adjust: none; transform-origin:left top;" draggable="false"></iframe>
+            <button name="zoomSheet" class = "gridButton inOrDe" style="color: white; height: 50px;">+</button>
+		        <button name="zoomSheet" class = "gridButton inOrDe" style="color: white; height: 50px;">-</button>
+          </div>
+
+          <div id="searchDiv" class="center" style="display: none;">
+            <h3 style="display: inline; margin-right: 5px;">Search:</h3>
+            <input style="display: inline; min-width: 20%;" name="search">
+          </div>
+          
+          <div id="cards"></div>
+          <hr>
+          <div class="center">
+            <h3>Roll Dice:</h3>
+            <button class="gridButton diceSelect selected-dice">Basic</button>
+            <button class="gridButton diceSelect">Checks</button>
+            <button class="gridButton diceSelect">Saves</button>
+            <button class="gridButton diceSelect">Misc</button>
+          </div>
+          
+          <div class="center" id="diceRoller" style="margin-top: 10px; margin-bottom: 10px;">
+            <input id="diceToRoll" style="display: inline;" value="1" placeholder="1"/>
+            <p style="display: inline;">d</p>
+            <input id="sides" style="display: inline;" value="20" placeholder="20"/>
+            <p style="display: inline;">+/-</p>
+            <input id = "modifier" style="display: inline;" value="0" placeholder="0"/>
+          </div>
+
+          <div class="center">
+            <select name="adv" id="adv">
+              <option value = "Advantage/Disadvantage">Advantage/Disadvantage</option>
+              <option value = "Advantage">Advantage</option>
+              <option value = "Disadvantage">Disadvantage</option>
+            </select>
+          </div>
+
+          <button id = "rollDice">Roll</button>
+        </div>
+
+        <div id = "discDisplay" class = "bg-UP-purple color-UP-black col-md-12 col-sm-12" style="height: 600px;">
+          <h3>Display</h3>
+          <hr>
+          <iframe class="displayCombat.html" title="dmSite" style="width: 100%; height: 80%; overflow-x: hidden; overflow-y: scroll;"></iframe>
+        </div>
+      </div>
+    
+      <div id = "footer" class = "col-12 bg-UP-blue">
+      </div>
+    </div>
+
+     <!-- Bootstrap JavaScript Components-LOAD LAST -->
+     <script scr="js/bootstrap/scripts.js"></script>
+     <script scr="js/bootstrap/bootstrap.js"></script>
+     <script src="parent.js" type = "module"></script>
+     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+     <script src="js/mapControler.js" type = "module"></script>
+     <script src="src/map.js" type = "module"></script>     
+     <script type="module">
+      var skillsLoaded = false;
+     </script>
+  </body>
+</html>

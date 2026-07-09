@@ -1,0 +1,522 @@
+{
+    "Garrett" : 
+    {
+        "ability1" : 
+        {
+            "name": "Ghostly Beginnings",
+            "desc" : "Your ghost infusion grants you many benefits, and drawbacks. The stronger this side of you get, the less control of your body you have. By unlocking this skill you gain resistance to Cold & Necrotic. You also gain Ghost Mode, an active ability by using an action your ghostly side grows temporally (5 Turns) to boost your abilities. In Ghost Mode you gain the ability to levitate (While on the ground) you can float up to 10 feet off the ground, and can see up to 60 feet in the Ethereal Plane. Ghost mode can be used as many times as you have proficiency bonus. For these benefits you gain 15% Infusion Rate, once you hit 100% you will become permanently your chosen animal/beast forever. When in an interaction that may have your infused side wanting to do something, you must roll a d100 if you roll above your Infusion Rate you resist that action.",
+            "infusionRate" : 15
+        },
+        
+        "ability2" : 
+        {
+            "name" : "Ghost Phasing",
+            "desc" : "Like other ghosts being able to travel through objects and people, with this upgrade you can as well. While in Ghost mode for an action, you are able to move through any solid (non-moving) object / people as long as it is less than 3 feet wide. Your physical body can't go beyond this amount, at least with this much Infusion Rate. For this benefit you gain 10% Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability3" : 
+        {
+            "name" : "Ghost Wildshape",
+            "desc" : "By having your ghostly side take over majority of your body you will be able to wildshape into a ghost (Using ‹a class='nav-link active' aria-current='page' href='wildshape.html?ghost' target=' blank' style='display: inline;'>Ghost</a> D&D 5e Stat Block) for an action, this can be done proficiency bonus / 2 (rounded down) times a day. You can stay a ghost for up to 5 turns or until your HP drops to 0 (Any overflow will go to your normal hp same as druid) Once unwildshaped, you must wait 10 minutes before using the ability again, as your ghost side needs time to recharge. For this benefit you gain 15% infusion rate.",
+            "infusionRate" : 15
+        },
+
+        "ability4" : 
+        {
+            "name" : "Ghostly Possession",
+            "desc" : "By unlocking this you are now able to possess people and items while in Ghost Mode. A humanoid must succeed on a D13 Charisma saving throw, or be possessed by you. Your body fuses into your target and you can pilot the person, you keep your Int, Wis, & Char, but don't gain access to target's knowledge. Once the target's HP drop to 0, or you end on bonus action you are kicked out of the target. When possessing objects, you are able to hear, smell, see, and feel what is around you. You can also vibrate or manipulate objects if they are designed to do so (Flipping a lever, pushing a button). For these benefits you gain 10% infusion rate.",
+            "infusionRate" : 10
+        },
+
+        "ability5" : 
+        {
+            "name" : "Ghostly Etherealness",
+            "desc" : "While in Ghost Mode, you can position your body in between both Material Plane and Ethereal Plane for an action. While in between the two realms you are visible on both planes, yet you can't affect either and they can't affect you. You can regain full access to material plane at any time, or forcefully when Ghost Mode ends. For these benefits you gain an infusion rate of 10%.",
+            "infusionRate" : 10
+        },
+
+        "upgrade1" : 
+        {
+            "name" : "Longer Ghostly Beginings ",
+            "desc" : "By unlocking this your Ghost Mode ability will be able to be held for 10 turns instead of the normal 5. As a bonus you also gain 60 feet of dark vision in both Material and Ethereal plains. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade2" : 
+        {
+            "name" : "Improved Ghost Phasing",
+            "desc" : "By unlocking this your Ghost Mode phasing can go up to 5 feet in depth instead of the normal 3ft. As an extra benefit you are able to phase through moving things now as well. For these benefits you will gain an infusion rate of 10%.",
+            "infusionRate" : 10
+        },
+
+        "upgrade3" : 
+        {
+            "name" : "Improved Ghostly Levitation",
+            "desc" : "By unlocking this your levitation from your Ghost Mode goes up to a full 40 feet and can be activated while midair. For these benefits you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade4" : 
+        {
+            "name" : "Enhanced Ghost Wildshape",
+            "desc" : "By having your ghostly side take over majority of your body you will be able to wildshape into a ghost (Using <a class= 'nav-link active' aria-current= 'page' href='wildshape.html?ghost' target=' blank' style='display: inline;' ›Ghost</a> D&D 5e Stat Block) for an action, this can be done proficiency bonus times a day. You can stay a ghost for up to 10 turns or until your HP drops to 0 (Any overflow will go to your normal hp same as druid) Once unwildshaped, you must wait 5 minutes before using the ability again, as your ghost side needs time to recharge. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        }
+    },
+
+    "Hannah" : 
+    {
+        "ability1" : 
+        {
+            "name": "Scorpion Pointy Tail",
+            "desc" : "Your Scorpion infusion grants you many benefits, and drawbacks. The stronger this side of you gets, the less control of your body you have. By unlocking this skill you gain 15ft of Blindsight, allowing you to sense invisible creatures around you. You also gain Scorpion Mode, an active ability by using an action your Scorpion side grows temporally (5 Turns) to boost your abilities. In Scorpion Mode, you gain the ability to use your tail to sting someone using your proficiency and dex to hit. On a hit you will do 1d10 + dex piercing damage, and the target must make a dc (10+dex+prof) Constitution saving throw, taking 2d6 poison damage on a fail, or half damage on a success. You are also able to use a bonus action to have your tail eject the poison, this can be collected and used at a later date. Scorpion mode can be used as many times as you have a proficiency bonus. For these benefits, you gain 15% Infusion Rate, once you hit 100% you will become permanently your chosen animal/beast forever. When in an interaction that may have your infused side wanting to do something, you must roll a d100 if you roll above your Infusion Rate you resist that action.",
+            "infusionRate" : 15
+        },
+        
+        "ability2" : 
+        {
+            "name" : "Scorpion Storing Energy",
+            "desc" : "Like other Scorpions, you can store your energy as well. When you end your turn in Scorpion Mode, any unused action, bonus action, or reaction can be carried over to your next turn for a max of 2 of each. Reactions carried over this way can be used on the same target. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability3" : 
+        {
+            "name" : "Scorpion Wildshape",
+            "desc" : "By having your Scorpion side take over majority of your body you will be able to wildshape into a Scorpion (Using <a class='nav-link active' aria-current='page' href='wildshape.html?Scorpion' target='_blank' style='display: inline;'>Scorpion</a> D&D 5e Stat Block) for an action, this can be done proficiency bonus / 2 (rounded down) times a day. You can stay a Scorpion for up to 5 turns or until your HP drops to 0 (Any overflow will go to your normal hp same as druid) Once unwildshaped, you must wait 10 minutes before using the ability again, as your Scorpion side needs time to recharge. For these benefits, you gain 15% more Infusion Rate.",
+            "infusionRate" : 15
+        },
+
+        "ability4" : 
+        {
+            "name" : "Resilient Scorpion",
+            "desc" : "By unlocking this you are now able through all terrain (except cold environments) without having any speed impact. For these benefits, you gain 15% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability5" : 
+        {
+            "name" : "Variant Scorpion Poison",
+            "desc" : "While in Scorpion mode when you use your sting ability you can choose to get a random poison effect. Roll a poison of the injury poison list. 1d9 for poison and 1d2 for the strength of that poison. You can also collect this poison like your normal poison collection ability. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade1" : 
+        {
+            "name" : "Longer Scorpion Mode",
+            "desc" : "By unlocking this your Scorpion Mode ability will be able to be held for 10 turns instead of the normal 5. As a bonus you also will gain 25 feet of Blindsight. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade2" : 
+        {
+            "name" : "Improved Scorpion Energy Storage",
+            "desc" : "By unlocking this your Scorpion Mode energy storing can go up to 3 actions, bonus action, and reactions carrying over. As an extra benefit if you didn't move last turn you get an extra 10ft of movement carrying over. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade3" : 
+        {
+            "name" : "Improved Scorpion Poison",
+            "desc" : "By unlocking this on a tail sting success target must make a dc (10+dex+prof) Constitution saving throw, taking 4d6 poison damage on a fail, or half damage on a success. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade4" : 
+        {
+            "name" : "Enhanced Scorpion Wildshape",
+            "desc" : "By unlocking this your Scorpion Wildshape gains stronger giving you many upgrades. You can now wildshape up to your proficiency bonus instead of pb/2. You also can remain in wildshape for up to 10 turns, and only need to wait 5 minutes instead of the 10 to wildshape. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        }
+    },
+
+    "Ben" : 
+    {
+        "ability1" : 
+        {
+            "name" : "Swift Ferret",
+            "desc" : "Your ferret infusion grants you many benefits, and drawbacks. The stronger this side of you gets, the less control of your body you have. By unlocking this skill you gain an advantage on  Wisdom (Perception) checks that rely on hearing or smell. You also gain Ferret Mode, an an active ability by using an action your ferret side grows temporally (5 Turns) to boost your abilities. In Ferret Mode you gain the ability to do an extra bonus action from your excess energy. Also in the Ferret Mode, you can use your action to do a little ferret dance memorizing creatures within 5 feet from you. (Their next turn will be skipped/They will be distracted for the 7 seconds). Ferret mode can be used as many times as you have a proficiency bonus. For these benefits, you gain 15% Infusion Rate, once you hit 100% you will become permanently your chosen animal/beast forever. When in an interaction that may have your infused side wanting to do something, you must roll a d100 if you roll above your Infusion Rate you resist that action.",
+            "infusionRate" : 15
+        },
+        
+        "ability2" : 
+        {
+            "name" : "Quick Ferret Nap",
+            "desc" : "Your ferret side loves naps, these naps help give it the energy and dexterity it needs for survival. While in ferret mode, you can give up an action and a bonus action to heal some of your missing hp. (Current Level + Proficiency Bonus + 1d6) For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability3" : 
+        {
+            "name" : "Ferret Wildshape",
+            "desc" : "By having your ferret side take over the majority of your body you will be able to wildshape into a ferret (Using <a class='nav-link active' aria-current='page' href='wildshape.html?ferret' target='_blank' style='display: inline;'> Enhanced Ferret</a> D&D 5e Stat Block) for an action, this can be done proficiency bonus / 2 (rounded down) times a day. You can stay a ferret for up to 5 turns or until your HP drops to 0 (Any overflow will go to your normal hp same as druid) Once unwildshaped, you must wait 10 minutes before using the ability again, as your ferret side needs time to recharge. For these benefits, you gain 15% more Infusion Rate.",
+            "infusionRate" : 15
+        },
+
+        "ability4" : 
+        {
+            "name" : "Longer Ferret Nap",
+            "desc" : "With your infusion being a big part of you now, longer naps (short rest & long rest) do more healing. By going into Ferret Mode before the rest, you will roll a 1d2. On a one you will heal 1.5 the amount of hp you would for the rest. On a two you will gain the normal hp & 1/2 of the hp that was healed as Temp Hp. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability5" : 
+        {
+            "name" : "Quicken Ferret Action",
+            "desc" : "With unlocking this, you can turn something that would take an action into a bonus action instead. You can do this once a turn while in ferret mode. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade1" : 
+        {
+            "name" : "Longer Ferret Mode",
+            "desc" : "By unlocking this your Ferret Mode ability will be able to be held for 10 turns instead of the normal 5. As a bonus you also will gain +1 to Dex ability score. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade2" : 
+        {
+            "name" : "Enhanced Ferret Nap",
+            "desc" : "By unlocking this your naps in ferret mode does more healing, instead of the normal 1d6 added to level and Proficiency, you will now heal (Current Level + Proficiency + 2d8). For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade3" : 
+        {
+            "name" : "Quicker Ferret Action",
+            "desc" : "By unlocking this your extra bonus action while in Ferret Mode can be an action or bonus action instead. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade4" : 
+        {
+            "name" : "Enhanced Ferret Wildshape",
+            "desc" : "By unlocking this your Ferret Wildshape gains stronger giving you many upgrades. You can now wildshape up to your proficiency bonus instead of pb/2. You also can remain in wildshape for up to 10 turns, and only need to wait 5 minutes instead of the 10 to wildshape. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        }
+    },
+
+    "Okami" : 
+    {
+        "ability1" : 
+        {
+            "name" : "Pixiu's Treasure",
+            "desc" : "Your Pixiu infusion grants you many benefits and drawbacks. The stronger this side of you gets, the less control of your body you have. By unlocking this skill you gain resistance to Necrotic and immunity to being cursed. You also gain Pixiu Mode, an active ability by using an action your Pixiu side grows temporally (5 Turns) to boost your abilities. In Pixiu Mode you can connect (Bind) yourself with someone who is allied with you. As long as you are within 20 feet of this person when they take damage, you can use your reaction to fly at top speed, appearing within 5 feet of them, and push them aside. Making them only take 1/2 the damage and you take the other half. You can change who you are bound to by using a bonus action. Also while in Pixiu Mode you can fly up to 10 feet off the ground and move your normal walking across. Pixiu mode can be used as many times as you have proficiency bonus. For these benefits, you gain 15% Infusion Rate, once you hit 100% you will become permanently your chosen animal/beast forever. When in an interaction that may have your infused side wanting to do something, you must roll a d100 if you roll above your Infusion Rate you resist that action.",
+            "infusionRate" : 15
+        },
+        
+        "ability2" : 
+        {
+            "name" : "Pixiu's Bounded Pact",
+            "desc" : "While in Pixiu mode and bound to a person, your connection will grow stronger with this ability. You and your bond are so connected that any that would affect them will also affect you as well. For example, any healing you gain will heal the same to them as well. This works for bad things as well. If they are put to sleep from a spell you are put to sleep as well until they wake up or your Pixiu Mode expires you will remain in that state. Any active or passive effects will affect the two of you. (Damage taken by any party isn’t shared) You also will gain the ability to telepathically speak to one another within 30 feet of each other. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability3" : 
+        {
+            "name" : "Pixiu Wildshape",
+            "desc" : "By having your Pixiu side take over the majority of your body you will be able to wildshape into a Pixiu (Using <a class='nav-link active' aria-current='page' href='wildshape.html?pixiu' target='_blank' style='display: inline;'>Pixiu</a> 5e Stat Block) for an action, this can be done proficiency bonus / 2 (rounded down) times a day. You can stay a Pixiu for up to 5 turns or until your HP drops to 0 (Any overflow will go to your normal hp same as druid) Once unwildshaped, you must wait 10 minutes before using the ability again, as your Pixiu side needs time to recharge. For these benefits, you gain 15% more Infusion Rate.",
+            "infusionRate" : 15
+        },
+
+        "ability4" : 
+        {
+            "name" : "Pixiu's Hunger for Riches",
+            "desc" : "Pixiu is known for finding gold and giving it to the masters. They are also known to eat their treasures as well. You have been feeling this need to hoard these precious jewels, but with this ability in Pixiu Mode, you can now use these jewelry and money to your advantage. Eating gold will heal you, eating silver will make you more durable, and eating copper will make you more strong for some time. These effects also apply to your bounded pact. For coins, you must eat 5 of them to gain their effect. Eating more will increase duration or impact. (Gold every 5 coins heals you 2d8 + 3 + Proficiency), (Silver every 5 coins gives you temp hp of 2d8 + 3 + Proficiency. Temp Hp given this way can stack), (Copper 5 coins give you +2d6 + 3 + Proficiency more damage on attacks and increases your strength stat by 4 for 1 minute per 5 coins) For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability5" : 
+        {
+            "name" : "Pixiu's Multipact",
+            "desc" : "With this ability unlocked, you can bind to 2 people now instead of one in Pixiu Mode. You can choose to be bound to one or two, to change your bindings you will still use a bonus action. If you have Pixiu’s Bound Pact unlocked you are all linked to one another, they can borrow stats and communicate between themselves or you. You can all three discuss in your mind group chat, and things that affect one of you affect the other two as well. You also now share resistances and proficiencies as well. Etc. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade1" : 
+        {
+            "name" : "Longer Pixiu Mode",
+            "desc" : "By unlocking this your Pixiu Mode ability will be able to be held for 10 turns instead of the normal 5. As a bonus you can also fly up to 30 feet high instead of the 10. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade2" : 
+        {
+            "name" : "Improved Pixiu Pact",
+            "desc" : "By unlocking this ability your Pixiu pact will no longer share the negative effects, only the ones deemed as positive. As a bonus, through your telepathic connection, you both can now share stats from Intelligence, Wisdom, and Charisma. Being that they are giving you the knowledge/advice from their experiences. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade3" : 
+        {
+            "name" : "Improved Pixiu Protection",
+            "desc" : "By unlocking this your Pixiu protection goes from splitting the damage in half between you and your bound to you taking 1/2 and them taking 1/4 of the total damage. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade4" : 
+        {
+            "name" : "Enhanced Pixiu Wildshape",
+            "desc" : "By unlocking this your Pixiu Wildshape gains stronger giving you many upgrades. You can now wildshape up to your proficiency bonus instead of pb/2. You also can remain in wildshape for up to 10 turns, and only need to wait 5 minutes instead of the 10 to wildshape. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        }
+    },
+
+    "Alejandro" : 
+    {
+        "ability1" : 
+        {
+            "name" : "Basilisk's Eyes",
+            "desc" : "Your Basilisk infusion grants you many benefits and drawbacks. The stronger this side of you gets, the less control of your body you have. By unlocking this skill you gain immunity to poison and advantage on Constitution saving throws. You also gain Basilisk Mode, an active ability by using an action your Basilisk side grows temporally (5 Turns) to boost your abilities. In Basilisk Mode you can use an action to do a petrifying stare on creatures looking at you (in a fight this would include anyone fighting you directly, not in a fight anyone who is talking to you would be implied to be looking at you in the eyes. This ability also works on yourself if you see your own eyes). The being must be within 10 feet of you, then they must save on a DC 12 Constitution saving throw. If they fail, the creature magically begins to turn to stone and is restrained. It must repeat the saving throw at the end of its next turn. On a success, the effect ends. On a second failure, the creature is petrified until freed by the greater restoration spell or other magic. You also will gain 30 feet of dark vision in this form. Basilisk mode can be used as many times as you have proficiency bonus. For these benefits, you gain 15% Infusion Rate, once you hit 100% you will become permanently your chosen animal/beast forever. When in an interaction that may have your infused side wanting to do something, you must roll a d100 if you roll above your Infusion Rate you resist that action.",
+            "infusionRate" : 15
+        },
+        
+        "ability2" : 
+        {
+            "name" : "Basilisk's Venom",
+            "desc" : "The venom from a basilisk is one of the most deadly venoms in the world. Once this venom is inside of a being there is little to do to cure it without magic. Of course you are immune to this venom, the only way for you to deploy this is through your teeth. While in Basilisk mode you gain the Basilisk Bite ability, doing 1d10+3 damage on a hit. This will then infect the target, doing 2d6+2 on each of their turns of poison damage. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability3" : 
+        {
+            "name" : "Basilisk Wildshape",
+            "desc" : "By having your Basilisk side take over the majority of your body you will be able to wildshape into a Basilisk (Using <a class='nav-link active' aria-current='page' href='wildshape.html?basilisk' target='_blank' style='display: inline;'>Basilisk</a> 5e Stat Block) for an action, this can be done proficiency bonus / 2 (rounded down) times a day. You can stay a Basilisk for up to 5 turns or until your HP drops to 0 (Any overflow will go to your normal hp same as druid) Once unwildshaped, you must wait 10 minutes before using the ability again, as your Basilisk side needs time to recharge. For these benefits, you gain 15% more Infusion Rate.",
+            "infusionRate" : 15
+        },
+
+        "ability4" : 
+        {
+            "name" : "Basilisk's Fire Breath",
+            "desc" : "Basilisk are also known for their burning hot fire breath. While in Basilisk mode you can use your bonus action to do a fire breath attack. This travels in a line from you for 10 feet. Any creature in this line rolls a DC 13 dexterity saving throw. On a failed save they take 3d6+2 fire damage, or half as much on a success. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability5" : 
+        {
+            "name" : "Basilisk Dripping Venom",
+            "desc" : "With this unlocked, you can now make your teeth drip its venom in Basilisk mode. This can be collected and used to coat weapons, poured into food, or anything you wish. Once this venom is inside a person it will do its normal damage decided from Basilisk Venom's ability. If this ability is still locked it will do 1d6 poison damage a turn, this is incurable by normal means. Only magic can end its effects. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade1" : 
+        {
+            "name" : "Longer Basilisk Mode",
+            "desc" : "By unlocking this your Basilisk Mode ability will be able to be held for 10 turns instead of the normal 5. As a bonus, you also get 60 feet of dark vision instead of 30. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade2" : 
+        {
+            "name" : "Stronger Basilisk Venom",
+            "desc" : "By unlocking this your bite attack goes from 1d10+3 into 2d10+6 and your venom will go from 2d6+2 into 3d6+4 damage each of their turns. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade3" : 
+        {
+            "name" : "Improved Basilisk Vision",
+            "desc" : "By unlocking this your Basilisk petrifying stare goes from 10 feet from you to 30 feet where your locking eyes can turn them to stone. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade4" : 
+        {
+            "name" : "Enhanced Basilisk Wildshape",
+            "desc" : "By unlocking this your Basilisk Wildshape gains stronger giving you many upgrades. You can now wildshape up to your proficiency bonus instead of pb/2. You also can remain in wildshape for up to 10 turns, and only need to wait 5 minutes instead of the 10 to wildshape. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        }
+    }, 
+
+    "Dream" : 
+    {
+        "ability1" : 
+        {
+            "name" : "Vampire Squid's Light",
+            "desc" : "Your Vampire Squid infusion grants you many benefits and drawbacks. The stronger this side of you gets, the less control of your body you have. By unlocking this skill you gain resistance to Cold and can breathe underwater with the help of your gills. You also gain Vampire Squid Mode, an active ability by using an action your Vampire Squid side grows temporally (5 Turns) to boost your abilities. In Vampire Squid Mode you can use a bonus action to make the ends of your tentacles glow in any color you choose, creating 15 feet of light from each. You can also use your action to have your tentacles grab and try to grapple someone within 5 feet of you. The target will do an athletics save, they must beat your (athletics + lv + proficiency) DC. If they don’t they are grappled for the turn. On their next turn, they can use their action to try and break out again. Also while in Vampire Squid Mode you will have darkvision up to 30ft. Vampire Squid mode can be used as many times as you have proficiency bonus. For these benefits, you gain 15% Infusion Rate, once you hit 100% you will become permanently your chosen animal/beast forever. When in an interaction that may have your infused side wanting to do something, you must roll a d100 if you roll above your Infusion Rate you resist that action.",
+            "infusionRate" : 15
+        },
+        
+        "ability2" : 
+        {
+            "name" : "Vampire Squid Bioluminescence Mucus",
+            "desc" : "Like the vampire squid, you too can create a bioluminescence mucus cloud, after unlocking this ability you can use your action in Vampire Squid Mode to spit this mucus on someone within 5ft of you. This mucus will restrain the creature for 1d4 + 1 turns before it starts to dissolve. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability3" : 
+        {
+            "name" : "Vampire Squid Wildshape",
+            "desc" : "By having your Vampire Squid side take over the majority of your body you will be able to wildshape into a Vampire Squid (Using <a class='nav-link active' aria-current='page' href='wildshape.html?vSquid' target='_blank' style='display: inline;'>Vampire Squid</a> 5e Stat Block) for an action, this can be done proficiency bonus / 2 (rounded down) times a day. You can stay a Vampire Squid for up to 5 turns or until your HP drops to 0 (Any overflow will go to your normal hp same as druid) Once unwildshaped, you must wait 10 minutes before using the ability again, as your Vampire Squid side needs time to recharge. For these benefits, you gain 15% more Infusion Rate.",
+            "infusionRate" : 15
+        },
+
+        "ability4" : 
+        {
+            "name" : "Vampire Squid's Teeth",
+            "desc" : "Vampire Squid are known for inverting itself inside out revealing their teeth. You can do this as well. But instead of your mouth, your tentacles will invert revealing teeth. When using a bonus action in Vampire Squid Mode, you can invert them giving you a temporary increase to your AC the increase is by your proficiency modifier and will last till your Vampire Squid mode runs out. If any creature attacks miss they will take 2d4+2 damage from hitting your teeth. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability5" : 
+        {
+            "name" : "Vampire Squid Regeneration",
+            "desc" : "Vampire Squid are known for the regeneration of their arms. You too can gain this ability, while in Vampire Squid Mode at the start of each of your turns, you may roll 2d4+2 and regain that amount of health. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade1" : 
+        {
+            "name" : "Longer Vampire Squid Mode",
+            "desc" : "By unlocking this your Vampire Squid Mode ability will be able to be held for 10 turns instead of the normal 5. As a bonus, you also get 60 feet of darkvision instead of 30. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade2" : 
+        {
+            "name" : "Improved Vampire Squid Mucus",
+            "desc" : "By unlocking this your Vampire Squid Mucus can now reach 10 feet from you and restrain the creature for 2d4 + 3 turns instead of the 1d4 + 1. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade3" : 
+        {
+            "name" : "Improved Vampire Squid Grapple",
+            "desc" : "By unlocking this your Vampire Squid Mode grapple can be used as a bonus action instead of an action. The DC stays at (athletics + lv + proficiency). As a bonus, you gain a swim speed of 30ft in Vampire Squid Mode. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade4" : 
+        {
+            "name" : "Enhanced Vampire Squid Wildshape",
+            "desc" : "By unlocking this your Vampire Squid Wildshape gains stronger giving you many upgrades. You can now wildshape up to your proficiency bonus instead of pb/2. You also can remain in wildshape for up to 10 turns, and only need to wait 5 minutes instead of the 10 to wildshape. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        }
+    },
+
+        "Kody" : 
+    {
+        "ability1" : 
+        {
+            "name" : "Hydra’s More The Merrier",
+            "desc" : "Your Hydra infusion grants you many benefits and drawbacks. The stronger this side of you gets, the less control of your body you have. By unlocking this skill you gain an advantage on Charm and frighten checks, but gain a weakness to fire. You also gain Hydra Mode, an active ability by using an action your Hydra side grows temporally (5 Turns) to boost your abilities. In Hydra Mode when you take 15 points of damage, you will grow a temporary head from the point of impact. Each head you grow will heal you 5 hp. Each of your heads will get a reaction action to bite the nearest creature when walking by dealing a 1d10+proficency bonus with proficiency being added to the accuracy roll. Once the head successfully deals damage or your Hydra mode runs out, the head will dissipate. Also while in Hydra Mode you will have darkvision up to 30ft. Hydra mode can be used as many times as you have proficiency bonus. For these benefits, you gain 15% Infusion Rate, once you hit 100% you will become permanently your chosen animal/beast forever. When in an interaction that may have your infused side wanting to do something, you must roll a d100 if you roll above your Infusion Rate you resist that action.",
+            "infusionRate" : 15
+        },
+        
+        "ability2" : 
+        {
+            "name" : "Hydra’s Extra Head",
+            "desc" : "Like the Hydra, you too will have another permanent head. This head will add 5hp to your max hp. You can have one of the heads resting while the other is awake. Allowing you to be awake during long rest. (Long/short rest benefits will only apply if you are not moving around) While in Hydra Mode, you can use your own reaction to bite the nearest creature when walking by dealing a 1d10+proficency bonus with proficiency being added to the accuracy roll. This head will remain after making a successful attack. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability3" : 
+        {
+            "name" : "Hydra Wildshape",
+            "desc" : "By having your Hydra side take over the majority of your body you will be able to wildshape into a Hydra (Using <a class='nav-link active' aria-current='page' href='wildshape.html?hydra' target='_blank' style='display: inline;'>Hydra</a> 5e Stat Block) for an action, this can be done proficiency bonus / 2 (rounded down) times a day. You can stay a Hydra for up to 5 turns or until your HP drops to 0 (Any overflow will go to your normal hp same as druid) Once unwildshaped, you must wait 10 minutes before using the ability again, as your Hydra side needs time to recharge. For these benefits, you gain 15% more Infusion Rate.",
+            "infusionRate" : 15
+        },
+
+        "ability4" : 
+        {
+            "name" : "Hydra Breathless",
+            "desc" : "Hydra's are also able to hold their breaths for a long time. With this unlocked, you can do this as well. If you have one head you can hold your breath for 30 minutes, but if you have 2 heads you can hold it for 60 minutes. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "ability5" : 
+        {
+            "name" : "Hydra Venomous Bite",
+            "desc" : "Some Hydra's have venom going through their breaths or bite. You too can gain this ability, while in Hydra Mode your bite attack goes to dealing a 1d10+proficency bonus with an extra 2d8+5 acid damage with proficiency being added to the accuracy roll. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade1" : 
+        {
+            "name" : "Longer Hydra Mode",
+            "desc" : "By unlocking this your Hydra Mode ability will be able to be held for 10 turns instead of the normal 5. As a bonus, you also get 60 feet of darkvision instead of 30. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade2" : 
+        {
+            "name" : "Improved Hydra Extra Head",
+            "desc" : "Your extra head will be able to be used as a bonus action or a reaction while in Hydra Mode. Your extra head gives you 10 max hp instead of the normal 5. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade3" : 
+        {
+            "name" : "Improved Hydra Threshold",
+            "desc" : "By unlocking this your Hydra Mode threshold to grow a head goes from 15 to 10 hp lost. As a bonus, your heads now are able to try and bite during your turn. They still can do reaction and will die after dealing damage. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        },
+
+        "upgrade4" : 
+        {
+            "name" : "Enhanced Hydra Wildshape",
+            "desc" : "By unlocking this your Hydra Wildshape gains stronger giving you many upgrades. You can now wildshape up to your proficiency bonus instead of pb/2. You also can remain in wildshape for up to 10 turns, and only need to wait 5 minutes instead of the 10 to wildshape. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate" : 10
+        }
+    },
+
+    "Colin" :
+    {
+        "ability1" :
+        {
+            "name": "All-seeing Rat",
+            "desc": "Your rat infusion grants you many benefits, and drawbacks. The stronger this side gets, the less control over your body. By unlocking this skill, you gain resistance to Poison, but it gives you weakness to cold. You also gain Rat Mode, an active ability; by using an action, your rat side grows temporarily (5 Turns) to boost your abilities. In Rat Mode, you can shrink to Small size, gain advantage on Dexterity (Stealth & Athletics) checks, and have blindsight up to 15ft and 30 ft of Darkvision. As a small creature, you can squeeze into spaces with at least a foot of space. Rat Mode can be used as many times as you have a proficiency bonus. Also in Rat Mode, you can summon a rat companion. You and this companion share a language, “Rat’s speak”, you can give him commands. He is treated as a find familiar, allowing you to cast touch spells through him. You can also use your action to take on his senses, and lose your own. For these benefits, you gain 15% Infusion Rate. Once you hit 100%, you become your chosen beast permanently. In interactions where your infused side wants to act, you must roll a d100; if you roll above your Infusion Rate, you resist.",
+            "infusionRate": 15
+        },
+        "ability2" :
+        {
+            "name": "Rat’s Agility",
+            "desc": "Rats are master escapists. While in Rat Mode, you can take the Disengage or Hide action as a bonus action on each of your turns. Additionally, your movement speed increases by 15 feet. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate": 10
+        },
+        "ability3" :
+        {
+            "name": "Rat’s Wildshape",
+            "desc": "By having your rat side take over the majority of your body, you can wildshape into a Rat (Using <a class='nav-link active' aria-current='page' href='wildshape.html?rat' target='_blank' style='display: inline;'>Rat</a> 5e Stat Block)) for an action. This can be done proficiency bonus / 2 (rounded down) times a day. You can stay a rat for up to 5 turns or until your HP drops to 0. Once unwildshaped, you must wait 10 minutes before using the ability again. For this benefit, you gain 15% infusion rate.",
+            "infusionRate": 15
+        },
+        "ability4" :
+        {
+            "name": "Rat’s Vermin's Bite",
+            "desc": "Like a rat, biting is their main damage. While in Rat Mode, you gain a bite action dealing 5d6 + proficiency bonus + strength piercing damage, and adding strength and proficiency to the accuracy roll. On a hit, the target must make a DC (10 + Dex + Prof) Constitution saving throw or be poisoned for 1 minute. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate": 10
+        },
+        "ability5" :
+        {
+            "name": "Rat Pack Tactics",
+            "desc": "You have learned to capitalize on the presence of your allies. While in Rat Mode, you have advantage on an attack roll against a creature if at least one of your allies is within 10 feet of the creature and the ally isn't incapacitated. For this benefit, you gain 10% more Infusion Rate.",
+            "infusionRate": 10
+        },
+        "upgrade1" :
+        {
+            "name": "Enhanced Rat Mode",
+            "desc": "By unlocking this, your Rat Mode ability will be able to be held for 10 turns instead of the normal 5. As a bonus, you also get 60 feet of darkvision instead of 30, and 30ft of blindsight. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate": 10
+        },
+        "upgrade2" :
+        {
+            "name": "Improved Rat’s Agility",
+            "desc": "Your agility is further enhanced. You gain a climbing speed equal to your walking speed while in Rat Mode. You also gain another 10ft of movement, and advantage on Acrobatics, Athletics, Slight of Hand, Stealth, and Survival Checks, and Dexterity saves.  For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate": 10
+        },
+        "upgrade3" :
+        {
+            "name": "Rat’s Mighty Squeak",
+            "desc": "Upgrading your base Rat Mode, you gain a +2 bonus to AC. You also can summon 5 Rat companions, following the same rules as your original. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate": 10
+        },
+        "upgrade4" :
+        {
+            "name": "Enhanced Rat Wildshape",
+            "desc": "By unlocking this, your Rat Wildshape becomes stronger. You can now wildshape up to your proficiency bonus times a day. You can also remain in wildshape for up to 10 turns, and the cooldown after reverting is reduced to 5 minutes. For these benefits, you gain 10% more Infusion Rate.",
+            "infusionRate": 10
+        }
+    }
+}
+

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name = "description" content = "Skill tree for players">
+    <link rel="shortcut icon" href="images/favicon.png">
+
+    <!-- CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href = "css/Styles.css" rel = "stylesheet" />
+
+    <title>Skill Tree</title>
+  </head>
+  
+  <body style="background: #2A6E8F;">
+    <div class="container">
+      <div id="cover" class = "invisible" style="z-index: 1011; opacity: .98";>
+        <h3 id = "viewTitles" class="center" style="z-index: 1016;"></h3>
+        <p id = "showInstruction" style="padding:10px;"></p>
+        <button id="hideCovers" class= "gridButton" style="z-index: 1012;">Cancel</button>
+        <button id="unlock" class="gridButton invisible" style="z-index: 1013;">Unlock/Ok</button>
+      </div>
+
+      <div class="row align-items-top">
+        <div id = "map" class = "bg-UP-purple color-UP-black col-md-12 col-sm-12 area"> 
+          <img src="images/skillTree.jpg" usemap="#image-map" id="skillImg" style="width: 100%; height: 100%; border: none; margin: 0px;">
+
+          <map name="image-map" id = "tree">
+              <area alt="start1" title="start1" href="" coords="969,551,56" shape="circle">
+              <area alt="ability1" title="ability1" coords="1120,549,47" shape="circle">
+              <area alt="ability2" title="ability2" coords="1245,674,52" shape="circle">
+              <area alt="upgrade2" title="upgrade2" coords="1244,797,49" shape="circle">
+              <area alt="empty1" title="empty1" coords="1370,558,45" shape="circle">
+              <area alt="upgrade1" title="upgrade1" coords="1244,431,52" shape="circle">
+              <area alt="upgrade3" title="upgrade3" coords="1245,292,49" shape="circle">
+              <area alt="ability3" title="ability3" coords="1517,552,49" shape="circle">
+              <area alt="empty2" title="empty2" coords="1517,425,49" shape="circle">
+              <area alt="ability4" title="ability4" coords="1517,289,51" shape="circle">
+              <area alt="empty3" title="empty3" coords="1519,672,49" shape="circle">
+              <area alt="upgrade4" title="upgrade4" coords="1517,794,51" shape="circle">
+              <area alt="empty4" title="empty4" coords="1647,554,49" shape="circle">
+              <area alt="ability5" title="ability5" coords="1770,554,52" shape="circle">
+              <area alt="Dexterity1" title="Dexterity1" coords="812,174,56" shape="circle">
+              <area alt="Wisdom1" title="Wisdom1" coords="812,326,54" shape="circle">
+              <area alt="Intelligence1" title="Intelligence1" coords="812,479,55" shape="circle">
+              <area alt="Constitution1" title="Constitution1" coords="812,623,55" shape="circle">
+              <area alt="Charisma1" title="Charisma1" coords="812,769,54" shape="circle">
+              <area alt="Strength1" title="Strength1" coords="812,908,56" shape="circle">
+              <area alt="Strength2" title="Strength2" coords="676,174,54" shape="circle">
+              <area alt="Intelligence2" title="Intelligence2" coords="676,328,54" shape="circle">
+              <area alt="Wisdom2" title="Wisdom2" coords="676,480,56" shape="circle">
+              <area alt="Charisma2" title="Charisma2" coords="676,625,56" shape="circle">
+              <area alt="Constitution2" title="Constitution2" coords="676,768,56" shape="circle">
+              <area alt="Dexterity2" title="Dexterity2" coords="676,909,56" shape="circle">
+              <area alt="Dexterity3" title="Dexterity3" coords="542,254,56" shape="circle">
+              <area alt="Constitution3" title="Constitution3" coords="542,550,56" shape="circle">
+              <area alt="Strength3" title="Strength3" coords="542,846,54" shape="circle">
+              <area alt="Strength4" title="Strength4" coords="407,144,54" shape="circle">
+              <area alt="Wisdom3" title="Wisdom3" coords="458,388,55" shape="circle">
+              <area alt="Intelligence3" title="Intelligence3" coords="468,695,56" shape="circle">
+              <area alt="Strength5" title="Strength5" coords="407,934,57" shape="circle">
+              <area alt="all1" title="all1" coords="382,542,55" shape="circle">
+              <area alt="Dexterity4" title="Dexterity4" coords="299,398,55" shape="circle">
+              <area alt="Constitution4" title="Constitution4" coords="299,694,55" shape="circle">
+              <area alt="all2" title="all2" coords="225,542,55" shape="circle">
+          </map>
+        </div>
+
+        <div id = "discDisplay" class = "bg-UP-purple color-UP-black col-md-12 col-sm-12" style="height: 800px;">
+          <h3>Currently Active:</h3>
+          <p id="skillDisplay"></p>
+          <hr>
+          <p id="beast" title="Current Infusion Rate:"></p>
+        </div>
+      </div>
+	</div>
+
+     <!-- Bootstrap JavaScript Components-LOAD LAST -->
+     <script src="js/skillTree.js" type="module"></script>
+     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
