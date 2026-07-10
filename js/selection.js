@@ -75,7 +75,6 @@ function userLoggedIn()
     oldToken = wholeChars[player]["token"];
     init();
     charName.value = wholeChars[player]["charName"];
-    setUpCharacters();
 }
 
 function init()
@@ -296,19 +295,16 @@ function handleCreateCustom()
 
 function addBorders()
 {
+    div.appendChild(bord);
+
     for(let i = 0; i < borders.length; i++)
     {
         let color = borders[i][0];
-        borders[i] = document.createElement("img");
-        borders[i].src = borders[i][1];
-        borders[i].id = color;
-        borders[i].classList = "bord";
-        borders[i].onclick = handleChoose;
-    }
-
-    div.appendChild(bord);
-    for(let border of borders)
-    {
+        let border = document.createElement("img");
+        border.src = borders[i][1];
+        border.id = color;
+        border.classList = "bord";
+        border.onclick = handleChoose;
         div.appendChild(border);
     }
 }
