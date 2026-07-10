@@ -105,7 +105,13 @@ function setUpCharacters()
         elem.classList = "hide";
     }
 
-    people.push(player+"-");
+    people.push(player+"-"); 
+
+    if(!people.includes(window.wholeChar[player]["token"]["name"]))
+    {
+        people.push(window.wholeChar[player]["token"]["name"]);
+    }
+
     div.appendChild(char);
 
     addCharacters()
