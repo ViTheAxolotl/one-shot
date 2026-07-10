@@ -461,7 +461,7 @@ function handleGoButton()
         div.classList.add("center"); 
         div.appendChild(loading);
         div.appendChild(loadingGif);
-        setInterval(() => {window.location.href= `map.html`;}, 2000);
+        setInterval(() => {window.location.href= `index.html`;}, 2000);
     }
 }
 
