@@ -52,7 +52,7 @@ onValue(filesRef, (snapshot) =>
     if(firstLoad)
     {
         let temp = imgs["borders"];
-        for(let border of Object.keys(temp)){if(border != "invisible"){borders.push(border);}} //Populates the borders with each border
+        for(let border of Object.keys(temp)){if(border != "invisible"){borders.push([border, temp[border]]);}} //Populates the borders with each border
         firstLoad = false;
         setUpCharacters();
     }
@@ -173,7 +173,7 @@ function addCustomImgs()
 
     let customsBtn = document.createElement("button");
     customsBtn.classList = "gridButton";
-    customsBtn.innerHTML = "Manage Imgs";
+    customsBtn.innerHTML = "Manage/Add Imgs";
     customsBtn.style.width = "100%";
     customsBtn.onclick = handleCustomImg;
     placeBefore(customsBtn, bord);
@@ -298,9 +298,9 @@ function addBorders()
 {
     for(let i = 0; i < borders.length; i++)
     {
-        let color = borders[i];
+        let color = borders[i][0];
         borders[i] = document.createElement("img");
-        borders[i].src = `images/map/tokens/${color}Border.png`;
+        borders[i].src = borders[i][1];
         borders[i].id = color;
         borders[i].classList = "bord";
         borders[i].onclick = handleChoose;
