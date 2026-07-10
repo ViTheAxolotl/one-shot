@@ -54,6 +54,7 @@ onValue(filesRef, (snapshot) =>
         let temp = imgs["borders"];
         for(let border of Object.keys(temp)){if(border != "invisible"){borders.push(border);}} //Populates the borders with each border
         firstLoad = false;
+        setUpCharacters();
     }
 });
 
@@ -92,7 +93,7 @@ function init()
     hp.classList = "blo";
     hp.style.margin = "5px";
 
-    enter.onclick = setUpCharacters;
+    //enter.onclick = setUpCharacters;
     go.onclick = handleGoButton;
 }
 
@@ -141,12 +142,15 @@ function addCharacters()
 {
     for(let char of people)
     {
-        let person = document.createElement("img");
-        person.id = char;
-        person.src = imgs["tokens"][char];
-        person.classList = "char";
-        person.onclick = handleChoose;
-        div.appendChild(person);
+        if(imgs["tokens"][char])
+        {
+            let person = document.createElement("img");
+            person.id = char;
+            person.src = imgs["tokens"][char];
+            person.classList = "char";
+            person.onclick = handleChoose;
+            div.appendChild(person);
+        }
     }
 }
 
