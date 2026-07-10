@@ -107,9 +107,9 @@ function setUpCharacters()
 
     if(imgs["tokens"][player+"-"]){people.push(player+"-");}
 
-    if(!people.includes(window.wholeChars[player]["token"]["name"]))
+    if(!people.includes(wholeChars[player]["token"]["name"]))
     {
-        people.push(window.wholeChars[player]["token"]["name"]);
+        people.push(wholeChars[player]["token"]["name"]);
     }
 
     div.appendChild(char);
