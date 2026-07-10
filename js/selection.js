@@ -2,6 +2,7 @@
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js';
 import { toTitleCase, auth, database, setDoc, clenseInput, deleteDoc, reload, placeBefore } from './viMethods.js';
+import imageCompression from 'https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.mjs';
 
 let player;
 let wholeChars = {};
@@ -227,7 +228,6 @@ function handleCustomImg()
 
     let fileLabel = document.createElement("h6");
     fileLabel.innerHTML = "Upload Image: ";
-    fileLabel.classList = "color-UP-yellow";
     fileLabel.style.margin = "5px";
     fileLabel.style.display = "inline";
 
@@ -243,7 +243,6 @@ function handleCustomImg()
 
     let nameLabel = document.createElement("h6");
     nameLabel.innerHTML = "Nickname: ";
-    nameLabel.classList = "color-UP-yellow";
     nameLabel.style.margin = "5px";
     nameLabel.style.display = "inline";
 
