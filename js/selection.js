@@ -342,7 +342,7 @@ async function handleCreateCustom()
 
         // Update database maps pointing to our newly uploaded asset link
         setDoc(dbPath, downloadURL);
-        setDoc(`playerChar/${player}/token/name/${nickname}`);
+        setDoc(`playerChar/${player}/token/name`, nickname);
         
         alert("Custom Token Successfully Uploaded! Now reloading to be able to apply");
         reload(.5);
