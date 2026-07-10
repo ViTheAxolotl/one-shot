@@ -105,11 +105,11 @@ function setUpCharacters()
         elem.classList = "hide";
     }
 
-    people.push(player+"-"); 
+    if(imgs["tokens"][player+"-"]){people.push(player+"-");}
 
-    if(!people.includes(window.wholeChar[player]["token"]["name"]))
+    if(!people.includes(window.wholeChars[player]["token"]["name"]))
     {
-        people.push(window.wholeChar[player]["token"]["name"]);
+        people.push(window.wholeChars[player]["token"]["name"]);
     }
 
     div.appendChild(char);
