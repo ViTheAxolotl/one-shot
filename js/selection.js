@@ -225,24 +225,39 @@ function handleCustomImg()
     let newDiv = document.createElement("div");
     newDiv.classList.add("center");
 
-    for(let i = 0; i < names.length; i++)
-    {
-        let span = document.createElement("span");
-        span.style.display = "block";
+    let fileLabel = document.createElement("h6");
+    fileLabel.innerHTML = "Upload Image: ";
+    fileLabel.classList = "color-UP-yellow";
+    fileLabel.style.margin = "5px";
+    fileLabel.style.display = "inline";
 
-        let label = document.createElement("h6");
-        label.innerHTML = `${names[i]}:`;
-        label.style.display = "inline";
-        label.style.margin = "5px";
+    let tokenFileInput = document.createElement("input");
+    tokenFileInput.type = "file";
+    tokenFileInput.id = "CustomFileInput";
+    tokenFileInput.accept = "image/*";
+    tokenFileInput.style.margin = "5px";
+    tokenFileInput.style.setProperty("width", "40%", "important");
 
-        objects[i].id = names[i];
-        objects[i].style.margin = "5px";
-        objects[i].style.width = "40%";
-        
-        newDiv.appendChild(label);
-        newDiv.appendChild(objects[i]);
-        newDiv.appendChild(span);
-    }
+    let br = document.createElement("span");
+    br.style.display = "block";
+
+    let nameLabel = document.createElement("h6");
+    nameLabel.innerHTML = "Nickname: ";
+    nameLabel.classList = "color-UP-yellow";
+    nameLabel.style.margin = "5px";
+    nameLabel.style.display = "inline";
+
+    let tokenNameInput = document.createElement("input");
+    tokenNameInput.type = "text";
+    tokenNameInput.id = "Nickname";
+    tokenNameInput.style.margin = "5px";
+    tokenNameInput.style.width = "40%";
+
+    newDiv.appendChild(fileLabel);
+    newDiv.appendChild(tokenFileInput);
+    newDiv.appendChild(br);
+    newDiv.appendChild(nameLabel);
+    newDiv.appendChild(tokenNameInput);
 
     let createBtn = document.createElement("button");
     createBtn.innerHTML = "Create Custom Img";
@@ -280,17 +295,64 @@ function handleDeleteCustom()
     reload(.5);
 }
 
-function handleCreateCustom()
+async function handleCreateCustom()
 {
-    let url = document.getElementById("Url").value;
-    let nickname = document.getElementById("Nickname").value;
-    
-    url = clenseInput(url);
-    nickname = clenseInput(nickname);
-    nickname = "custom-" + nickname;
+    let fileElement = document.getElementById("CustomFileInput");
+    let nicknameInput = document.getElementById("Nickname").value;
+    let dbPath;
+    let storagePath;
 
-    setDoc(`customImages/${nickname}`, {"name" : nickname, "player" : player, "src" : url});
-    reload(.5);
+    if (!fileElement.files || fileElement.files.length === 0) 
+    {
+        alert("Please select a file to upload first!");
+        return;
+    }
+
+    if (!nicknameInput.trim()) 
+    {
+        alert("Please enter a nickname for this custom token!");
+        return;
+    }
+
+    let nickname = clenseInput(nicknameInput);
+    nickname = nickname + "-";
+    dbPath = `files/tokens/${nickname}`;
+    storagePath = `images/map/tokens/${nickname}`;
+
+    // Setup Compression configuration boundaries
+    const compressionOptions = 
+    {
+        maxSizeMB: 0.2,          
+        maxWidthOrHeight: 1024,  
+        useWebWorker: true
+    };
+
+    try 
+    {
+        const compressedFile = await imageCompression(fileElement.files[0], compressionOptions);
+        
+        // Match the token folder tree requirements
+        const storageReference = sRef(storage, storagePath);
+
+        console.log("Pushing compressed element to Cloud storage path: ", storagePath);
+        const snapshot = await uploadBytes(storageReference, compressedFile);
+        
+        // Grab the static production link target
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        // Update database maps pointing to our newly uploaded asset link
+        setDoc(dbPath, downloadURL);
+        
+        alert("Custom Token Successfully Uploaded! Now reloading to be able to apply");
+        reload(.5);
+
+    } 
+    
+    catch (error) 
+    {
+        console.error("Custom token upload transaction process broken: ", error);
+        alert("Upload failed. Check logs for detail.");
+    }
 }
 
 function addBorders()
