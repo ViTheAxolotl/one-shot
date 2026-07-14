@@ -1244,6 +1244,8 @@ function handleGenerate()
         obj["charName"] = element;
         obj["stats"]["name"] = element;
         obj["token"]["id"] = element;
+
+        setDoc(`playerChar/${element}`, obj);
     });
 
     hideButtons();
