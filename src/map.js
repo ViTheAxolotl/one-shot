@@ -421,8 +421,6 @@ function addCharacter(character, update)
             this.classList.add("customImg");
             
             // Force non-standard uploads to scale down safely to the grid cell bounds
-            this.style.setProperty("width", "100%", "important");
-            this.style.setProperty("height", "100%", "important");
             this.style.setProperty("borderRadius", "50%");
             this.style.setProperty("objectFit", "cover");
         }
