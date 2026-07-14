@@ -416,7 +416,7 @@ function addCharacter(character, update)
 
     char[0].onload = function() 
     {
-        if (this.naturalWidth !== 56 || this.naturalHeight !== 56) 
+        if (this.naturalWidth !== 73 || this.naturalHeight !== 73) 
         {
             this.classList.add("customImg");
             
