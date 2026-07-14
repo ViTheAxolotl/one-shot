@@ -410,8 +410,8 @@ function addCharacter(character, update)
     
     if(!tokenImg.includes("custom-")){char[0].src = window.imgs["tokens"][tokenImg];} else{char[0].src = window.wholeCustom[tokenImg]["src"]; char[0].classList.add("customImg");}
     char[0].id = character["id"];
-    char[0].setAttribute("width", "56px");
-    char[0].setAttribute("height", "56px");
+    char[0].style.maxHeight = "100%";
+    char[0].style.maxWidth = "100%";
     char[0].style.borderRadius = "50%";
     char[0].style.objectFit = "cover";
     
