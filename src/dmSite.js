@@ -1237,9 +1237,17 @@ function handleUploadInteractive()
 
 function handleGenerate()
 {
+    let players = ["Mish", "Mistah", "Kha", "Jane"];
+    
+    players.forEach((element) => {
+        let obj = window.top.parent.wholeChar["Okami"]; 
+        obj["charName"] = element;
+        obj["stats"]["name"] = element;
+        obj["token"]["id"] = element;
+    });
+
     hideButtons();
     handleDone();
-    backupFavorites();
 }
 
 function backupFavorites()
