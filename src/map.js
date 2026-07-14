@@ -408,13 +408,11 @@ function addCharacter(character, update)
     else{img.src = window.wholeCustom[image]["src"];} 
     img.onerror = () => {char[0].src = `images/unknown-.png`;};
     
-     else{char[0].src = window.wholeCustom[tokenImg]["src"]; char[0].classList.add("customImg");}
     char[0].src = window.imgs["tokens"][tokenImg];
     char[0].id = character["id"];
     char[0].style.maxHeight = "100%";
     char[0].style.maxWidth = "100%";
-    char[0].style.borderRadius = "50%";
-    char[0].style.objectFit = "cover";
+    
 
     char[0].onload = function() 
     {
@@ -425,6 +423,8 @@ function addCharacter(character, update)
             // Force non-standard uploads to scale down safely to the grid cell bounds
             this.style.setProperty("width", "100%", "important");
             this.style.setProperty("height", "100%", "important");
+            this.style.setProperty("borderRadius", "50%");
+            this.style.setProperty("objectFit", "cover");
         }
     };
     
