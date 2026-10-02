@@ -284,7 +284,7 @@ function handleEdit()
                 let currentBorder = window.top.parent.imgs["borders"][key];
                 let option = document.createElement("option");
                 option.value = key;
-                option.text = currentBorder.slice(currentBorder.indexOf("ns/") + 3).replace("Border.png", "");
+                option.text = key;
                 txtFeilds[i].appendChild(option);
                 txtFeilds[i].onchange = updateBorderPic;
             }
@@ -300,7 +300,7 @@ function handleEdit()
                 let currentBorder = window.top.parent.imgs["tokens"][key];
                 let option = document.createElement("option");
                 option.value = key;
-                option.text = currentBorder.slice(currentBorder.indexOf("ns/") + 3).replace(".png", "");
+                option.text = key;
                 txtFeilds[i].appendChild(option);
                 txtFeilds[i].onchange = updateTokenPic;
             }
