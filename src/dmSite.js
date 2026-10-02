@@ -119,7 +119,7 @@ function handleAdd()
     reset.onclick = handleDone;
 }
 
-function makeToken(key)
+function makeToken(key) 
 {
     let token = [document.createElement("div"), document.createElement("img"), document.createElement("img"), document.createElement("img")];
     token[0].id = `${key.id}-div`;
@@ -128,13 +128,13 @@ function makeToken(key)
     token[0].style.position = "relative";
     token[0].style.minHeight = "82px";
     token[0].style.minWidth = "82px";
-    token[1].src = `images/map/tokens/${key.name}.png`;
+    token[1].src = window.top.parent.imgs["tokens"][key.name];
     token[1].id = key.name;
     token[1].classList = `tokens ${key.name} char`;
-    token[2].src = `images/map/tokens/${key.border}Border.png`;
+    token[2].src = window.top.parent.imgs["borders"][key.border];
     token[2].id = key.border;
     token[2].classList = `tokens ${key.id} border_`;
-    token[3].src = updateHpPic(key.maxHp, key.currentHp);
+    token[3].src = window.top.parent.imgs["tokens"][key.name];
     token[3].id = "hp";
     token[3].classList = `tokens ${key.name} hp`;
     token[2].onclick = handleDeleteOrEdit;
@@ -345,6 +345,7 @@ function handleEdit()
 function updateBorderPic()
 {
     this.parentNode.childNodes[1].src = window.top.parent.imgs["borders"][this[this.selectedIndex].value];
+    this.parentNode.childNodes[1].classList.remove("invisible");
 }
 
 function updateTokenPic()
