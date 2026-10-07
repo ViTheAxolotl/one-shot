@@ -7,14 +7,14 @@ import { getStorage, uploadBytes, getDownloadURL, ref as sRef } from "https://ww
 
 const firebaseApp = initializeApp
 ({
-    apiKey: "AIzaSyArcsmJkXSeuIHMysYtIzRdjIDlKNQA25Y",
-    authDomain: "forgottenrealmsmap.firebaseapp.com",
-    projectId: "forgottenrealmsmap",
-    storageBucket: "forgottenrealmsmap.appspot.com",
-    messagingSenderId: "697902154695",
-    appId: "1:697902154695:web:ffa5c47817f3097c89cfe2",
-    measurementId: "G-Q2W494NRDT",
-    storageBucket: "gs://forgottenrealmsmap.firebasestorage.app"
+    apiKey: "AIzaSyDvuBp4EboXMRbkdp6_YBGn7tq08jAYmvA",
+    authDomain: "one-shot-14fa0.firebaseapp.com",
+    projectId: "one-shot-14fa0",
+    storageBucket: "one-shot-14fa0.firebasestorage.app",
+    messagingSenderId: "222065387269",
+    appId: "1:222065387269:web:f2d0d3d6b2120a279bf96c",
+    measurementId: "G-T98814SJ58",
+    storageBucket: "gs://one-shot-14fa0.firebasestorage.app"
 }); //Connects to database
 
 export let auth = getAuth(); //Logs into accounts
@@ -139,12 +139,10 @@ export function toTitleCase(word)
     if(word.includes(" ")) //More than one word
     {
         word = word.split(" "); 
-        
         for(let singleWord of word)
         {
             if(singleWord != ""){finalWord += `${singleWord[0].toUpperCase() + singleWord.slice(1)} `;} //Capitilize each word in the varible
         }
-        
         finalWord = finalWord.slice(0, finalWord.length - 1);
     }
 
