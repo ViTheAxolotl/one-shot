@@ -586,7 +586,7 @@ function addCharacter(character, update)
             {
                 for(let image of char)
                 {
-                    image.src = "images/map/tokens/invisible-.png";
+                    image.src = window.imgs["tokens"]["invisible-"];
                 }
             }
         }
