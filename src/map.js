@@ -563,7 +563,7 @@ function addCharacter(character, update)
             {
                 for(let image of char)
                 {
-                    image.src = "images/map/tokens/invisible-.png";
+                    image.src = window.imgs["tokens"]["invisible-"];
                 }
             }
 
@@ -676,48 +676,68 @@ function setupExp(num, char, xOrY)
     }
 }
 
-function dup(xOrY, char, character, locations, title)
+function dup(xOrY, char, character, locations, title) 
 {
     let num;
     let dupNum;
     let rotate = "0";
-
+    
     if(xOrY == "x"){dupNum = title.slice(title.indexOf("Dup X"));}
     else{dupNum = title.slice(title.indexOf("Dup Y"));}
+    
     if(title.includes("90")){rotate = "90";}
     else if(title.includes("180")){rotate = "180";}
     else if(title.includes("270")){rotate = "270";}
-
-    if(dupNum[5] != ",")
+    
+    if(dupNum[5] != ",") 
     {
-        if(dupNum[6] != ",")
+        if(dupNum[6] != ",") 
         {
             num = parseInt(dupNum[5] + dupNum[6]);
-        }
-
-        else
+        } 
+        
+        else 
         {
             num = parseInt(dupNum[5]);
         }
-    }
-
-    else
+    } 
+    
+    else 
     {
-        num = 12
+        num = 12;
     }
 
-    if(xOrY == "x"){offSet = map.xPos.indexOf(character["xPos"]);}
-    else{offSet = map.yPos.indexOf(character["yPos"]);}
+    let baseIndex;
+    let posArray;
+    if(xOrY == "x")
+    {
+        posArray = map.xPos;
+        baseIndex = posArray.indexOf(character["xPos"]);
+    } 
+    
+    else 
+    {
+        posArray = map.yPos;
+        baseIndex = posArray.indexOf(character["yPos"]);
+    }
 
-    for(let i = 0; i < num; i++){setupDup(char, character, xOrY, locations, rotate)}
+    if (baseIndex === -1) return;
+
+    // Loop to spawn duplicates extending outward from the base token position
+    for(let i = 1; i <= num; i++) {
+        // Adjust the offset step to correct the rightward bias
+        let currentOffset = (baseIndex - 1) + i; 
+        if (currentOffset >= 0 && currentOffset < posArray.length) {
+            setupDup(char, character, xOrY, locations, rotate, currentOffset);
+        }
+    }
 }
 
-function setupDup(char, character, xOrY, locations, rotate)
+function setupDup(char, character, xOrY, locations, rotate, offSet) 
 {
     let stuffs = [document.createElement("img"), document.createElement("img"), document.createElement("img")];
-    offSet++;
-
-    for(let d = 0; d < 3; d++)
+    
+    for(let d = 0; d < 3; d++) 
     {
         stuffs[d].classList.add("tokens");
         stuffs[d].src = char[d].src;
@@ -725,16 +745,21 @@ function setupDup(char, character, xOrY, locations, rotate)
         stuffs[d].style.transform = `rotate(${rotate}deg)`;
         stuffs[d].classList.add(character["id"]);
         
-        if(xOrY == "x"){placeTokens(map.pos[offSet], locations[1], stuffs[d]);}
-        else{placeTokens(locations[0], map.pos[offSet], stuffs[d]);}
-        
-        switch(d)
+        if(xOrY == "x") 
         {
-            case 0:
-            {
+            placeTokens(map.pos[offSet], locations[1], stuffs[d]);
+        } 
+        
+        else 
+        {
+            placeTokens(locations[0], map.pos[offSet], stuffs[d]);
+        }
+        
+        switch(d) 
+        {
+            case 0: 
                 stuffs[d].classList.add("char");
                 break;
-            }
 
             case 1:
                 stuffs[d].classList.add("border_");
