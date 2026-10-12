@@ -766,25 +766,24 @@ function handleChangeInTurn(direction)
 function moveChar(xPos, yPos)
 {
     let x, y;
-
     x = map.xPos[map.pos.indexOf(xPos)];
     y = map.yPos[map.pos.indexOf(yPos)];
-
-    setDoc(`currentMap/${currentCharacter[0].classList[1]}/xPos`, x);
-    setDoc(`currentMap/${currentCharacter[0].classList[1]}/yPos`, y);
-
-    if(currentCharacter[0].classList[1] == window.player)
+    
+    let currentId = currentCharacter[0].classList[1];
+    
+    setDoc(`currentMap/${currentId}/xPos`, x);
+    setDoc(`currentMap/${currentId}/yPos`, y);
+    
+    if(currentId == window.player)
     {
         setDoc(`playerChar/${window.player}/token/xPos`, x);
         setDoc(`playerChar/${window.player}/token/yPos`, y);
     }
-
-    if(window.wholeDB[currentCharacter[0].classList[1]]["isSummon"])
+    if(window.wholeDB[currentId]["isSummon"])
     {
-        setDoc(`playerChar/Vi/summons/${currentCharacter[0].classList[1]}/xPos`, x);
-        setDoc(`playerChar/Vi/summons/${currentCharacter[0].classList[1]}/yPos`, y);
+        setDoc(`playerChar/Vi/summons/${currentId}/xPos`, x);
+        setDoc(`playerChar/Vi/summons/${currentId}/yPos`, y);
     }
-
 }
 
 /**
@@ -859,28 +858,29 @@ function handleArrow()
         case "up":
             if(bounds[0] < currentPos[1]) //If they are not on the top border
             {
-                moveChar(currentPos[0], currentPos[1] - map.movement);
+                moveChar(currentPos[0], currentPos[1] - map.movement, "up");
             }  
             break;
+        
         
         case "down":
             if(bounds[1] > currentPos[1]) //If they are not on the bottom border
             {
-                moveChar(currentPos[0], currentPos[1] + map.movement);
+                moveChar(currentPos[0], currentPos[1] + map.movement, "down");
             }    
             break;
-
+        
         case "left": 
             if(bounds[0] < currentPos[0]) //If they are not on the left border
             {
-                moveChar(currentPos[0] - map.movement, currentPos[1]);
+                moveChar(currentPos[0] - map.movement, currentPos[1], "left");
             }
             break;
-
+        
         case "right":
             if(bounds[1] > currentPos[0]) //If they are not on the right border
             {
-                moveChar(currentPos[0] + map.movement, currentPos[1]);
+                moveChar(currentPos[0] + map.movement, currentPos[1], "right");
             } 
             break;
     }
