@@ -480,12 +480,12 @@ function addCharacter(character, update)
             {
                 if(image.style.zIndex == "")
                 {
-                    image.style.zIndex = 400;
+                    image.style.zIndex = 1000;
                 }
 
                 else
                 {
-                    image.style.zIndex = `${parseInt(image.style.zIndex) + 300}`;
+                    image.style.zIndex = `${parseInt(image.style.zIndex) + 600}`;
                 }
             }
         }
