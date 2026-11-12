@@ -574,6 +574,13 @@ table, .itemSearch, #itemImg
     cursor: pointer;
 }
 
+/* The sheet zoom scales the iframe down but its layout box stays wide;
+   clip that blank overflow so the page doesn't scroll sideways */
+#sheet
+{
+    overflow-x: clip;
+}
+
 #gridMap, #statSheet
 {
     position: relative;
@@ -1279,6 +1286,16 @@ body.embedded #siteList > #story
     margin: 10px 0px 20px 0px;
     border: solid #0d0907 4px;
     outline: 1px solid var(--brass-dim);
+}
+
+/* Sheets site: the + and trash icons live in these panels, so no photo frame */
+#info #addButton, #hometown #trashcan
+{
+    border: none;
+    outline: none;
+    margin: 10px auto 20px;
+    display: block;
+    cursor: pointer;
 }
 
 #info p, #hometown p, #notes p
