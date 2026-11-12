@@ -513,9 +513,31 @@ table, .itemSearch, #itemImg
 }
 
 /* Battle map */
+/* Map on top, zoom buttons centred in the space left underneath it */
 #gridMapWrapper
 {
+    display: flex;
+    flex-direction: column;
     padding-bottom: 8px;
+}
+
+#gridMapWrapper #gridMap
+{
+    flex: none;
+}
+
+.zoomBar
+{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.zoomBar .gridButton.inOrDe
+{
+    margin: 0;
 }
 
 #gridMap
