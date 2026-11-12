@@ -1098,3 +1098,28 @@ export function setMode(auth)
         mode = data;
     });
 }
+
+// Opening index.html#sheet (the "Character Sheet" link in the name dropdown)
+// jumps straight to the Sheet tab. The tab's click handler is attached by
+// another script, so wait for it before clicking (falls back after 5s).
+function openTabFromHash()
+{
+    if(location.hash != "#sheet"){return;}
+
+    let sheetBtn = document.querySelector('.firstMenu[name="sheet"]');
+    if(!sheetBtn){return;}
+
+    let tries = 0;
+    let timer = setInterval(() =>
+    {
+        tries++;
+        if(sheetBtn.onclick || tries >= 20)
+        {
+            clearInterval(timer);
+            sheetBtn.click();
+        }
+    }, 250);
+}
+
+openTabFromHash();
+window.addEventListener("hashchange", openTabFromHash);

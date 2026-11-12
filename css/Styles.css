@@ -1116,6 +1116,12 @@ body.embedded #siteList > #story
 .stats
 {
     color: var(--ink);
+    font-size: 1rem;        /* sheet keeps its original 16px text size */
+}
+
+#story.stats
+{
+    padding: 10px;
 }
 
 .stats table, .stats td, .stats tr
