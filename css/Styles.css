@@ -514,11 +514,13 @@ table, .itemSearch, #itemImg
 
 /* Battle map */
 /* Map on top, zoom buttons centred in the space left underneath it */
-#gridMapWrapper
+/* no bottom padding, so the gap under the buttons matches the gap above
+   (.row > raises specificity over the phone padding rule further down) */
+.row > #gridMapWrapper
 {
     display: flex;
     flex-direction: column;
-    padding-bottom: 8px;
+    padding-bottom: 0;
 }
 
 #gridMapWrapper #gridMap
