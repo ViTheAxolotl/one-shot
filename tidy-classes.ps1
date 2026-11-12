@@ -28,7 +28,7 @@ $renames = [ordered]@{
     'color-I-label'   = 'text-parchment'
 }
 
-$scriptOnly = @('complete', 'noCircle', 'spell-slot-label', 'spell-check-hidden', 'topHalf', 'inlineDisplay', 'hide')
+$scriptOnly = @('complete', 'spell-slot-label', 'spell-check-hidden', 'hide')
 
 $files = Get-ChildItem -Path $root -Recurse -File -Include *.html, *.js | Where-Object {
     $rel = $_.FullName.Substring($root.Length).TrimStart('\', '/')

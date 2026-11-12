@@ -483,7 +483,7 @@ button[name="favorites"] img
     line-height: 1;
 }
 
-#deleteButton, #text
+#deleteButton, #text, #favoriteBtn
 {
     display: block;
     margin-left: auto;
@@ -495,6 +495,25 @@ button[name="favorites"] img
 {
     width: 75px;
     height: 75px;
+}
+
+/* Favorite star inside a spell card's button (size set inline by mapControler.js) */
+#favoriteBtn
+{
+    margin-top: 0;
+}
+
+/* "Select Targets" / "Use Ability" on a spell card: the go button.
+   mapControler.js sets an inline green; this keeps it green, in the theme */
+#castBtn
+{
+    background: linear-gradient(180deg, #557a3d, var(--moss));
+    border-color: #8fae6a;
+}
+
+#castBtn:hover
+{
+    background: linear-gradient(180deg, #628b47, #4a6e36);
 }
 
 .eOrD
@@ -596,12 +615,6 @@ table, .itemSearch, #itemImg
 .customImg, #story .tokens
 {
     border-radius: 50%;
-}
-
-/* added by your token scripts for square tokens */
-.noCircle
-{
-    border-radius: 0% !important;
 }
 
 #gridMap .customImg
@@ -1010,7 +1023,7 @@ table, .itemSearch, #itemImg
 }
 
 /* Quests: incomplete = red edge, complete = green edge.
-   .complete is swapped in by mapControler.js */
+   Both are set by mapControler.js */
 .complete, .incomplete
 {
     border-radius: var(--radius);
@@ -1197,20 +1210,8 @@ body.embedded #siteList > #story
     margin-bottom: 0px;
 }
 
-/* 12. SPELL SLOTS & OTHER SCRIPT-ONLY CLASSES ---------------------------
-   Nothing in the HTML uses these. They're kept because the scripts you
-   didn't send (stats.js, mapControler.js…) most likely add them.
-   Run tidy-classes.js on the full repo to confirm before deleting. */
-.topHalf input
-{
-    width: 9vw !important;
-    text-align: center;
-}
-
-.inlineDisplay
-{
-    display: inline;
-}
+/* 12. SPELL SLOTS -----------------------------------------------------
+   Built by stats.js (updateCheckboxes) */
 
 .spell-slot-label
 {
