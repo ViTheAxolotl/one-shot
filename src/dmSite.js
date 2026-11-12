@@ -123,7 +123,7 @@ function makeToken(key)
 {
     let token = [document.createElement("div"), document.createElement("img"), document.createElement("img"), document.createElement("img")];
     token[0].id = `${key.id}-div`;
-    token[0].classList = "bg-UP-blue objectBorder";
+    token[0].classList = "bg-oak-deep objectBorder";
     token[0].style.margin = "5px";
     token[0].style.position = "relative";
     token[0].style.minHeight = "82px";
@@ -378,7 +378,7 @@ function resetState()
     div.remove();
     div = document.createElement("div");
     div.id = "story";
-    div.classList = "bg-UP-purple color-UP-black col-md-12 col-sm-12";
+    div.classList = "bg-oak text-parchment col-md-12 col-sm-12";
     placeBefore(div, aboveDiv.childNodes[1]);
 }
 
@@ -610,7 +610,7 @@ function makeTORow(key)
 {
     let TORow = [document.createElement("div"), ["Name", "Order", "Selected"], [document.createElement("h6"), document.createElement("input"), document.createElement("input"), document.createElement("button")]];
     TORow[0].id = `${key.charName}-div`;
-    TORow[0].classList = "bg-UP-grey objectBorder center";
+    TORow[0].classList = "bg-stone objectBorder center";
     TORow[0].style.margin = "5px";
     TORow[0].style.position = "relative";
     TORow[0].style.minHeight = "82px";
@@ -1072,10 +1072,10 @@ function createQuestCard(quest)
         deleteBtn.id = `empty-delete`;
     }
 
-    card.classList = "card color-UP-black bg-UP-blue";
+    card.classList = "card text-parchment bg-oak-deep";
     cardBody.classList = "card-body";
     
-    title.classList = "basicMargin color-UP-black";
+    title.classList = "basicMargin text-parchment";
     title.style.display = "inline";
     
     text.classList = "basicMargin card-text";

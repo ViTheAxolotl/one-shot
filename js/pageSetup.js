@@ -46,8 +46,8 @@ onAuthStateChanged(auth, (user) => {
 
         log = `</ul>
             </div>
-            <a class="nav-link" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="float: right; min-width: 6%;">
-                <button class="link-primary bg-UP-grey" style = "min-width: 70px;">${name}</button
+            <a class="nav-link" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 6%;">
+                <button class="link-primary bg-stone" style = "min-width: 70px;">${name}</button>
             </a>
             <ul class="dropdown-menu bg-dark" style="right: 0; left: auto;" aria-labelledby="navbarScrollingDropdown">
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="${mainLocation}stats.html">Stats</a></li>
@@ -63,7 +63,7 @@ onAuthStateChanged(auth, (user) => {
         // User is signed out
         log = `</ul>
             </div>
-            <a class="navbar-brand" style="float = right" href="${mainLocation}loginPage.html?${url.slice(-1)}"><button class="link-primary bg-UP-grey">Login</button></a>);`;
+            <a class="navbar-brand ms-lg-auto" href="${mainLocation}loginPage.html?${url.slice(-1)}"><button class="link-primary bg-stone">Login</button></a>`;
     }
 
     navBarSetup();
@@ -85,7 +85,7 @@ function navBarSetup()
             <ul class="navbar-nav me-auto my-2 my-lg-0 " style="--bs-scroll-height: 100px;"> 
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="${mainLocation}index.html">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="${mainLocation}selection.html">Change Token</a></li>
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="https://sheets.axol-apps.com/index.html">Standalone Character Sheets</a></li>);    
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="https://sheets.axol-apps.com/index.html">Standalone Character Sheets</a></li>    
                 ${log}
     </div>`;
 

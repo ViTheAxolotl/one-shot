@@ -145,7 +145,7 @@ function createEditableNote(title, text, pos, display)
 function handleCreate()
 {
     let cardDiv = document.createElement("div");
-    cardDiv.setAttribute("class", "card .bg-UP-blue notes");
+    cardDiv.setAttribute("class", "card notes");
     cardDiv.id = `new-div`;
     let cardBody = document.createElement("div");
     cardBody.setAttribute("class", "card-body center");
@@ -184,7 +184,7 @@ function setCardScreen(enter, title, pos, text)
 function createNoteCard(title, text)
 {
     let cardDiv = document.createElement("div");
-    cardDiv.setAttribute("class", "card .bg-UP-blue notes");
+    cardDiv.setAttribute("class", "card notes");
     cardDiv.id = `${title}-div`;
     let cardBody = document.createElement("div");
     cardBody.setAttribute("class", "card-body notes");

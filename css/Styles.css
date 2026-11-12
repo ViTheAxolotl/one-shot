@@ -1,89 +1,365 @@
-body
+/* =====================================================================
+   Infused — table companion styles
+   Theme: lantern-lit dungeon table. Oak & leather panels with brass trim,
+   parchment for anything you'd read (spells, notes, quests, sheets).
+
+   Layout:
+     1. Fonts & tokens          8. Overlay / token viewer
+     2. Base elements           9. Parchment: cards, notes, quests
+     3. Colour helper classes  10. DM tools
+     4. Navbar                 11. Character sheet (stats.html)
+     5. Panels & header        12. Spell slots
+     6. Buttons & states       13. Old pages (oldIndex, recap, login)
+     7. Dashboard              14. Responsive
+   ===================================================================== */
+
+/* 1. FONTS & TOKENS -------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&display=swap');
+
+:root
 {
-    background: url(../images/background.jpg) black;
+    /* surfaces */
+    --night:        #120e0b;   /* behind everything */
+    --oak:          #251b14;   /* panel base */
+    --oak-deep:     #1b140f;   /* insets, wells */
+    --leather:      #4a231c;   /* buttons */
+    --leather-hi:   #61302a;
+    --stone:        #3a332e;   /* small +/- buttons */
+
+    /* metal & paper */
+    --brass:        #c9a24a;
+    --brass-dim:    #7d6230;
+    --brass-glow:   rgba(233, 190, 92, .45);
+    --parchment:    #ecdcb6;   /* text on dark */
+    --parchment-dim:#b9a986;
+    --ink:          #2b1d12;   /* text on paper */
+    --ink-soft:     #5a4430;
+
+    /* meaning */
+    --moss:         #3f5f2e;   /* complete / good */
+    --blood:        #8e2a22;   /* danger / remove */
+
+    --font-display: 'IM Fell English SC', 'IM Fell English', Georgia, serif;
+    --font-title:   'IM Fell English', Georgia, serif;
+    --font-body:    'Alegreya', Georgia, 'Times New Roman', serif;
+
+    --radius:       4px;
+    --frame:        0 0 0 3px #0d0907, 0 0 0 4px var(--brass-dim), 0 14px 30px rgba(0, 0, 0, .55);
 }
 
-.paper
+/* 2. BASE ------------------------------------------------------------- */
+body
 {
-    background: url(../images/bigPaper.jpg) lightgray 100% 100%;
+    background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 176, 84, .10), transparent 70%),
+        linear-gradient(rgba(12, 8, 6, .55), rgba(12, 8, 6, .82)),
+        url(../images/background.jpg) var(--night);
+    background-attachment: fixed;
+    color: var(--parchment);
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    font-variant-numeric: lining-nums;
+}
+
+/* Pages that live inside an iframe on the dashboard blend into the panel */
+body.embedded
+{
+    background: var(--oak);
 }
 
 body * { -webkit-text-size-adjust: none !important; }
 
-.bg-UP-purple
+h1, h2, h3, h4, h5, h6
 {
-    background-color: #2A6E8F !important;
+    text-align: center;
+    margin-bottom: 10px;
+    line-height: 1.2;
 }
 
-.bg-UP-blue
+h1, h2, h3
 {
-    background-color: #5AADE6 !important;
+    font-family: var(--font-display);
+    font-weight: 400;
+    color: #e6c77e;
+    letter-spacing: .02em;
 }
 
-.bg-UP-yellow
+h4, h5
 {
-    background-color: #411759 !important;
+    font-family: var(--font-title);
+    font-weight: 400;
 }
 
-.bg-UP-grey
+h5
 {
-    background-color: rgb(70, 70, 70) !important;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
 }
 
-.bg-UP-white
+h6
 {
-    background-color: white !important;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 1.05rem;
 }
 
-.color-UP-purple
+p
 {
-    color: #2A6E8F;
+    text-indent: 30px;
 }
 
-.color-UP-blue
+a
 {
-    color: #5AADE6;
+    color: #e6c77e;
 }
 
-.color-UP-yellow
+a:hover
 {
-    color: #88008B;
+    color: #fff1c9;
 }
 
-.color-UP-black
+hr
 {
-    color: #000000;
+    border: 0;
+    height: 1px;
+    opacity: 1;
+    background: linear-gradient(90deg, transparent, var(--brass-dim) 20%, var(--brass-dim) 80%, transparent);
+    margin: 14px 0;
 }
 
-.color-I-button
+input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),
+select,
+textarea
 {
-    color: #0D6DFC;
+    background: #f3e7c9;
+    color: var(--ink);
+    border: 1px solid var(--brass-dim);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-family: var(--font-body);
+    font-variant-numeric: lining-nums;
+    box-shadow: inset 0 1px 3px rgba(60, 35, 10, .35);
 }
 
-.color-I-label
+input:focus,
+select:focus,
+textarea:focus
 {
-    color: #455B7D;
+    outline: 2px solid var(--brass);
+    outline-offset: 1px;
 }
 
-#corkBoard
+input[type=checkbox], input[type=radio]
 {
-    background: url(../images/cork-board.jpg) brown;
+    accent-color: var(--leather);
 }
 
+::selection
+{
+    background: var(--brass);
+    color: var(--ink);
+}
+
+/* scrollbars inside panels & iframes */
+*
+{
+    scrollbar-color: var(--brass-dim) var(--oak-deep);
+}
+
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--oak-deep); }
+::-webkit-scrollbar-thumb { background: var(--brass-dim); border: 3px solid var(--oak-deep); border-radius: 8px; }
+::-webkit-scrollbar-corner { background: var(--oak-deep); }
+
+iframe
+{
+    border: 1px solid var(--brass-dim);
+    border-radius: var(--radius);
+    background: var(--oak);
+}
+
+/* 3. COLOUR HELPER CLASSES -------------------------------------------
+   Named after the palette above. Used in the HTML and by the JS. */
+.bg-oak       { background-color: var(--oak) !important; }
+.bg-oak-deep  { background-color: var(--oak-deep) !important; }
+.bg-stone     { background-color: var(--stone) !important; }
+
+.text-parchment { color: var(--parchment); }
+.text-brass     { color: #e6c77e; }
+
+/* 4. NAVBAR ----------------------------------------------------------- */
+.navbar.bg-dark
+{
+    background:
+        linear-gradient(180deg, #1d1611, #120d0a) !important;
+    border-bottom: 1px solid var(--brass-dim);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .5);
+    padding: 6px 0;
+}
+
+.navbar-brand img
+{
+    width: 54px;
+    height: 54px;
+    filter: drop-shadow(0 0 8px rgba(255, 176, 84, .35));
+}
+
+.nav-item
+{
+    text-align: center;
+}
+
+.navbar-nav .nav-link.active, .nav-link
+{
+    color: var(--parchment);
+    font-family: var(--font-title);
+    font-size: 1.15rem;
+    padding: 6px 12px !important;
+    border-bottom: 1px solid transparent;
+}
+
+.navbar-nav .nav-link:hover
+{
+    color: #fff1c9;
+    border-bottom-color: var(--brass);
+}
+
+/* user / login button at the right of the nav */
+.navbar button.link-primary
+{
+    width: auto;
+    margin: 0;
+    padding: 4px 18px;
+    background: transparent !important;
+    color: #e6c77e !important;
+    border: 1px solid var(--brass-dim);
+    border-radius: 999px;
+    font-family: var(--font-title);
+    font-size: 1.05rem;
+    text-decoration: none;
+}
+
+.navbar button.link-primary:hover
+{
+    border-color: var(--brass);
+    background: rgba(201, 162, 74, .12) !important;
+}
+
+.navbar .dropdown-menu.bg-dark
+{
+    background: var(--oak-deep) !important;
+    border: 1px solid var(--brass-dim);
+}
+
+.navbar-primary .navbar-toggler-icon
+{
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(201,162,74,1)' stroke-width='3' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
+
+.navbar-primary .navbar-toggler
+{
+    border-color: var(--brass-dim);
+    width: 56px;
+    margin: 0;
+    background: transparent;
+}
+
+/* 5. PANELS & HEADER -------------------------------------------------- */
+#info, #hometown, #footer, #header, #story, #list, #display, #map,
+#notes, #controls, #discDisplay, #gridMapWrapper, #login
+{
+    border: 1px solid var(--brass-dim);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--frame);
+    background-image:
+        /* brass rivets in each corner */
+        radial-gradient(circle at 9px 9px, #e2c06a 0 2px, #6d5426 2.5px 3px, transparent 3.5px),
+        radial-gradient(circle at calc(100% - 9px) 9px, #e2c06a 0 2px, #6d5426 2.5px 3px, transparent 3.5px),
+        radial-gradient(circle at 9px calc(100% - 9px), #e2c06a 0 2px, #6d5426 2.5px 3px, transparent 3.5px),
+        radial-gradient(circle at calc(100% - 9px) calc(100% - 9px), #e2c06a 0 2px, #6d5426 2.5px 3px, transparent 3.5px),
+        linear-gradient(180deg, rgba(255, 220, 160, .035), rgba(0, 0, 0, .12));
+}
+
+.objectBorder
+{
+    border: 1px solid var(--brass-dim);
+    border-radius: var(--radius);
+    padding: 10px 10px 0px 10px;
+}
+
+/* Inside an iframe the dashboard already supplies the frame */
+body.embedded #story,
+body.embedded #notes,
+body.embedded #map,
+body.embedded #discDisplay
+{
+    border: none;
+    box-shadow: none;
+    background-image: none;
+}
+
+/* Page title: a carved plaque */
 #header
 {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 28px;
+    padding: 18px 16px 14px;
+    background-color: var(--oak-deep) !important;
+}
+
+#header br
+{
+    display: none;
+}
+
+#header h1
+{
+    display: inline-flex;
+    align-items: center;
+    gap: 22px;
+    margin: 0;
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    color: #ecd08c;
+    text-shadow: 0 2px 0 #000, 0 0 22px rgba(236, 208, 140, .25);
+}
+
+#header h1::before,
+#header h1::after
+{
+    content: "";
+    flex: none;
+    width: clamp(48px, 12vw, 170px);
+    height: 14px;
+    /* a rule ending in a small diamond, pointing at the title */
+    background: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 14' preserveAspectRatio='xMaxYMid meet'%3E%3Cpath d='M0 7h150' stroke='%237d6230' stroke-width='1'/%3E%3Cpath d='M152 7l7-6 7 6-7 6z' fill='%23c9a24a'/%3E%3Ccircle cx='143' cy='7' r='2' fill='%23c9a24a'/%3E%3C/svg%3E") right center / auto 100% no-repeat;
+}
+
+#header h1::after
+{
+    transform: scaleX(-1);
 }
 
 #footer
 {
     text-align: center;
-    padding-bottom: 10px;
-    margin: 20px 0px;
+    padding: 10px;
+    margin: 28px 0px;
+    background-color: var(--oak-deep) !important;
+    background-image: none;
 }
 
-#hometown, #info, #quests, #notes
+#footer h6
+{
+    margin: 0;
+    font-size: .9rem;
+    color: var(--parchment-dim);
+    font-weight: 400;
+}
+
+#hometown, #info, #notes
 {
     text-align: center;
 }
@@ -93,221 +369,121 @@ body * { -webkit-text-size-adjust: none !important; }
     margin: 20px 0px 0px 10px;
 }
 
-#search, #item
-{
-    margin-top: 20px;
-}
-
-#info, #list, #quests
+#info, #list
 {
     margin: 20px 10px 0px 0px;
 }
 
-#story, #map, #towns, #controls, #discDisplay, #gridMapWrapper, #login
+#story, #map, #controls, #discDisplay, #gridMapWrapper, #login
 {
-    margin-top: 20px;
+    margin-top: 24px;
 }
 
-p
-{
-    text-indent: 30px;
-}
-
-#info, #hometown, #footer, #header, #story, #list, #display, #map, #towns, #search, #item, #quests, #notes, #controls, #discDisplay, #gridMapWrapper, #login
-{
-    border: #555555 4px solid;
-    padding: 10px;
-}
-
-.objectBorder
-{
-    border: #555555 4px solid;
-    padding: 10px 10px 0px 10px;
-}
-
-h1, h3, h5, h6
-{
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-h5
-{
-    text-decoration: underline;
-}
-
-
+/* 6. BUTTONS & STATES ------------------------------------------------- */
 button
 {
     text-align: center;
     width: 100%;
-    padding: 5px;
+    padding: 6px 10px;
     margin: 5px 0px;
-    background-color: #411759;
-    color: #5AADE6;
+    background: linear-gradient(180deg, var(--leather-hi), var(--leather));
+    color: var(--parchment);
+    border: 1px solid var(--brass-dim);
+    border-radius: var(--radius);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 1.02rem;
+    box-shadow: inset 0 1px 0 rgba(255, 220, 170, .12), 0 2px 0 rgba(0, 0, 0, .45);
+    transition: background-color .15s, border-color .15s, color .15s;
 }
 
-table, .itemSearch, #itemImg, #charImg
+button:hover
 {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    border-color: var(--brass);
+    color: #fff4d6;
+    background: linear-gradient(180deg, #74392f, #55281f);
 }
 
-.itemSearch
+button:active
 {
-    width: 40%;
-    display: block;
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, .5);
 }
 
-.m-bottom-margin
+button:focus-visible
 {
-    margin-bottom: 20px;
+    outline: 2px solid var(--brass);
+    outline-offset: 2px;
 }
 
-#map, #towns
+/* The selected tab / option: brass fill so it reads at a glance */
+.selected, .selected-dice
 {
-    text-align: center;
+    outline: 2px solid var(--brass);
+    outline-offset: -1px;
+    box-shadow: 0 0 12px var(--brass-glow);
 }
 
-#map img, #towns img
+button.selected, button.selected-dice
 {
-    width: 550px;
-    height: 425px;
-    border: solid black 4px;
+    background: linear-gradient(180deg, #e2c06a, #b48d3a);
+    color: var(--ink);
+    border-color: #f1d690;
+    outline: none;
+    box-shadow: 0 0 14px var(--brass-glow), inset 0 1px 0 rgba(255, 255, 255, .4);
 }
 
-table, .itemSearch, #itemImg
+/* Selected token on the map */
+.selected-temp
 {
-    margin-left: auto;
-    margin-right: auto;
+    outline: 3px solid var(--brass);
+    outline-offset: 1px;
+    box-shadow: 0 0 16px 4px var(--brass-glow);
 }
 
-#itemImg
+.gridButton
 {
-    display: block;
-    width: 300px;
-    height: 300px;
-    margin: 10px 0px 20px 0px;
-    border: solid black 4px;
-    margin-left: auto;
-    margin-right: auto;
+    display: inline-block;
+    width: 23%;
+    margin: 4px auto;
 }
 
-#charImg
+/* Small +/- steppers */
+.inOrDe
 {
-    display: none;
-    width: 300px;
-    height: 400px;
-    margin: 10px 0px 20px 0px;
-    border: solid black 4px;
-    margin-left: auto;
-    margin-right: auto;
+    display: inline;
+    width: 10%;
+    min-width: 34px;
+    background: linear-gradient(180deg, #4a423b, var(--stone));
+    color: var(--parchment);
+    font-weight: 700;
+    touch-action: manipulation;
 }
 
-.nav-item
+.inOrDe:hover
 {
-    text-align: center;
+    background: linear-gradient(180deg, #574e46, #433b35);
 }
 
-#hometown img, #info img
+/* Favorites tab: star sized to match the button text (scales with it) */
+button[name="favorites"] img
 {
-    height: fit-content;
-    margin: 10px 0px 20px 0px;
-    border: solid black 4px;
+    height: 1.15em;
+    width: auto;
+    margin: 0;
+    vertical-align: -0.2em;
 }
 
-#towns p, #info p, #hometown p, #quests p, #notes p
+/* Map/sheet zoom buttons are both .gridButton and .inOrDe */
+.gridButton.inOrDe
 {
-    text-align: left;
+    width: 72px;
+    height: 44px !important;
+    font-size: 1.4rem;
+    line-height: 1;
 }
 
-.navbar-primary .navbar-toggler-icon 
-{
-    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(81,0,134, 1)' stroke-width='4' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
-}
-  
-.navbar-primary .navbar-toggler 
-{
-    border-color: #FCC90D; 
-    width: 56px;
-} 
-
-.navbar-nav .nav-link.active, .nav-link
-{
-    color: #0d6efd;
-}
-
-.d-block
-{
-    width: 150vh;
-}
-
-.complete
-{
-    background: green;
-    border-color: black;
-    border-radius: 10%;
-}
-
-.incomplete
-{
-    background: #555555;
-    border-color: black;
-    border-radius: 10%;
-}
-
-.card
-{
-    margin: 10px;
-    border-color: black;
-    border-radius: 10%;
-}
-
-.notes
-{
-    background: url(../images/paper.PNG) #00098C no-repeat;
-    background-size: 800%;    
-    border-color: black;
-    border-radius: 10%;
-    color: black;
-}
-
-.notes h5
-{
-    color: black;
-}
-
-.center
-{
-    text-align: center !important;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.sLink
-{
-    text-decoration: none;
-    margin-left: -25px;
-}
-
-.hide
-{
-    display: none;
-}
-
-#map ul
-{
-    text-align: left;
-}
-
-.unhide
-{
-    display: block;
-}
-
-#deleteButton, #text, #favoriteBtn
+#deleteButton, #text
 {
     display: block;
     margin-left: auto;
@@ -315,53 +491,39 @@ table, .itemSearch, #itemImg
     margin-top: 5px;
 }
 
-#deleteButton, #addButton, #favoriteBtn
+#deleteButton, #addButton
 {
     width: 75px;
     height: 75px;
 }
 
-#jaun
+.eOrD
 {
-    width: 413px;
+    width: 20%;
+    margin: 5px;
 }
 
-#havenport
+/* 7. DASHBOARD -------------------------------------------------------- */
+table, .itemSearch, #itemImg
 {
-    height: 300px;
-    width: 313px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
-#flyer
+/* Battle map */
+#gridMapWrapper
 {
-    height: 300px;
-    width: 325px;
+    padding-bottom: 8px;
 }
 
-.qBCol
+#gridMap
 {
-    width: 49%; 
-}
-#qBCol1
-{
-    float: left;
-}
-
-#qBCol2
-{
-    float: right;
-}
-
-.nail
-{
-    width: 4%;
-    height: 4%;
-}
-
-#arrows img
-{
-    width: 60%;
-    height: 60%;
+    border: 3px solid #0d0907 !important;
+    outline: 1px solid var(--brass-dim);
+    border-radius: 2px;
+    background: #2b2622;
 }
 
 #grid
@@ -378,6 +540,12 @@ table, .itemSearch, #itemImg
     object-fit: cover;
 }
 
+#gridMap
+{
+    transition: transform 0.3s ease;
+    transform-origin: center center;
+}
+
 #gridMap .tokens
 {
     position: absolute;
@@ -392,55 +560,59 @@ table, .itemSearch, #itemImg
     left: 0;
 }
 
-.eOrD
-{
-    width: 20%;
-    margin: 5px;
-}
+.tokens  { z-index: 800; }
+.border_ { z-index: 1000; }
+.hp      { z-index: 900; }
 
 .arrows
 {
     touch-action: manipulation;
 }
 
-.selected, .selected-temp, .selected-dice
+.customImg, #story .tokens
 {
-    border: solid #20b2aa 3px;
+    border-radius: 50%;
+}
+
+/* added by your token scripts for square tokens */
+.noCircle
+{
+    border-radius: 0% !important;
+}
+
+#gridMap .customImg
+{
+    width: 73px;
+    height: 73px;
+}
+
+#story .tokens
+{
+    width: 12vh;
+    height: 12vh;
+}
+
+/* Character name above the tabs */
+#controls #name
+{
+    font-size: clamp(1.8rem, 3.4vw, 2.4rem);
+    margin: 4px 0 14px;
+}
+
+/* Stats tab */
+#stats > table
+{
+    width: 100%;
+}
+
+#stats td
+{
+    padding: 4px 8px;
 }
 
 .blo
 {
     display: block;
-}
-
-.tokens
-{
-    z-index: 800;
-}
-
-.border_
-{
-    z-index: 1000;
-}
-
-.hp
-{
-    z-index: 900;
-}
-
-.inOrDe
-{
-    display: inline;
-    background-color: rgb(70, 70, 70);
-    color: white;
-    width: 10%;
-    touch-action: manipulation;
-}
-
-.numberInput 
-{
-    margin: 5px;
-    width: 15%;
 }
 
 .labelS
@@ -449,20 +621,244 @@ table, .itemSearch, #itemImg
     margin: 5px;
 }
 
-#story span
+#titles .labelS
 {
+    font-size: 1.1rem;
+}
+
+/* Current & Temp HP share one grid so the steppers line up.
+   label | + | value | -   (the label column is as wide as "Current Hp:") */
+#hp
+{
+    display: grid;
+    grid-template-columns: auto 48px 84px 48px;
+    justify-content: start;
+    align-items: center;
+    gap: 8px 6px;
+}
+
+#hp .labelS
+{
+    display: block;
+    margin: 0 6px 0 0;
+    font-size: 1.1rem;
     text-align: left;
 }
 
+#hp .inOrDe, #hp .numberInput
+{
+    width: 100%;
+    min-width: 0;
+    height: 38px;
+    margin: 0;
+}
+
+/* Max HP text is still written by map.js, just not shown */
+#hp #max, #hp .blo
+{
+    display: none;
+}
+
+#ac, #infusionRate, #inspo
+{
+    grid-column: 1 / -1;
+    padding: 2px 0;
+    margin: 0;
+    text-align: left !important;
+}
+
+.numberInput
+{
+    margin: 5px;
+    width: 15%;
+    min-width: 56px;
+    text-align: center;
+}
+
+#status
+{
+    width: 50%;
+}
+
+#arrows svg
+{
+    width: 40%;
+    height: 40%;
+    margin-left: -25%;
+}
+
+#arrows svg
+{
+    max-width: 190px;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .6));
+}
+
+#arrows a
+{
+    cursor: pointer;
+}
+
+/* Turn order: a framed ledger */
+#turn
+{
+    border: 1px solid var(--brass-dim);
+    border-radius: var(--radius);
+    background: var(--oak-deep);
+    box-shadow: inset 0 0 0 3px #120d0a, inset 0 0 22px rgba(0, 0, 0, .6);
+    margin: 5px;
+    padding: 10px 6px;
+}
+
+#turn h3
+{
+    margin-bottom: 2px;
+}
+
+#currentTurn
+{
+    color: var(--parchment-dim);
+    font-weight: 400;
+}
+
+#turnOrder > div
+{
+    border-radius: 3px;
+    padding: 2px 6px;
+    border-bottom: 1px solid rgba(125, 98, 48, .3);
+}
+
+#turnOrder > div.selected
+{
+    background: rgba(201, 162, 74, .14);
+    box-shadow: none;
+    outline: 1px solid var(--brass);
+}
+
+#turnOrder h6
+{
+    font-weight: 500;
+}
+
+#changeTokenBtn
+{
+    margin-top: 0;
+}
+
+/* Sub-menus under Actions / Favorites / Quick Action */
+#spells, #ability, #spellsF, #abilityF, #spellsFQ, #abilityFQ
+{
+    text-align: center;
+}
+
+/* Spell / ability browser search */
+#searchDiv h3
+{
+    vertical-align: middle;
+}
+
+#searchDiv input
+{
+    vertical-align: middle;
+    padding: 4px 10px;
+}
+
+/* Dice roller */
+.center input
+{
+    width: 7%;
+    min-width: 3.6rem;
+    text-align: center;
+}
+
+#diceRoller p
+{
+    text-indent: 0;
+    font-family: var(--font-title);
+    font-size: 1.4rem;
+    color: #e6c77e;
+    margin: 0 4px;
+    vertical-align: middle;
+}
+
+#diceRoller input
+{
+    font-size: 1.15rem;
+    vertical-align: middle;
+}
+
+#adv
+{
+    padding: 4px 8px;
+}
+
+#rollDice
+{
+    margin-top: 12px;
+    padding: 10px;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: .06em;
+    background: linear-gradient(180deg, #7a2f26, #4f1e18);
+    border-color: var(--brass);
+}
+
+#rollDice:hover
+{
+    background: linear-gradient(180deg, #8d382d, #5c231c);
+}
+
+#discDisplay h3
+{
+    font-size: 2rem;
+}
+
+/* Help button */
+#helpBtn
+{
+    position: fixed;
+    bottom: 3%;
+    left: 3%;
+    width: 52px;
+    height: 52px;
+    z-index: 1005;
+    cursor: pointer;
+    border-radius: 50%;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .7)) sepia(.5) saturate(1.3) hue-rotate(-12deg);
+}
+
+/* Maps tab */
+.carousel-inner
+{
+    border-radius: var(--radius);
+}
+
+#carousel .d-block
+{
+    width: 150vh;
+}
+
+/* 8. OVERLAY / TOKEN VIEWER ------------------------------------------- */
 #cover, #spellFrame
 {
-    background-color: grey; 
-    opacity: .95; 
-    position: fixed; 
-    top: 0px; 
+    background-color: rgba(14, 10, 8, .95);
+    opacity: 1;
+    position: fixed;
+    top: 0px;
     left: 0px;
     width: 100%;
     height: 100%;
+    overflow-y: auto;
+    color: var(--parchment);
+}
+
+#cover h3
+{
+    color: #e6c77e !important;
+}
+
+#cover p, #cover li
+{
+    color: var(--parchment);
 }
 
 .veiwTokens
@@ -473,161 +869,226 @@ table, .itemSearch, #itemImg
     width: 24%;
 }
 
-#viewTitle
+#viewTitle, #viewTitles
 {
     position: absolute;
     top: 70%;
     left: 30%;
-    color: black;
+    color: #ecd08c;
+}
+
+#viewTitles
+{
+    position: static;
+    margin-top: 40px;
 }
 
 #hideCover, #quickAction
 {
-    background-color: #FCC90D;
-    color: white;
+    background: linear-gradient(180deg, #e2c06a, #b48d3a);
+    color: var(--ink);
+    border-color: #f1d690;
     width: 20%;
     position: absolute;
     top: 0px;
     left: 80%;
+    margin: 0;
+    border-radius: 0 0 var(--radius) var(--radius);
 }
 
 #quickAction
 {
     left: 59%;
+    background: linear-gradient(180deg, var(--leather-hi), var(--leather));
+    color: var(--parchment);
+    border-color: var(--brass-dim);
 }
 
-.gridButton
+#exitIframe
 {
-    display: inline;
-    width: 23%;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 8px;
 }
 
-#turn
+/* 9. PARCHMENT: CARDS, NOTES, QUESTS ---------------------------------- */
+.paper
 {
-    border: 4px black solid;
-    margin: 5px;
+    background: url(../images/bigPaper.jpg) #e8d6ac;
+    background-size: 100% 100%;
+    color: var(--ink);
 }
 
-#status
+.card
 {
-    width: 50%
+    margin: 10px;
+    border: 1px solid #0d0907;
+    border-radius: var(--radius);
+    background-color: transparent;
 }
 
-#arrows img, #arrows svg
+/* Spell, ability and note cards */
+.notes
 {
-    width: 40%;
-    height: 40%;
-    margin-left: -25%;
+    background: url(../images/bigPaper.jpg) #e8d6ac no-repeat;
+    background-size: 100% 100%;
+    border: 1px solid #6b4a24;
+    border-radius: var(--radius);
+    color: var(--ink);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .45);
 }
 
-.center input
+.notes .notes
 {
-    width: 7%;
+    border: none;
+    box-shadow: none;
+    background: none;
 }
 
-#helpBtn
+#cards .card, #qaCards .card, #notesDisplay .card
 {
-    position: fixed;
-    bottom: 3%;
-    left: 3%;
+    margin: 14px 4px;
 }
 
-.customImg, #story .tokens
+.notes .card-body, .card-body.notes
 {
-    -moz-border-radius: 50%;
-    -webkit-border-radius: 50%;
-    border-radius: 50%;
+    padding: 18px 26px 20px;
 }
 
-.noCircle
+.notes h5, .notes .card-title,
+.paper h1, .paper h3, .paper h5, .paper h6
 {
-    -moz-border-radius: 0% !important;
-    -webkit-border-radius: 0% !important;
-    border-radius: 0% !important;
+    color: var(--ink);
 }
 
-#gridMap .customImg
+.notes h5, .notes .card-title
 {
-    width: 73px;
-    height: 73px;
+    font-family: var(--font-title);
+    font-size: 1.6rem;
+    text-decoration: none;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(90, 68, 48, .45);
 }
 
-#gridMap
+.notes p, .notes li
 {
-    transition: transform 0.3s ease;
-    transform-origin: center center;
+    color: var(--ink);
+    line-height: 1.6;
 }
 
-#story .tokens
+.notes b, .notes strong
 {
-    width: 12vh;
-    height: 12vh;
+    color: #5e1d14;
 }
 
-.dropbtn 
+.notes a
 {
-    background-color: #cccccc;
-    -moz-border-radius: 30%;
-    -webkit-border-radius: 30%;
-    border-radius: 30%;
+    color: #6e2418;
+}
+
+/* Quests: incomplete = red edge, complete = green edge.
+   .complete is swapped in by mapControler.js */
+.complete, .incomplete
+{
+    border-radius: var(--radius);
+}
+
+.card.incomplete, .card.complete
+{
+    background: url(../images/bigPaper.jpg) #e8d6ac;
+    background-size: 100% 100%;
+    color: var(--ink);
+    border: 1px solid #6b4a24;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .45);
+}
+
+.card.complete
+{
+    border-left: 8px solid var(--moss);
+}
+
+.card.incomplete
+{
+    border-left: 8px solid var(--blood);
+}
+
+.card-body.incomplete, .card-body.complete,
+.card-text.incomplete, .card-text.complete
+{
+    background: none;
+    border: none;
+}
+
+.card.incomplete .card-title, .card.complete .card-title,
+.card.incomplete p, .card.complete p, #quest .card h5
+{
+    color: var(--ink) !important;
+}
+
+#questInstructions
+{
+    text-indent: 0;
+    margin: 6px 0 0;
+    color: var(--ink-soft) !important;
+    font-size: .95rem;
+}
+
+#quest > h6
+{
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: #e6c77e;
+    font-weight: 400;
+}
+
+/* 10. DM TOOLS -------------------------------------------------------- */
+.dropbtn
+{
+    background: var(--stone);
+    border-radius: 999px;
     width: 48%;
 }
 
-.ddown 
+.ddown
 {
     position: relative;
 }
 
-.ddown-content 
+.ddown-content
 {
     display: none;
     position: absolute;
-    background-color: #797878;
-    box-shadow: 0px 8px 16px 0px #00000033;
+    background-color: var(--oak-deep);
+    border: 1px solid var(--brass-dim);
+    box-shadow: 0px 8px 16px 0px #00000066;
     z-index: 1;
-    -moz-border-radius: 10%;
-    -webkit-border-radius: 10%;
-    border-radius: 10%;
+    border-radius: var(--radius);
 }
 
-.ddown-content img 
+.ddown-content img
 {
     margin: 5px;
     width: 20%;
     padding-left: 10px;
+    border-radius: 3px;
 }
 
-.ddown-content img:hover 
+.ddown-content img:hover
 {
-    background-color: #888888;
+    background-color: rgba(201, 162, 74, .2);
 }
 
-.ddown:hover .dropbtn 
+.ddown:hover .dropbtn
 {
-    background-color: #797878;
+    background-color: #4a423b;
 }
 
-.ddownShow .ddown-content 
-{
-    display: block;
-}
+.ddownShow .ddown-content { display: block; }
+.ddownHide .ddown-content { display: none; }
 
-.ddownHide .ddown-content 
-{
-    display: none;
-}
-
-.area 
+.area
 {
     position: relative;
-}
-
-.col-md-7
-{
-    flex:0 0 auto;
-    width: 56.8% !important;
 }
 
 .basicMargin
@@ -635,17 +1096,31 @@ table, .itemSearch, #itemImg
     margin: 5px;
 }
 
-/*
-#story input
+/* The DM button board */
+body.embedded #siteList > #story
 {
-    display: inline;
-    width: 25vw;
+    border: 1px solid var(--brass-dim);
+    border-radius: var(--radius);
+    background-color: var(--oak-deep) !important;
+    box-shadow: inset 0 0 0 3px #120d0a;
+    padding: 16px 12px;
+    margin-top: 18px;
 }
-*/
+
+#siteList p
+{
+    text-indent: 0px;
+}
+
+/* 11. CHARACTER SHEET (stats.html) ------------------------------------ */
+.stats
+{
+    color: var(--ink);
+}
 
 .stats table, .stats td, .stats tr
 {
-    border: 1px solid black;
+    border: 1px solid rgba(70, 48, 26, .55);
     padding: 5px;
 }
 
@@ -654,12 +1129,6 @@ table, .itemSearch, #itemImg
     width: 4vw !important;
     text-align: center;
     margin: 5px;
-}
-
-.topHalf input
-{
-    width: 9vw !important;
-    text-align: center;
 }
 
 .stats input[type=radio]
@@ -674,9 +1143,38 @@ table, .itemSearch, #itemImg
     padding: 5px;
 }
 
+.stats h1, .stats h3, .stats h5, .stats h6
+{
+    color: var(--ink);
+}
+
+.stats input:not([type=checkbox]):not([type=radio]),
+.stats select,
+.stats textarea
+{
+    background: rgba(255, 250, 235, .55);
+    box-shadow: none;
+    border-color: rgba(90, 68, 48, .6);
+}
+
+.stats button
+{
+    width: auto;
+}
+
 .statSheet p
 {
     margin-bottom: 0px;
+}
+
+/* 12. SPELL SLOTS & OTHER SCRIPT-ONLY CLASSES ---------------------------
+   Nothing in the HTML uses these. They're kept because the scripts you
+   didn't send (stats.js, mapControler.js…) most likely add them.
+   Run tidy-classes.js on the full repo to confirm before deleting. */
+.topHalf input
+{
+    width: 9vw !important;
+    text-align: center;
 }
 
 .inlineDisplay
@@ -684,95 +1182,154 @@ table, .itemSearch, #itemImg
     display: inline;
 }
 
-#siteList p
+.spell-slot-label
 {
-    text-indent: 0px;
-}
-
-/* The default 'Unchecked' state */
-.spell-slot-label 
-{
-    display: inline-block; 
-    width: 50px; 
-    height: 50px;          
-    background-image: url('../images/spellSlot.png'); 
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background-image: url('../images/spellSlot.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     cursor: pointer;
     margin: 2px;
+    transition: transform .12s;
 }
 
-/* Hover effect so players know it's clickable */
-.spell-slot-label:hover 
+.spell-slot-label:hover
 {
     transform: scale(1.1);
 }
 
-/* The 'Checked' (Used) state */
-/* The '+' selector looks for the label immediately following a checked input */
-.spell-check-hidden:checked + .spell-slot-label 
+.spell-check-hidden:checked + .spell-slot-label
 {
     background-image: url('../images/usedSpellSlot.png');
 }
 
+/* 13. OLD PAGES (oldIndex, recap, login, item lookup) ----------------- */
+.itemSearch
+{
+    width: 40%;
+    display: block;
+}
+
+.m-bottom-margin
+{
+    margin-bottom: 20px;
+}
+
+#map
+{
+    text-align: center;
+}
+
+#map img
+{
+    width: 550px;
+    height: 425px;
+    border: solid #0d0907 4px;
+    outline: 1px solid var(--brass-dim);
+}
+
+#itemImg
+{
+    display: block;
+    width: 300px;
+    height: 300px;
+    margin: 10px auto 20px;
+    border: solid #0d0907 4px;
+    outline: 1px solid var(--brass-dim);
+}
+
+#hometown img, #info img
+{
+    height: fit-content;
+    max-width: 100%;
+    margin: 10px 0px 20px 0px;
+    border: solid #0d0907 4px;
+    outline: 1px solid var(--brass-dim);
+}
+
+#info p, #hometown p, #notes p
+{
+    text-align: left;
+}
+
+#notes #description
+{
+    text-align: center;
+    text-indent: 0;
+}
+
+.center
+{
+    text-align: center !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hide   { display: none; }
+
+#map ul
+{
+    text-align: left;
+}
+
+#jaun { width: 413px; }
+#havenport { height: 300px; width: 313px; }
+
+#story span
+{
+    text-align: left;
+}
+
+/* Login */
+#login h5
+{
+    text-decoration: none;
+    font-size: 1.25rem;
+}
+
+#login input
+{
+    padding: 6px 10px;
+    min-width: 240px;
+}
+
+#login #submit
+{
+    margin-top: 14px;
+}
+
+#login #back
+{
+    background: linear-gradient(180deg, #4a423b, var(--stone));
+}
+
+/* Skill tree */
+#skillImg
+{
+    border-radius: var(--radius);
+}
+
+#skillDisplay, #beast
+{
+    text-indent: 0;
+}
+
+/* Side-by-side panels on oldIndex / recap: shave the 7-col panel so the
+   5-col one still fits next to it with its 10px margin */
+.col-md-7
+{
+    flex: 0 0 auto;
+    width: 56.8% !important;
+}
+
+/* 14. RESPONSIVE ------------------------------------------------------ */
 @media (max-width: 1399px) {
-    .col-md-6
-    {
-        width: 47%;
-    }
+    .col-md-7 { width: 56.5% !important; }
 
-    .col-md-9
-    {
-        width: 73.2%;
-    }
-
-    .col-md-7
-    {
-        flex:0 0 auto;
-        width: 56.5% !important;
-    }
-
-    #arrows img
-    {
-        width: 13%;
-        height: 13%;
-    }
-
-    #arrows #up
-    {
-        margin-left: 14%;
-    }
-
-    .tODiv
-    {
-        width: 10%;
-        height: 10%;
-    }
-
-    .veiwTokens
-    {
-        top: 20%;
-        left: 34%;
-        width: 24%;
-    }
-
-    #turn
-    {
-        width: 70%;
-    }
-
-    #status
-    {
-        width: 50%
-    }
-
-    #arrows img, #arrows svg
-    {
-        width: 40%;
-        height: 40%;
-        margin-left: -25%;
-    }
+    #turn { width: 70%; }
 
     #login h5
     {
@@ -781,75 +1338,27 @@ table, .itemSearch, #itemImg
         margin: 5%;
     }
 
-    #login span 
+    #login span
     {
         display: block;
         margin: 1% 0px;
     }
-  }
+}
 
 @media (max-width: 1199px) {
-    .col-md-6
-    {
-        width: 48.9%;
-    }
+    .col-md-7 { width: 56.2% !important; }
 
-    .col-md-7
-    {
-        flex:0 0 auto;
-        width: 56.2% !important;
-    }
-
-    .col-md-9
-    {
-        width: 72.8%;
-    }
-
-    #hp .labelS
-    {
-        display: inline;
-    }
-
-    .inOrDe
-    {
-        width: 10%;
-        height: 10%;
-    }
-
-    .numberInput 
-    {
-        width: 15%;
-    }
-  }
+    .gridButton { width: 31%; }
+}
 
 @media (max-width: 991px) {
-    .col-md-6
-    {
-        width: 48.6%;
-    }
-
-    .col-md-9
-    {
-        width: 72.2%;
-    }
-
-    .col-md-7
-    {
-        flex:0 0 auto;
-        width: 55.5% !important;
-    }
+    .col-md-7 { width: 55.5% !important; }
 
     #grid
     {
-        margin: 0%; 
+        margin: 0%;
         width: 2200px;
         height: 2200px;
-    }
-
-    #arrows img
-    {
-        width: 27%;
-        height: 27%;
     }
 
     .center input, a button
@@ -857,104 +1366,86 @@ table, .itemSearch, #itemImg
         min-width: 11%;
     }
 
-    #arrows #left
-    {
-        margin-left: 10%;
-    }
-
-    #arrows #up
-    {
-        margin-left: 41%;
-    }
-
-    #info img, #havenport 
+    #info img, #havenport
     {
         height: 140px;
         width: 290px;
     }
 
-    #flyer
-    {
-        width: 300px;
-        height: 204px;
-    }
-
     #helpBtn
     {
-        position: fixed;
-        bottom: 0%;
-        left: 0%;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .col-md-7
-    {
-        flex:0 0 auto;
-        width: 100% !important;
-    }
-    
-    .col-md-6  
-    {
-        width: 47.9% !important;
+        bottom: 12px;
+        left: 12px;
+        width: 44px;
+        height: 44px;
     }
 
-    .col-md-9
+    .navbar-collapse
     {
-        width: 100%;
+        padding: 8px 0;
     }
+
+    .navbar button.link-primary
+    {
+        margin: 6px 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .col-md-7 { width: 100% !important; }
 
     .col-sm-12
     {
         margin: 10px 0px 0px 0px !important;
     }
 
-    #charImg
+    #story, #map, #controls, #discDisplay, #gridMapWrapper, #login
     {
-        height: 250px;
-        width: 180px;
+        margin-top: 22px !important;
     }
 
-    #flyer 
-    {
-        width: 220px;
-        height: 282px;
-    }
-  }
+    .gridButton { width: 48%; }
 
-@media (max-width: 574px) {
-    .col-md-7
+    .gridButton.inOrDe { width: 64px; }
+
+    /* stack the stats table: d-pad/turn order above hp/quests */
+    #stats > table, #stats > table > tbody, #stats > table > tbody > tr, #stats > table > tbody > tr > td
     {
-        flex:0 0 auto;
+        display: block;
         width: 100% !important;
     }
 
-    .col-md-6  
-    {
-        width: 100%;
-    }
+    #turn { width: auto; }
 
-    #info img, #havenport 
+    #arrows svg
+    {
+        width: 50%;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 574px) {
+    body { font-size: 1rem; }
+
+    #info img, #havenport
     {
         height: 201px !important;
         width: 363px;
     }
 
-    #flyer 
-    {
-        width: 280px;
-        height: 282px !important;
-    }
-  }
-
-  @media (max-width: 574px) {
-    #info, #hometown, #story, #list, #display, #quests, #notes, #controls, #discDisplay, #gridMap
+    #info, #hometown, #story, #list, #display, #notes, #controls, #discDisplay, #gridMap
     {
         margin: 0px;
         margin-top: 20px;
     }
 
-    #map img, #towns img
+    #info, #hometown, #footer, #header, #story, #list, #display, #map,
+    #notes, #controls, #discDisplay, #gridMapWrapper, #login
+    {
+        padding: 12px 10px;
+    }
+
+    #map img
     {
         height: 225px;
         width: 325px;
@@ -966,39 +1457,9 @@ table, .itemSearch, #itemImg
         width: 250px;
     }
 
-    #charImg
-    {
-        height: 250px;
-        width: 180px;
-    }
+    .inOrDe { width: 15%; }
 
-    .qBCol
-    {
-        float: none !important;
-        width: 100%;
-    }
-
-    .nail
-    {
-        width: 10%;
-        height: 10%;
-    }
-
-    #hp .labelS
-    {
-        display: block;
-    }
-
-    .inOrDe
-    {
-        width: 15%;
-        height: 30%;
-    }
-
-    .numberInput 
-    {
-        width: 30%;
-    }
+    .numberInput { width: 30%; }
 
     .veiwTokens
     {
@@ -1007,30 +1468,25 @@ table, .itemSearch, #itemImg
         width: 55%;
     }
 
-    #turn
-    {
-        width: 70%;
-    }
+    #status { width: 60%; }
 
-    #status
-    {
-        width: 60%
-    }
-
-    #arrows img, #arrows svg
+    #arrows svg
     {
         width: 70%;
         height: 70%;
         margin-left: 0.1%;
     }
 
-    .ddown-content img 
-    {
-        width: 25%;
-    }
+    .ddown-content img { width: 25%; }
 
-    #CharacterButton
-    {
-        width: 38%;
-    }
-  }
+    #hideCover, #quickAction { width: 38%; left: 62%; }
+    #quickAction { left: 22%; }
+
+    .itemSearch { width: 90%; }
+
+    #login input { min-width: 0; width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #gridMap, button, .spell-slot-label { transition: none; }
+}

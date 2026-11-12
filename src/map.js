@@ -366,7 +366,7 @@ function handleTurnTimer()
     let list = document.createElement("ul");
 
     title.innerHTML = toTitleCase(person);
-    title.classList = "center color-UP-yellow";
+    title.classList = "center text-brass";
 
     back.innerHTML = "<- Back";
     back.onclick = function(){removeTurnOrder(); setTurnOrder();};
@@ -382,7 +382,7 @@ function handleTurnTimer()
         if(skill != "temp")
         {
             let bullet = document.createElement("li");
-            bullet.classList= "color-UP-yellow";
+            bullet.classList= "text-brass";
             bullet.innerHTML = `${skill} | ${skills[skill]["expires"] - window.wholeTO["Var"]["currentTurn"]} turns left active.`;
             list.appendChild(bullet);
         }

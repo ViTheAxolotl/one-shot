@@ -169,7 +169,7 @@ export function createCard(title, text, location)
     if(!quickAction)
     {   
         let cardDiv = document.createElement("div");
-        cardDiv.setAttribute("class", "card .bg-UP-blue notes");
+        cardDiv.setAttribute("class", "card notes");
         let cardBody = document.createElement("div");
         cardBody.setAttribute("class", "card-body notes");
         let cardTitle = document.createElement("h5");
@@ -194,7 +194,7 @@ export function createCard(title, text, location)
     else
     {
         let card = document.createElement("button");
-        card.classList = "center gridButton card-body color-UP-yellow bg-UP-white";
+        card.classList = "center gridButton card-body text-brass bg-oak";
         card.innerHTML = title;
 
         let noteDisplay = document.getElementById(location);

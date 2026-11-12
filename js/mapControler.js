@@ -2190,7 +2190,7 @@ function handleEditCard()
     emptyCards();
 
     let cardDiv = document.createElement("div");
-    cardDiv.setAttribute("class", "card .bg-UP-blue notes");
+    cardDiv.setAttribute("class", "card notes");
     let cardBody = document.createElement("div");
     cardBody.setAttribute("class", "card-body notes");
     let cardTitle = document.createElement("h5");
@@ -2395,7 +2395,7 @@ function handleChangeToken()
         selects[i].style.width = "100%";
 
         let dropBtn = document.createElement("button");
-        dropBtn.classList = `color-I-button dropbtn ${labels[i]}`;
+        dropBtn.classList = `text-brass dropbtn ${labels[i]}`;
         dropBtn.id = `${labels[i]}Button`;
         dropBtn.onclick = handleShowSelect;
         placeBefore(dropBtn, selects[i]);
@@ -2585,7 +2585,7 @@ function handleCustomsButton()
     
     let fileLabel = document.createElement("h6");
     fileLabel.innerHTML = "Upload Image: ";
-    fileLabel.classList = "color-UP-yellow";
+    fileLabel.classList = "text-brass";
     fileLabel.style.margin = "5px";
     fileLabel.style.display = "inline";
 
@@ -2601,7 +2601,7 @@ function handleCustomsButton()
 
     let nameLabel = document.createElement("h6");
     nameLabel.innerHTML = "Nickname: ";
-    nameLabel.classList = "color-UP-yellow";
+    nameLabel.classList = "text-brass";
     nameLabel.style.margin = "5px";
     nameLabel.style.display = "inline";
 
@@ -2845,7 +2845,7 @@ function handleLoadQuests()
         
         card.classList = "card temp-Card";
         cardBody.classList = "card-body";
-        title.classList = "card-title color-UP-black";
+        title.classList = "card-title text-parchment";
         title.innerHTML = questTitle;
         text.innerHTML = questText;
         text.classList = "card-text";
