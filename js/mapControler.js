@@ -124,11 +124,30 @@ export function setWholeCharCont(data)
     if(window.wholeChar[window.player]["zoomSheetLevel"])
     {
         //document.getElementById("statSheet").style.zoom = `${window.wholeChar[player]["zoomSheetLevel"]}%`;
-        document.getElementById("statSheet").style.transform = `scale(${window.wholeChar[window.player]["zoomSheetLevel"]/100})`;
-        document.getElementById("statSheet").style.width = `${100/(window.wholeChar[window.player]["zoomSheetLevel"]/100)}%`;
-        document.getElementById("statSheet").style.marginBottom = `${((window.wholeChar[window.player]["zoomSheetLevel"]/100)-1)*70*9.4}px`;
-        document.getElementById("statSheet").style.height = `${((100/window.wholeChar[window.player]["zoomSheetLevel"]))*50+40}vh`;
+        applySheetZoom(window.wholeChar[window.player]["zoomSheetLevel"]);
     }
+}
+
+/**
+ * Shows the Sheet tab at `level`% zoom. The frame is scaled down from its top-left corner,
+ * so it is made wider and taller by 100/level to still fill the space once shrunk. Its
+ * layout box stays that big, so a negative bottom margin of exactly
+ * (layout height - shown height) pulls the zoom buttons back up under the sheet.
+ */
+function applySheetZoom(level)
+{
+    let frame = document.getElementById("statSheet");
+    if(!frame || !level){return;}
+
+    let scale = level / 100;
+    let layout = (100 / level) * 50 + 40;   //Height before scaling, in vh (same as before)
+    let shown = layout * scale;             //Height it takes on screen
+
+    frame.style.transformOrigin = "left top";
+    frame.style.transform = `scale(${scale})`;
+    frame.style.width = `${100 / scale}%`;
+    frame.style.height = `${layout}vh`;
+    frame.style.marginBottom = `-${layout - shown}vh`;
 }
 
 /**
@@ -622,9 +641,8 @@ function tempHpUpdate()
 function changeValue()
 {
     let cHp = parseInt(currentHp.value);
-    // Note: maxHp is the "/ max" heading, not an input, so .value is undefined and mHp is NaN.
-    // That means the + button doesn't stop at max HP.
-    let mHp = parseInt(maxHp.value);
+    // maxHp is the "/ 24" heading (not an input), so read the number out of its text
+    let mHp = parseInt(maxHp.innerHTML.replace("/", ""));
     let tHp = parseInt(tempHp.value);
     let modifier = this.innerHTML;
 
@@ -1465,8 +1483,6 @@ function handleTargetButton()
 /**
  * A target checkbox changed: highlight or un-highlight that token on the map, and switch
  * the button between "Select Targets" and "Use Ability".
- * Note: `castBtn` here isn't defined in this function (the button was created in
- * handleCardClick), so this relies on the browser treating its id as a global.
  */
 function handleSelectedTarget()
 {
@@ -1486,7 +1502,8 @@ function handleSelectedTarget()
             }
         }
 
-        castBtn.innerHTML = "Use Ability";
+        let castBtn = document.getElementById("castBtn");
+        if(castBtn){castBtn.innerHTML = "Use Ability";}
     }
 
     else
@@ -1502,7 +1519,8 @@ function handleSelectedTarget()
         }
 
 
-        if(selected.length < 1)
+        let castBtn = document.getElementById("castBtn");
+        if(selected.length < 1 && castBtn)
         {
             castBtn.innerHTML = "Select Targets";
         }
@@ -1871,7 +1889,7 @@ function handleUseAction(targets, manual = null)
 
             else{userAddTo = spellOrAttackBonus("@damage")}
 
-            if(document.getElementById("flanking").value == "Flanking!")
+            if(flankingActive())
             {
                 userAddTo = `${parseInt(userAddTo) + 2}`;
                 if(parseInt(userAddTo) > 0){userAddTo = "+" + userAddTo;} else{userAddTo = "-" + userAddTo;}
@@ -1943,7 +1961,7 @@ function handleUseAction(targets, manual = null)
 
             if(document.getElementById("crit"))
             {
-                if(document.getElementById("crit").value == "Activate Crit!")
+                if(critActive())
                 {
                     damage[0] = `${parseInt(damage[0]) * 2}`;
                 }
@@ -1979,8 +1997,8 @@ function handleUseAction(targets, manual = null)
             if(display)
             {
                 display += `\nAccurcy: ${accurcy} to Hit.\n`;
-                if(document.getElementById("crit").value == "Activate Crit!"){display += "- Changed to Crit with the power of Angiorian!\n"}
-                if(document.getElementById("flanking").value == "Flanking!"){display += "- Added +2 to accuracy for flanking with Ally.\n"}
+                if(critActive()){display += "- Changed to Crit with the power of Angiorian!\n"}
+                if(flankingActive()){display += "- Added +2 to accuracy for flanking with Ally.\n"}
                 let roll = accurcy.split("**")[1];
 
                 for(let key in Object.keys(targets))
@@ -1995,14 +2013,14 @@ function handleUseAction(targets, manual = null)
                         ending = "Healing";
                     }
 
-                    else if(parseInt(roll) >= parseInt(ac) || document.getElementById("crit").value == "Activate Crit!")
+                    else if(parseInt(roll) >= parseInt(ac) || critActive())
                     {
                         display += `(Success Hit) ${targets[key].title.split(":")[0]}, `;
                         fail = false; 
                         let hp = damage.split("**")[1];
                         if(window.wholeChar[targets[key].title.split(":")[0]]){let targe = targets[key].title.split(":")[0]; if(window.wholeChar[targe]["rage"] && !description.includes("{noRage") && !spellLevel){let past = damage.slice(damage.indexOf("**") + 2); past = past.slice(0, damage.indexOf("**")); let hp = Math.floor(parseInt(past)/2); damage = damage.replace(past, `${hp}** (1/2 Rage)`);}}
                         handleChangeHp(hp, window.wholeDB[targets[key].title.split(":")[0]], "-");
-                        if(document.getElementById("sneak").value != "Sneak-Attack?"){description += `{@sDice ${Math.floor(parseInt(window.wholeChar[window.player]["stats"]["lv"])/2)}d6} Sneak Attack.`;}
+                        if(sneakActive()){description += `{@sDice ${Math.floor(parseInt(window.wholeChar[window.player]["stats"]["lv"])/2)}d6} Sneak Attack.`;}
                     }
 
                     else
@@ -2021,8 +2039,8 @@ function handleUseAction(targets, manual = null)
                 for(key in Object.keys(targets)){display += `${toTitleCase(targets[key].classList[1])}, `;}
                 display = display.slice(0, display.length - 2);
                 display += `\n${useInfo}\nAccurcy: ${accurcy} to Hit.\n`;
-                if(document.getElementById("crit")){if(document.getElementById("crit").value == "Activate Crit!"){display+= "- Changed to Crit with Angiorian Strength!\n";}}
-                if(document.getElementById("flanking").value == "Flanking!"){display += "- Added +2 to accuracy for flanking with Ally.\n"}
+                if(document.getElementById("crit")){if(critActive()){display+= "- Changed to Crit with Angiorian Strength!\n";}}
+                if(flankingActive()){display += "- Added +2 to accuracy for flanking with Ally.\n"}
                 let roll = accurcy.split("**")[1];
 
                 for(let key in Object.keys(targets))
@@ -2037,13 +2055,13 @@ function handleUseAction(targets, manual = null)
                         ending = "Healing";
                     }
 
-                    else if(parseInt(roll) >= parseInt(ac) || document.getElementById("crit").value == "Activate Crit!")
+                    else if(parseInt(roll) >= parseInt(ac) || critActive())
                     {
                         display += `(Success Hit) ${targets[key].title.split(":")[0]}, `;
                         fail = false; 
                         if(window.wholeChar[targets[key].title.split(":")[0]]){let targe = targets[key].title.split(":")[0]; if(window.wholeChar[targe]["rage"] && !description.includes("{noRage") && !spellLevel){let past = damage.slice(damage.indexOf("**") + 2); past = past.slice(0, damage.indexOf("**")); let hp = parseInt(past)/2; damage = damage.replace(past, `${hp}** (1/2 Rage)`);}}
                         handleChangeHp(damage.split("**")[1], window.wholeDB[targets[key].classList[1]], "-");
-                        if(document.getElementById("sneak")){if(document.getElementById("sneak").value != "Sneak-Attack?"){description += `{@sDice ${Math.floor(parseInt(window.wholeChar[window.player]["stats"]["lv"])/2)}d6} Sneak Attack.`;}}
+                        if(document.getElementById("sneak")){if(sneakActive()){description += `{@sDice ${Math.floor(parseInt(window.wholeChar[window.player]["stats"]["lv"])/2)}d6} Sneak Attack.`;}}
                     }
 
                     else
@@ -2134,7 +2152,7 @@ function handleUseAction(targets, manual = null)
     }
 
     // How long it lasts, in turns, for the turn-order timer.
-    // This uses 1 minute = 9 turns and 1 hour = 514 turns (D&D rounds are 6 seconds, so 10 and 600).
+    // A D&D round is 6 seconds, so 1 minute = 10 turns and 1 hour = 600 turns.
     let timeActive = "0";
 
     if(listOf[lastUse]["duration"]) //spell set turn count down
@@ -2144,11 +2162,11 @@ function handleUseAction(targets, manual = null)
         switch(time[1])
         {
             case "hour":
-                timeActive = parseInt(time[0]) * 514;
+                timeActive = parseInt(time[0]) * 600;
                 break;
 
             case "minute":
-                timeActive = parseInt(time[0]) * 9;
+                timeActive = parseInt(time[0]) * 10;
                 break;
 
             case "round":
@@ -2189,11 +2207,11 @@ function handleUseAction(targets, manual = null)
         switch(cut)
         {
             case "hour":
-                timeActive = parseInt(usedInfo) * 514;
+                timeActive = parseInt(usedInfo) * 600;
                 break;
 
             case "minute":
-                timeActive = parseInt(usedInfo) * 9;
+                timeActive = parseInt(usedInfo) * 10;
                 break;
 
             case "turns":
@@ -2262,6 +2280,29 @@ function spellOrAttackBonus(usage)
     }
 
     return userAddTo;
+}
+
+/**
+ * The crit / Sneak Attack / flanking dropdowns on a card only exist for some players
+ * (crit: Kody and Vi, Sneak Attack: rogues) and not at all for {@respond} rolls.
+ * These read them safely: a missing dropdown just means "not chosen".
+ */
+function critActive()
+{
+    let crit = document.getElementById("crit");
+    return crit != null && crit.value == "Activate Crit!";
+}
+
+function sneakActive()
+{
+    let sneak = document.getElementById("sneak");
+    return sneak != null && sneak.value != "Sneak-Attack?";
+}
+
+function flankingActive()
+{
+    let flanking = document.getElementById("flanking");
+    return flanking != null && flanking.value == "Flanking!";
 }
 
 /**
@@ -2703,9 +2744,6 @@ function handleShowSelect()
 /**
  * "Manage Custom Images": lists the player's uploaded images with Delete buttons, and a
  * form to upload a new one.
- * Note: the Delete buttons point at handleDeleteCustom, which is commented out below, so
- * this stops with an error for players who have custom images. selection.js has a
- * working copy of that function.
  */
 function handleCustomsButton()
 {
@@ -2787,25 +2825,26 @@ function handleCustomsButton()
     placeBefore(cancelBtn, changeTokenBtn);
 }
 
-// Commented-out older version; see the note on handleCustomsButton().
-/**function handleDeleteCustom()
+/**
+ * Delete button in Manage Custom Images: removes that custom image, and any token on the
+ * map still using it goes back to that character's standard picture ("<id>-").
+ */
+function handleDeleteCustom()
 {
     deleteDoc(`customImages/${this.id}`);
-    
-    for(let tokens of Object.keys(window.wholeDB))
-    {
-        if(window.wholeDB[tokens]["name"] == this.id)
-        {
-            let access = document.getElementById("name").innerHTML.toLowerCase();
-            let newToken = window.wholeDB[access];
 
+    for(let token of Object.keys(window.wholeDB))
+    {
+        if(window.wholeDB[token]["name"] == this.id)
+        {
+            let newToken = window.wholeDB[token];
             newToken.name = `${newToken.id}-`;
-            setDoc(`currentMap/${access}`, newToken);
+            setDoc(`currentMap/${token}`, newToken);
         }
-    }   
+    }
 
     reload(.5);
-}*/
+}
 
 /**
  * Uploads a new custom token picture: checks a file and nickname, compresses it to ~0.2 MB,

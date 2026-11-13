@@ -162,20 +162,16 @@ function makeToken(key)
     let token = [document.createElement("div"), document.createElement("img"), document.createElement("img"), document.createElement("img")];
     token[0].id = `${key.id}-div`;
     token[0].classList = "bg-oak-deep objectBorder";
-    token[0].classList = "bg-oak-deep objectBorder";
     token[0].style.margin = "5px";
     token[0].style.position = "relative";
     token[0].style.minHeight = "82px";
     token[0].style.minWidth = "82px";
     token[1].src = window.top.parent.imgs["tokens"][key.name];
-    token[1].src = window.top.parent.imgs["tokens"][key.name];
     token[1].id = key.name;
     token[1].classList = `tokens ${key.name} char`;
     token[2].src = window.top.parent.imgs["borders"][key.border];
-    token[2].src = window.top.parent.imgs["borders"][key.border];
     token[2].id = key.border;
     token[2].classList = `tokens ${key.id} border_`;
-    token[3].src = window.top.parent.imgs["tokens"][key.name];
     token[3].src = window.top.parent.imgs["tokens"][key.name];
     token[3].id = "hp";
     token[3].classList = `tokens ${key.name} hp`;
@@ -342,7 +338,6 @@ function handleEdit()
                 let option = document.createElement("option");
                 option.value = key;
                 option.text = key;
-                option.text = key;
                 txtFeilds[i].appendChild(option);
                 txtFeilds[i].onchange = updateBorderPic;
             }
@@ -358,7 +353,6 @@ function handleEdit()
                 let currentBorder = window.top.parent.imgs["tokens"][key];
                 let option = document.createElement("option");
                 option.value = key;
-                option.text = key;
                 option.text = key;
                 txtFeilds[i].appendChild(option);
                 txtFeilds[i].onchange = updateTokenPic;
@@ -396,7 +390,7 @@ function handleEdit()
     txtFeilds[6].value = curCharacter.yPos;
     txtFeilds[7].value = curCharacter.tempHp;
     txtFeilds[8].value = curCharacter.isSummon;
-    txtFeilds[9].value = curCharacter.ac;
+    txtFeilds[9].value = curCharacter.AC ?? curCharacter.ac ?? ""; //Map tokens store it as AC
     editDiv.appendChild(document.createElement("h6"));
     buttons.forEach(em => {editDiv.appendChild(em)});
 }
@@ -407,7 +401,6 @@ function handleEdit()
 function updateBorderPic()
 {
     this.parentNode.childNodes[1].src = window.top.parent.imgs["borders"][this[this.selectedIndex].value];
-    this.parentNode.childNodes[1].classList.remove("invisible");
     this.parentNode.childNodes[1].classList.remove("invisible");
 }
 
@@ -453,7 +446,6 @@ function resetState()
     div.remove();
     div = document.createElement("div");
     div.id = "story";
-    div.classList = "bg-oak text-parchment col-md-12 col-sm-12";
     div.classList = "bg-oak text-parchment col-md-12 col-sm-12";
     placeBefore(div, aboveDiv.childNodes[1]);
 }
@@ -545,28 +537,15 @@ function handleQuick()
 }
 
 /**
- * Saves the new current HP for one token from the Quick Change Hp list.
- * Note: it rewrites the whole token, and leaves out tempHp and isSummon, and reads AC from
- * `.ac` (the map stores it as `AC`). Those values are lost when this is used.
+ * Saves the new current HP for one token from the Quick Change Hp list. Only currentHp is
+ * written, so temp HP, AC, summon flag and everything else on the token stay as they are.
  */
 function quickUpdate()
 {
     let i = this.id;
     let newHp = document.getElementById('newHp_' + i);
 
-    setDoc(`currentMap/${i}`,
-    {
-        border : window.top.parent.wholeDB[i].border,
-        currentHp : newHp.value,
-        maxHp : window.top.parent.wholeDB[i].maxHp,
-        map : "",
-        id : i,
-        name : window.top.parent.wholeDB[i].name,
-        title : window.top.parent.wholeDB[i].title,
-        xPos : window.top.parent.wholeDB[i].xPos,
-        yPos : window.top.parent.wholeDB[i].yPos,
-        AC: window.top.parent.wholeDB[i].ac
-    });
+    setDoc(`currentMap/${i}/currentHp`, newHp.value);
 
     resetQuick();
 }
@@ -733,7 +712,6 @@ function makeTORow(key)
 {
     let TORow = [document.createElement("div"), ["Name", "Order", "Selected"], [document.createElement("h6"), document.createElement("input"), document.createElement("input"), document.createElement("button")]];
     TORow[0].id = `${key.charName}-div`;
-    TORow[0].classList = "bg-stone objectBorder center";
     TORow[0].classList = "bg-stone objectBorder center";
     TORow[0].style.margin = "5px";
     TORow[0].style.position = "relative";
@@ -1257,10 +1235,8 @@ function createQuestCard(quest)
     }
 
     card.classList = "card text-parchment bg-oak-deep";
-    card.classList = "card text-parchment bg-oak-deep";
     cardBody.classList = "card-body";
     
-    title.classList = "basicMargin text-parchment";
     title.classList = "basicMargin text-parchment";
     title.style.display = "inline";
     
@@ -1319,7 +1295,6 @@ function handleCreateQuest()
 
 /**
  * Reads every quest card and replaces the whole quest list (playerChar/Vi/quests).
- * Note: wait(4, handleDone()) runs handleDone straight away; wait(4, handleDone) would wait 4s.
  */
 function uploadQuests()
 {
@@ -1342,7 +1317,7 @@ function uploadQuests()
     }
 
     setDoc("playerChar/Vi/quests", quests);
-    wait(4, handleDone());
+    wait(4, handleDone); //Give the save a moment before reloading
 }
 
 /**
@@ -1747,8 +1722,8 @@ function addDone()
 /**
  * Saves the token from the edit form. A new token whose id is taken gets a number added.
  * It goes to currentMap/<id>, or preset/<id> when editing presets.
- * Note: the summon check above `let table` would crash if it ever ran (table isn't declared
- * yet), but isSummon comes from a text box as "true"/"false", so `s == true` is never true.
+ * The isSummon box is text, so it's saved as a real true/false: the string "false" would
+ * count as true everywhere the site checks isSummon.
  */
 function addToken()
 {
@@ -1776,10 +1751,7 @@ function addToken()
         mode = "none";
     }
 
-    if(s == true)
-    {
-        table = `playerChar/Vi/summons/summonPreset/${id}`;
-    }
+    s = (s === true || `${s}`.trim().toLowerCase() == "true"); //Text box -> true/false
 
     let table = `currentMap/${id}`;
     if(mode == "preset")
@@ -1848,5 +1820,4 @@ function handleRefreshUpload()
     alert("Done");
 }
 
-// Note: init() runs immediately here (the () calls it); setTimeout(init, 1000) would wait 1s.
-setTimeout(init(), 1000);
+init(); //Hook up the DM buttons

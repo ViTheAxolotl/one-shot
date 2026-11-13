@@ -96,7 +96,7 @@ function init()
 {
     setInterval(timer, 250);
 
-    document.getElementById("helpBtn").onclick = handleCharClick;
+    document.getElementById("helpBtn").onclick = function(){handleViewTokens(this);}; //Opens the instructions overlay
     document.getElementById("hideCover").onclick = hideCover; 
 
     let iFrames = document.getElementsByTagName("iframe");
@@ -442,7 +442,6 @@ function handleTurnTimer()
 
     title.innerHTML = toTitleCase(person);
     title.classList = "center text-brass";
-    title.classList = "center text-brass";
 
     back.innerHTML = "<- Back";
     back.onclick = function(){removeTurnOrder(); setTurnOrder();};
@@ -458,7 +457,6 @@ function handleTurnTimer()
         if(skill != "temp")
         {
             let bullet = document.createElement("li");
-            bullet.classList= "text-brass";
             bullet.classList= "text-brass";
             bullet.innerHTML = `${skill} | ${skills[skill]["expires"] - window.wholeTO["Var"]["currentTurn"]} turns left active.`;
             list.appendChild(bullet);
@@ -565,12 +563,10 @@ function addCharacter(character, update)
                 if(image.style.zIndex == "")
                 {
                     image.style.zIndex = 1000;
-                    image.style.zIndex = 1000;
                 }
 
                 else
                 {
-                    image.style.zIndex = `${parseInt(image.style.zIndex) + 600}`;
                     image.style.zIndex = `${parseInt(image.style.zIndex) + 600}`;
                 }
             }
@@ -650,7 +646,6 @@ function addCharacter(character, update)
                 for(let image of char)
                 {
                     image.src = window.imgs["tokens"]["invisible-"];
-                    image.src = window.imgs["tokens"]["invisible-"];
                 }
             }
 
@@ -673,7 +668,6 @@ function addCharacter(character, update)
             {
                 for(let image of char)
                 {
-                    image.src = window.imgs["tokens"]["invisible-"];
                     image.src = window.imgs["tokens"]["invisible-"];
                 }
             }
@@ -781,26 +775,18 @@ function dup(xOrY, char, character, locations, title)
     let dupNum;
     let rotate = "0";
     
-    
     if(xOrY == "x"){dupNum = title.slice(title.indexOf("Dup X"));}
     else{dupNum = title.slice(title.indexOf("Dup Y"));}
-    
     
     if(title.includes("90")){rotate = "90";}
     else if(title.includes("180")){rotate = "180";}
     else if(title.includes("270")){rotate = "270";}
     
     if(dupNum[5] != ",") 
-    
-    if(dupNum[5] != ",") 
     {
-        if(dupNum[6] != ",") 
         if(dupNum[6] != ",") 
         {
             num = parseInt(dupNum[5] + dupNum[6]);
-        } 
-        
-        else 
         } 
         
         else 
@@ -810,27 +796,10 @@ function dup(xOrY, char, character, locations, title)
     } 
     
     else 
-    } 
-    
-    else 
     {
-        num = 12;
         num = 12;
     }
 
-    let baseIndex;
-    let posArray;
-    if(xOrY == "x")
-    {
-        posArray = map.xPos;
-        baseIndex = posArray.indexOf(character["xPos"]);
-    } 
-    
-    else 
-    {
-        posArray = map.yPos;
-        baseIndex = posArray.indexOf(character["yPos"]);
-    }
     let baseIndex;
     let posArray;
     if(xOrY == "x")
@@ -865,8 +834,6 @@ function setupDup(char, character, xOrY, locations, rotate, offSet)
     let stuffs = [document.createElement("img"), document.createElement("img"), document.createElement("img")];
     
     for(let d = 0; d < 3; d++) 
-    
-    for(let d = 0; d < 3; d++) 
     {
         stuffs[d].classList.add("tokens");
         stuffs[d].src = char[d].src;
@@ -883,20 +850,9 @@ function setupDup(char, character, xOrY, locations, rotate, offSet)
         {
             placeTokens(locations[0], map.pos[offSet], stuffs[d]);
         }
-        if(xOrY == "x") 
-        {
-            placeTokens(map.pos[offSet], locations[1], stuffs[d]);
-        } 
-        
-        else 
-        {
-            placeTokens(locations[0], map.pos[offSet], stuffs[d]);
-        }
         
         switch(d) 
-        switch(d) 
         {
-            case 0: 
             case 0: 
                 stuffs[d].classList.add("char");
                 break;
@@ -994,7 +950,7 @@ function handleCharClick()
 /**
  * Opens the enlarged token view (#cover) for the clicked token, copying its picture,
  * ring and HP bar into it with its name/title. The help button reuses the same overlay
- * and adds Instructions tabs (Map / Stats / Actions / Favorites).
+ * and adds Instructions tabs (Map / Stats / Actions / Favorites), opening on Map.
  */
 function handleViewTokens(t)
 {
@@ -1061,7 +1017,9 @@ function handleViewTokens(t)
             holdingDiv.appendChild(label);
         }
 
-        viewDiv.insertBefore(holdingDiv, document.getElementById("viewToken"));
+        // The tabs go inside the overlay's first box, above the instruction text
+        viewDiv.children[0].insertBefore(holdingDiv, document.getElementById("showInstructions"));
+        holdingDiv.querySelector("button").click(); //Start on the Map instructions
     }
 }
 
@@ -1280,32 +1238,6 @@ export function setMode(auth)
         mode = data;
     });
 }
-
-// Opening index.html#sheet (the "Character Sheet" link in the name dropdown)
-// jumps straight to the Sheet tab. The tab's click handler is attached by
-// another script, so wait for it before clicking (falls back after 5s).
-function openTabFromHash()
-{
-    if(location.hash != "#sheet"){return;}
-
-    let sheetBtn = document.querySelector('.firstMenu[name="sheet"]');
-    if(!sheetBtn){return;}
-
-    let tries = 0;
-    let timer = setInterval(() =>
-    {
-        tries++;
-        if(sheetBtn.onclick || tries >= 20)
-        {
-            clearInterval(timer);
-            sheetBtn.click();
-        }
-    }, 250);
-}
-
-openTabFromHash();
-window.addEventListener("hashchange", openTabFromHash);
-
 
 // Opening index.html#sheet (the "Character Sheet" link in the name dropdown)
 // jumps straight to the Sheet tab. The tab's click handler is attached by

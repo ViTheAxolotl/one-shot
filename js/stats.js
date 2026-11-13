@@ -388,9 +388,7 @@ function setStats(stat)
             if(parent.wholeChar[parent.player]["stats"][`${exper}-expertise`]){modifier += parseInt(parent.wholeChar[parent.player]["stats"]["proficiency"]);}
         }
         
-        // Note: this compares a lower-cased class name with "Bard" (capital B), so it never
-        // matches. Use .includes("bard") if Jack of All Trades should apply.
-        else if(!stat.checked && parent.wholeChar[parent.player]["stats"]["class"].toLowerCase().includes("Bard"))
+        else if(!stat.checked && parent.wholeChar[parent.player]["stats"]["class"].toLowerCase().includes("bard")) //Jack of All Trades
         {
             modifier = parseInt(modifier) + Math.floor(parseInt(parent.wholeChar[parent.player]["stats"]["proficiency"]) / 2);
         }
