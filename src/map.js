@@ -1,3 +1,27 @@
+/**
+ * map.js — draws the battle map and turn order on the dashboard (index.html).
+ *
+ * The map is #gridMap: a big grid picture (#grid) with tokens laid over it as absolutely
+ * positioned images. Every token on the map is stored at currentMap/<id> as
+ *   { id, name (picture), border, xPos "1"-"26", yPos "A"-"Z", currentHp, maxHp, tempHp, AC, title, ... }
+ * and drawn as three stacked pictures: the token, its border ring, and its HP bar.
+ *
+ * The token's "title" is its status line (e.g. " Ben, Large, Top,"). Keywords in it change
+ * how it's drawn — see addCharacter():
+ *   Large / Huge / Gargantuan   2×2 / 3×3 / 4×4 squares
+ *   Top / Bottom                drawn above / below other tokens
+ *   90 / 180 / 270, FlipX/FlipY rotate or mirror
+ *   OpacNN                      see-through, e.g. Opac50
+ *   Invisible                   only its owner sees it
+ *   Hidden: Name                only that character (and the DM) can see it
+ *   Dup X n / Dup Y n           repeat it n squares across/down (walls, rivers...)
+ *   Exp X n / Exp Y n           stretch it n squares across/down
+ *
+ * Data arrives from parent.js through the exported set* functions. Clicking tokens,
+ * moving, HP and actions are handled by mapControler.js; this file mostly draws.
+ * Spell "bubbles" (area-of-effect rings) grow every quarter-second and then disappear.
+ */
+
 
 "use strict";
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
@@ -27,22 +51,34 @@ let startX, scrollLeft;
 let startY, scrollUp;
 let slider = gridMap;
 
+/**
+ * parent.js calls this whenever the map data changes: redraw all tokens.
+ */
 export function setWholeDB(data)
 {
     addTokens();
 }
 
+/**
+ * parent.js calls this whenever the turn order changes: redraw the turn-order list.
+ */
 export function setWholeTO(data)
 {
     removeTurnOrder(); 
     setTurnOrder();
 }
 
+/**
+ * parent.js calls this when the DM's summons change: remember whether summons are on.
+ */
 export function setWholeSummons(data)
 {
     isSummonOn = window.wholeSummons["isSummonOn"];
 }
 
+/**
+ * parent.js calls this when spell bubbles change: draw each one on the map.
+ */
 export function setWholeBubbles(data)
 {
     for(let bubble of Object.keys(window.wholeBubbles))
@@ -51,6 +87,11 @@ export function setWholeBubbles(data)
     }
 }
 
+/**
+ * Starts the bubble animation timer, hooks up the help button, and loads each tab's iframe
+ * 9 seconds after the page opens (so the map loads first). Each iframe's page name is
+ * stored as its first class (class="stats.html"). Right-click menus are blocked on them.
+ */
 function init()
 {
     setInterval(timer, 250);
@@ -69,6 +110,10 @@ function init()
     wait(13, function(){hideSkill()});
 }
 
+/**
+ * The Skill Tree tab has to be visible while it loads (its image map needs real sizes).
+ * Once skillTree.js reports it has loaded, hide the tab again; otherwise check every 3s.
+ */
 function hideSkill()
 {
     let skillDiv = document.getElementById("skills");
@@ -85,6 +130,7 @@ function hideSkill()
     }
 }
 
+// Click-and-drag to scroll the map: remember where the drag started...
 const startDragging = (e) => 
 {
     mouseDown = true;
@@ -99,6 +145,7 @@ const stopDragging = (e) =>
     mouseDown = false;
 }
 
+// ...and scroll by however far the mouse has moved since.
 const move = (e) => 
 {
     e.preventDefault();
@@ -117,6 +164,10 @@ slider.addEventListener('mousedown', startDragging, false);
 slider.addEventListener('mouseup', stopDragging, false);
 slider.addEventListener('mouseleave', stopDragging, false);
 
+/**
+ * Draws one spell bubble (a ring image) at its saved position and size.
+ * A bubble of "hold" is a placeholder that keeps bubbles/ from being empty.
+ */
 function addBubbles(bubbleDB)
 {
     if(bubbleDB != "hold")
@@ -136,6 +187,13 @@ function addBubbles(bubbleDB)
     }
 }
 
+/**
+ * Redraws the whole map. Removes every old token (keeps #grid and anything marked
+ * "update"), sets the map picture, then draws every token.
+ * If the logged-in player's own token isn't on the map yet, it's added (near the map's
+ * spawn point, with a random 0–2 square offset) along with any of their summons, then
+ * the page reloads to show it.
+ */
 function addTokens()
 {
     if(div.children.length > 1)
@@ -242,6 +300,11 @@ function addTokens()
     }
 }
 
+/**
+ * Adds one row to the turn-order list: position number, "| Name", and a small icon
+ * that appears when that character has a spell/ability running (click it for details).
+ * The character whose turn it is gets highlighted.
+ */
 function makeToken(key, turn, charPos)
 {
     let row = [document.createElement("div"), document.createElement("h6"), document.createElement("h6"), document.createElement("img")];
@@ -276,6 +339,9 @@ function makeToken(key, turn, charPos)
     divTO.appendChild(row[0]);
 }
 
+/**
+ * Empties the turn-order list.
+ */
 function removeTurnOrder()
 {
     let loop = true;
@@ -294,6 +360,11 @@ function removeTurnOrder()
     }
 }
 
+/**
+ * Rebuilds the turn order in position order (1, 2, 3...), shows the turn counter, and
+ * checks everyone's running spells/abilities: ones ending within 2 turns get the
+ * "expiring" icon, and ones that have reached their end turn are removed.
+ */
 function setTurnOrder()
 {
     for(let i = 1; i <= Object.keys(window.wholeTO).length; i++)
@@ -356,6 +427,10 @@ function setTurnOrder()
     }
 }
 
+/**
+ * Clicked the running-ability icon in the turn order: swaps the list for that character's
+ * active spells/abilities and how many turns each has left, with a Back link.
+ */
 function handleTurnTimer()
 {
     let div = document.getElementById("turnOrder");
@@ -366,7 +441,7 @@ function handleTurnTimer()
     let list = document.createElement("ul");
 
     title.innerHTML = toTitleCase(person);
-    title.classList = "center color-UP-yellow";
+    title.classList = "center text-brass";
 
     back.innerHTML = "<- Back";
     back.onclick = function(){removeTurnOrder(); setTurnOrder();};
@@ -382,7 +457,7 @@ function handleTurnTimer()
         if(skill != "temp")
         {
             let bullet = document.createElement("li");
-            bullet.classList= "color-UP-yellow";
+            bullet.classList= "text-brass";
             bullet.innerHTML = `${skill} | ${skills[skill]["expires"] - window.wholeTO["Var"]["currentTurn"]} turns left active.`;
             list.appendChild(bullet);
         }
@@ -393,6 +468,12 @@ function handleTurnTimer()
     div.appendChild(list);
 }
 
+/**
+ * Draws one token (picture + border ring + HP bar) at its grid square, applying any status
+ * keywords in its title (see the top of this file). Also, if this is the token the player
+ * is controlling, fills in the HP boxes and status line under the map.
+ * Non-73px pictures (custom uploads) are cropped to a circle and centred in the ring.
+ */
 function addCharacter(character, update)
 {
     let char = [document.createElement("img"), document.createElement("img"), document.createElement("img")];
@@ -404,6 +485,7 @@ function addCharacter(character, update)
 
     let image = tokenImg;
     let img = new Image();
+    // Test-load the picture so a missing one can fall back to the "unknown" token.
     if(!image.includes("custom-")){img.src = window.imgs["tokens"][image];}
     else{img.src = window.wholeCustom[image]["src"];} 
     img.onerror = () => {char[0].src = `images/unknown-.png`;};
@@ -480,12 +562,12 @@ function addCharacter(character, update)
             {
                 if(image.style.zIndex == "")
                 {
-                    image.style.zIndex = 400;
+                    image.style.zIndex = 1000;
                 }
 
                 else
                 {
-                    image.style.zIndex = `${parseInt(image.style.zIndex) + 300}`;
+                    image.style.zIndex = `${parseInt(image.style.zIndex) + 600}`;
                 }
             }
         }
@@ -563,7 +645,7 @@ function addCharacter(character, update)
             {
                 for(let image of char)
                 {
-                    image.src = "images/map/tokens/invisible-.png";
+                    image.src = window.imgs["tokens"]["invisible-"];
                 }
             }
 
@@ -586,7 +668,7 @@ function addCharacter(character, update)
             {
                 for(let image of char)
                 {
-                    image.src = "images/map/tokens/invisible-.png";
+                    image.src = window.imgs["tokens"]["invisible-"];
                 }
             }
         }
@@ -629,6 +711,10 @@ function addCharacter(character, update)
     }
 }
 
+/**
+ * Reads the number after "Exp X" / "Exp Y" in a title (1 or 2 digits; 12 if there is
+ * no number) and stretches the token that many squares.
+ */
 function exp(xOrY, title, char)
 {
     let expNum;
@@ -655,6 +741,9 @@ function exp(xOrY, title, char)
     }
 }
 
+/**
+ * Sets the width (x) or height (y) of all of a token's pictures to `num` squares.
+ */
 function setupExp(num, char, xOrY)
 {
     let size = (map.pos[num] - map.pos[0]) + "px";
@@ -676,48 +765,75 @@ function setupExp(num, char, xOrY)
     }
 }
 
-function dup(xOrY, char, character, locations, title)
+/**
+ * Reads the number after "Dup X" / "Dup Y" (12 if there is no number) and draws that many
+ * copies of the token in a line to the right / downward, keeping its rotation.
+ */
+function dup(xOrY, char, character, locations, title) 
 {
     let num;
     let dupNum;
     let rotate = "0";
-
+    
     if(xOrY == "x"){dupNum = title.slice(title.indexOf("Dup X"));}
     else{dupNum = title.slice(title.indexOf("Dup Y"));}
+    
     if(title.includes("90")){rotate = "90";}
     else if(title.includes("180")){rotate = "180";}
     else if(title.includes("270")){rotate = "270";}
-
-    if(dupNum[5] != ",")
+    
+    if(dupNum[5] != ",") 
     {
-        if(dupNum[6] != ",")
+        if(dupNum[6] != ",") 
         {
             num = parseInt(dupNum[5] + dupNum[6]);
-        }
-
-        else
+        } 
+        
+        else 
         {
             num = parseInt(dupNum[5]);
         }
-    }
-
-    else
+    } 
+    
+    else 
     {
-        num = 12
+        num = 12;
     }
 
-    if(xOrY == "x"){offSet = map.xPos.indexOf(character["xPos"]);}
-    else{offSet = map.yPos.indexOf(character["yPos"]);}
+    let baseIndex;
+    let posArray;
+    if(xOrY == "x")
+    {
+        posArray = map.xPos;
+        baseIndex = posArray.indexOf(character["xPos"]);
+    } 
+    
+    else 
+    {
+        posArray = map.yPos;
+        baseIndex = posArray.indexOf(character["yPos"]);
+    }
 
-    for(let i = 0; i < num; i++){setupDup(char, character, xOrY, locations, rotate)}
+    if (baseIndex === -1) return;
+
+    // Loop to spawn duplicates extending outward from the base token position
+    for(let i = 1; i <= num; i++) {
+        // Adjust the offset step to correct the rightward bias
+        let currentOffset = (baseIndex - 1) + i; 
+        if (currentOffset >= 0 && currentOffset < posArray.length) {
+            setupDup(char, character, xOrY, locations, rotate, currentOffset);
+        }
+    }
 }
 
-function setupDup(char, character, xOrY, locations, rotate)
+/**
+ * Draws one copy (picture, ring and HP bar) of a duplicated token at grid offset `offSet`.
+ */
+function setupDup(char, character, xOrY, locations, rotate, offSet) 
 {
     let stuffs = [document.createElement("img"), document.createElement("img"), document.createElement("img")];
-    offSet++;
-
-    for(let d = 0; d < 3; d++)
+    
+    for(let d = 0; d < 3; d++) 
     {
         stuffs[d].classList.add("tokens");
         stuffs[d].src = char[d].src;
@@ -725,16 +841,21 @@ function setupDup(char, character, xOrY, locations, rotate)
         stuffs[d].style.transform = `rotate(${rotate}deg)`;
         stuffs[d].classList.add(character["id"]);
         
-        if(xOrY == "x"){placeTokens(map.pos[offSet], locations[1], stuffs[d]);}
-        else{placeTokens(locations[0], map.pos[offSet], stuffs[d]);}
-        
-        switch(d)
+        if(xOrY == "x") 
         {
-            case 0:
-            {
+            placeTokens(map.pos[offSet], locations[1], stuffs[d]);
+        } 
+        
+        else 
+        {
+            placeTokens(locations[0], map.pos[offSet], stuffs[d]);
+        }
+        
+        switch(d) 
+        {
+            case 0: 
                 stuffs[d].classList.add("char");
                 break;
-            }
 
             case 1:
                 stuffs[d].classList.add("border_");
@@ -750,6 +871,9 @@ function setupDup(char, character, xOrY, locations, rotate)
 }
 
 
+/**
+ * Picks the HP-bar picture for a token from its current / max / temp HP.
+ */
 function getHpImg(character)
 {
     let maxHp = character["maxHp"];
@@ -759,6 +883,14 @@ function getHpImg(character)
     return returnHpImage(maxHp, tempHp, currentHp);
 }
 
+/**
+ * A token was clicked. What happens depends on the player's mode:
+ *   waiting: the DM (unless holding Ctrl), or a player clicking a token whose name is in
+ *            their own status line (their summons), takes control of that token.
+ *            Anyone else's token opens the enlarged token view.
+ *   using:   they're picking targets for a spell/ability: toggle this token as a target
+ *            and tick/untick its checkbox in the target list.
+ */
 function handleCharClick()
 {
     let name = titleTxt.innerHTML.replaceAll(" ", "").slice(titleTxt.innerHTML.indexOf(":") + 1).split(",");
@@ -815,6 +947,11 @@ function handleCharClick()
     }
 }
 
+/**
+ * Opens the enlarged token view (#cover) for the clicked token, copying its picture,
+ * ring and HP bar into it with its name/title. The help button reuses the same overlay
+ * and adds Instructions tabs (Map / Stats / Actions / Favorites).
+ */
 function handleViewTokens(t)
 {
     let currentToken = document.getElementsByClassName(t.classList[1]);
@@ -884,6 +1021,10 @@ function handleViewTokens(t)
     }
 }
 
+/**
+ * Help overlay: shows the instructions for the tab that was clicked. The Stats tab
+ * also lists the status keywords (Large, Huge, Top, Invisible...).
+ */
 function changeInstructions()
 {
     let labels = ["Map", "Stats", "Actions", "Favorites"];
@@ -923,6 +1064,10 @@ function changeInstructions()
     }
 }
 
+/**
+ * Closes the token view / help overlay, un-highlights any targeted tokens, turns quick-action
+ * mode off and empties the quick-action spell lists.
+ */
 function hideCover()
 {
     let viewDiv = document.getElementById("cover");
@@ -974,12 +1119,19 @@ function hideCover()
     }
 }
 
+/**
+ * Moves one picture to pixel position (x, y) on the map.
+ */
 function placeTokens(x, y, prop)
 {
     prop.style.left = x + "px";
     prop.style.top = y + "px";
 }
 
+/**
+ * Runs every 250ms: grows each spell bubble one step, or clears leftover bubble pictures
+ * when there are none left in the database.
+ */
 function timer()
 {
     if(window.wholeBubbles)
@@ -1002,6 +1154,9 @@ function timer()
     }
 }
 
+/**
+ * Removes every bubble picture from the map.
+ */
 function removeNullBubbles()
 {
     let nullBubbles = document.getElementsByClassName("bubbles");
@@ -1012,6 +1167,9 @@ function removeNullBubbles()
     }
 }
 
+/**
+ * Grows a bubble by 0.5 until it reaches 3.5× size, then deletes it from the page and the database.
+ */
 function editBubble(bubbleDB)
 {
     if(bubbleDB != "hold")
@@ -1038,6 +1196,7 @@ let startScrollLeft;
 let startScrollTop;
 let drag = false;
 
+// Same click-and-drag scrolling for the character sheet in the Sheet tab.
 const iframe = document.getElementById("statSheet");
 iframe.contentWindow.addEventListener("mousedown", (e) =>
 {
@@ -1062,6 +1221,10 @@ iframe.contentWindow.addEventListener("mouseup", () =>
     drag = false;
 });
 
+/**
+ * Called by parent.js after login. Sets this player's mode to "waiting" (not picking
+ * targets) and keeps `mode` in sync with the database from then on.
+ */
 export function setMode(auth)
 {
     setDoc(`playerChar/${window.player}/mode`, "waiting");
@@ -1073,3 +1236,28 @@ export function setMode(auth)
         mode = data;
     });
 }
+
+// Opening index.html#sheet (the "Character Sheet" link in the name dropdown)
+// jumps straight to the Sheet tab. The tab's click handler is attached by
+// another script, so wait for it before clicking (falls back after 5s).
+function openTabFromHash()
+{
+    if(location.hash != "#sheet"){return;}
+
+    let sheetBtn = document.querySelector('.firstMenu[name="sheet"]');
+    if(!sheetBtn){return;}
+
+    let tries = 0;
+    let timer = setInterval(() =>
+    {
+        tries++;
+        if(sheetBtn.onclick || tries >= 20)
+        {
+            clearInterval(timer);
+            sheetBtn.click();
+        }
+    }, 250);
+}
+
+openTabFromHash();
+window.addEventListener("hashchange", openTabFromHash);

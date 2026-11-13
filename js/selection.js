@@ -1,3 +1,19 @@
+/**
+ * selection.js — the Change Token page (selection.html).
+ *
+ * Where a player sets up the token that represents them on the battle map:
+ *   1. pick a picture (their standard token from files/tokens, or a custom image they uploaded),
+ *   2. pick a coloured border ring,
+ *   3. enter Max / Current / Temp HP and AC,
+ *   4. Go! saves the token to the map (currentMap/<Name>) and to their character
+ *      (playerChar/<Player>/token), then sends them to the dashboard.
+ * If they already had a token, its border, HP, title and map position are kept.
+ *
+ * Custom images: "Manage/Add Imgs" lets a player upload their own picture. It's compressed
+ * in the browser, stored in Firebase Storage under images/map/tokens/, and listed in
+ * files/tokens/<nickname>-. Token names end in "-" by convention.
+ */
+
 "use strict";
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js';
@@ -24,6 +40,7 @@ let imgs = {};
 let oldToken = {};
 let firstLoad = true;
 
+// Only the first read of character data is used to build the page.
 const charRef = ref(database, 'playerChar/');
 onValue(charRef, (snapshot) => 
 {
@@ -45,6 +62,7 @@ onValue(dbRef, (snapshot) =>
     wholeDb = data;
 });
 
+// The list of border images lives in files/borders. Once it arrives, build the page.
 const filesRef = ref(database, 'files/');
 onValue(filesRef, (snapshot) => 
 {
@@ -69,6 +87,10 @@ onAuthStateChanged(auth, (user) =>
     } 
 });
 
+/**
+ * Runs once character data arrives: works out who is logged in, remembers their
+ * current token (oldToken) so its settings can be kept, and builds the headings.
+ */
 function userLoggedIn()
 {
     player = auth.currentUser.email;
@@ -79,6 +101,10 @@ function userLoggedIn()
     charName.value = wholeChars[player]["charName"];
 }
 
+/**
+ * Creates the section headings (Select Character, Select Border, Current & Max Hp)
+ * and the Go! button, ready to be placed by setUpCharacters().
+ */
 function init()
 {
     char.innerHTML = "Select Character";
@@ -98,6 +124,11 @@ function init()
     go.onclick = handleGoButton;
 }
 
+/**
+ * Builds the page: hides the placeholder content, then adds the player's token pictures,
+ * the border rings, the HP/AC boxes and Go!. If they already have a token, it
+ * pre-selects their border and fills in their HP.
+ */
 function setUpCharacters()
 {
     for(let elem of div.children)
@@ -140,11 +171,17 @@ function setUpCharacters()
     }
 }
 
+/**
+ * Opens the link stored in the clicked element's id in a new tab, then reloads. Not used now.
+ */
 function openWindow()
 {    
     setInterval(() => {window.open(this.id, '_blank'); location.reload();}, 2000);   
 }
 
+/**
+ * Adds a clickable picture for each standard token this player can use.
+ */
 function addCharacters()
 {
     for(let char of people)
@@ -161,6 +198,10 @@ function addCharacters()
     }
 }
 
+/**
+ * Adds the player's own uploaded images as more token choices, plus the
+ * "Manage/Add Imgs" button. Pre-selects their current token picture.
+ */
 function addCustomImgs()
 {
     for(let custom of Object.keys(wholeCustom))
@@ -192,6 +233,10 @@ function addCustomImgs()
     }
 }
 
+/**
+ * "Manage/Add Imgs": replaces the page with the player's custom images (each with a
+ * Delete button) and a form to upload a new one with a nickname.
+ */
 function handleCustomImg()
 {
     while(div.children.length > 0)
@@ -282,6 +327,10 @@ function handleCustomImg()
     div.appendChild(customsDiv);
 }
 
+/**
+ * Deletes one custom image. Any token on the map still using it falls back to that
+ * character's standard picture ("<id>-").
+ */
 function handleDeleteCustom()
 {
     deleteDoc(`customImages/${this.id}`);
@@ -301,6 +350,11 @@ function handleDeleteCustom()
     reload(.5);
 }
 
+/**
+ * Uploads a new custom token picture: checks a file and nickname were given, cleans the
+ * nickname, compresses the image to about 0.2 MB, uploads it to Storage, saves the
+ * link under files/tokens/<nickname>-, makes it this player's token, and reloads.
+ */
 async function handleCreateCustom()
 {
     let fileElement = document.getElementById("CustomFileInput");
@@ -362,6 +416,9 @@ async function handleCreateCustom()
     }
 }
 
+/**
+ * Adds a clickable ring picture for every border colour (except "invisible").
+ */
 function addBorders()
 {
     div.appendChild(bord);
@@ -378,6 +435,9 @@ function addBorders()
     }
 }
 
+/**
+ * Adds the Max Hp / Current Hp / Temp Hp / AC number boxes.
+ */
 function addHp()
 {
     div.appendChild(hp);
@@ -404,6 +464,10 @@ function addHp()
     }
 }
 
+/**
+ * A picture or border was clicked: un-highlight the others in the same group and
+ * highlight this one ("selected").
+ */
 function handleChoose()
 {
     let classL = this.classList.value;
@@ -420,6 +484,10 @@ function handleChoose()
     this.classList.add("selected");
 }
 
+/**
+ * Go!: needs one picture and one border selected. Saves the token, swaps the page for a
+ * loading message, then goes to the dashboard after 2 seconds.
+ */
 function handleGoButton()
 {
     let currentSelected = document.getElementsByClassName("selected");
@@ -465,6 +533,11 @@ function handleGoButton()
     }
 }
 
+/**
+ * Builds the token object and saves it to the map and to the player's character.
+ * The map id is the picture name without its trailing "-". A new token starts at A1
+ * with the name as its title; an existing token keeps its title, position and summon flag.
+ */
 function createChar(curCharacter, curBorder)
 {
     let charName = curCharacter.slice(0, curCharacter.length - 1);

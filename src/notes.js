@@ -1,3 +1,15 @@
+/**
+ * notes.js — the Notes tab (notes.html, shown in an iframe on the dashboard).
+ *
+ * Each player has their own notes at playerChar/<Player>/notes, saved as
+ *   { "<Title>": { "desc": "<text>", "pos": <order number 1, 2, 3...> }, ... }
+ *
+ * View mode: notes are shown as parchment cards in "pos" order, with an Edit/Add button.
+ * Edit mode: every card turns into a title box + text box + order dropdown, with a trash
+ * icon each, plus Create Note / Cancel / Upload Notes. Upload checks that the order
+ * numbers are 1..N with no repeats, then replaces the whole notes object in one write.
+ */
+
 "use strict"
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js';
@@ -12,6 +24,8 @@ let isFirstRead = true;
 let display = document.getElementById("notesDisplay");
 let deleteProtection = true;
 
+// Once we know who is logged in, listen to their notes. Only the first read builds the
+// page, so a save from another device doesn't wipe out edits in progress.
 onAuthStateChanged(auth, (user) => 
 {
     user = auth.currentUser.email.split("@");
@@ -32,11 +46,17 @@ onAuthStateChanged(auth, (user) =>
     });
 });
 
+/**
+ * Leftover from an older version; looks up a button but does nothing with it.
+ */
 function init()
 {
     let button = document.getElementById("enter");
 }
 
+/**
+ * "Edit/Add Notes" was clicked: switch every card into edit mode.
+ */
 function handleAddButton()
 {
     let notes = document.getElementsByClassName("notes");
@@ -51,6 +71,11 @@ function handleAddButton()
     setAddScreen();
 }
 
+/**
+ * Trash icon on a note. The first click anywhere only shows a warning (deleteProtection);
+ * later clicks remove that note's card and drop the last number from every order
+ * dropdown, since there is one fewer note. Nothing is saved until "Upload Notes".
+ */
 function handleDeleteButton()
 {
     if(deleteProtection){alert("Are you sure you want to delete this note? Click trash again to confirm."); deleteProtection = false;}
@@ -66,6 +91,10 @@ function handleDeleteButton()
     }
 }
 
+/**
+ * Edit mode: rebuilds each note card as editable fields with a trash icon, renames
+ * the main button to "Upload Notes" and adds Create Note and Cancel (Cancel just reloads).
+ */
 function setAddScreen()
 {
     for(let child of display.children)
@@ -102,6 +131,10 @@ function setAddScreen()
     placeBefore(cancel, upload);
 }
 
+/**
+ * Adds the editing fields for one note into `display`: a title input, a text area,
+ * and an order dropdown numbered 1..(number of notes).
+ */
 function createEditableNote(title, text, pos, display)
 {
     let cardTitle = document.createElement("input");
@@ -142,10 +175,14 @@ function createEditableNote(title, text, pos, display)
     display.appendChild(cardPos);
 }
 
+/**
+ * "Create Note": adds a blank "Title"/"Text" note, gives it the next order number,
+ * and adds that new number to every other note's order dropdown.
+ */
 function handleCreate()
 {
     let cardDiv = document.createElement("div");
-    cardDiv.setAttribute("class", "card .bg-UP-blue notes");
+    cardDiv.setAttribute("class", "card notes");
     cardDiv.id = `new-div`;
     let cardBody = document.createElement("div");
     cardBody.setAttribute("class", "card-body center");
@@ -170,6 +207,9 @@ function handleCreate()
     }
 }
 
+/**
+ * Older helper that reset an edit form back to a blank title. Not called anywhere now.
+ */
 function setCardScreen(enter, title, pos, text)
 {
     let deleteButton = document.getElementById("deleteButton");
@@ -181,10 +221,13 @@ function setCardScreen(enter, title, pos, text)
     title.value = "";
 }
 
+/**
+ * Builds one read-only parchment card for a note (title + text paragraphs).
+ */
 function createNoteCard(title, text)
 {
     let cardDiv = document.createElement("div");
-    cardDiv.setAttribute("class", "card .bg-UP-blue notes");
+    cardDiv.setAttribute("class", "card notes");
     cardDiv.id = `${title}-div`;
     let cardBody = document.createElement("div");
     cardBody.setAttribute("class", "card-body notes");
@@ -206,6 +249,9 @@ function createNoteCard(title, text)
     return cardDiv;
 }
 
+/**
+ * Adds the big "Edit/Add Notes" button under the notes.
+ */
 function createAddButton()
 {
     let addButton = document.createElement("button");
@@ -218,6 +264,9 @@ function createAddButton()
     noteDisplay.appendChild(addButton);
 }
 
+/**
+ * Makes the trash-can image used to remove a note in edit mode.
+ */
 function createDeleteButton()
 {
     let deleteButton = document.createElement("img");
@@ -227,6 +276,11 @@ function createDeleteButton()
     return deleteButton;
 }
 
+/**
+ * "Upload Notes": reads every edit card back out of the page, checks the order numbers
+ * are 1..N with no gaps or repeats (alerts if not), then replaces the player's whole
+ * notes object in the database and reloads.
+ */
 async function addNote()
 {
     let poses = [];
@@ -272,6 +326,9 @@ async function addNote()
     }
 }
 
+/**
+ * Clears the notes area and shows every note as a card, sorted by its "pos" number.
+ */
 async function readNotes() //Need to do manual
 {
     display = document.getElementById("notesDisplay");

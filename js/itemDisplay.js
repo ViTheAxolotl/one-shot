@@ -1,8 +1,15 @@
+/**
+ * itemDisplay.js — the Item Lookup tab (itemIndex.html, shown in an iframe).
+ *
+ * Looks up an item by its exact name in the shared images data (files/items in Firebase,
+ * loaded by parent.js as window.imgs) and shows its description and picture.
+ */
+
 "use strict";
 import { reload } from '../js/viMethods.js';
 
 /**
- * Runs after the webpage loads
+ * Hooks up the Search and Reset buttons.
  */
 function init()
 { 
@@ -11,7 +18,8 @@ function init()
 }
 
 /**
- * When they click submit button
+ * Finds the typed item name in window.top.parent.imgs.items, shows its description
+ * and image, and scrolls down to them.
  */
 function handleSearch()
 {
@@ -26,7 +34,7 @@ function handleSearch()
 }
 
 /**
- * Reloads the webpage after .1 seconds
+ * Clears the lookup by reloading the page.
  */
 function handleReset()
 {

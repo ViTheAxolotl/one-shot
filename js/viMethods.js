@@ -1,3 +1,18 @@
+/**
+ * viMethods.js — the shared toolbox. Almost every other script imports from here.
+ *
+ *   • Connects to Firebase (database, login, file storage) and exports `auth`,
+ *     `database` and `storage` for everyone else.
+ *   • setDoc / deleteDoc: the one way the site writes to the database.
+ *   • sendDiscordMessage: posts a roll or action to the Discord channel AND to the
+ *     dashboard's Display feed.
+ *   • Small helpers: toTitleCase, statFormat (+3 / -1), wait, reload, createCard, etc.
+ *   • setMapValue: the pixel maths for placing tokens on the 26×26 battle-map grid.
+ *
+ * Note: the Firebase config below is meant to be public (all web apps ship it);
+ * what protects the data is the database's security rules, not this key.
+ */
+
 
 "use strict";
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js';
@@ -5,6 +20,7 @@ import { getDatabase, ref, set } from 'https://www.gstatic.com/firebasejs/9.15.0
 import { getAuth } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js';
 import { getStorage, uploadBytes, getDownloadURL, ref as sRef } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 
+// Firebase project settings. Every page that imports this file shares this one connection.
 const firebaseApp = initializeApp
 ({
     apiKey: "AIzaSyDvuBp4EboXMRbkdp6_YBGn7tq08jAYmvA",
@@ -21,8 +37,14 @@ export let auth = getAuth(); //Logs into accounts
 export let database = getDatabase(); //Sets up connection
 export let storage = getStorage(firebaseApp);
 export let quickAction = false;
+// Which ability score each skill uses (e.g. stealth -> Dexterity). Used when working out skill bonuses.
 export let skillDecrypt = {"athletics" : "Strength", "acrobatics" : "Dexterity", "slightOfHand" : "Dexterity", "stealth" : "Dexterity", "arcana" : "Intelligence", "history" : "Intelligence", "investigation" : "Intelligence", "nature" : "Intelligence", "religion" : "Intelligence", "animalHandling" : "Wisdom", "insight" : "Wisdom", "medicine" : "Wisdom", "perception" : "Wisdom", "survival" : "Wisdom",  "deception" : "Charisma",  "intimidation" : "Charisma",  "performance" : "Charisma",  "persuasion" : "Charisma"};
 
+/**
+ * Uploads an image the player picked: compresses it (max ~0.4 MB, 1024px) in the browser,
+ * stores it in Firebase Storage at `structure`, then saves the public download link
+ * in the database. `type` says what the image is for (currently only "portrait").
+ */
 export async function handleImageUpload(event, structure, type)
 {
     if(event.target.files)
@@ -67,13 +89,21 @@ export async function handleImageUpload(event, structure, type)
     }
 }
 
+/**
+ * Turns "quick action" mode on or off. In that mode createCard() makes compact buttons
+ * instead of full parchment cards (used by the Quick Action overlay).
+ */
 export function setQuickAction(bool)
 {
     quickAction = bool;
 }
 
 /**
- * Sets Map Values
+ * Works out where each grid square is, in pixels, on the battle map.
+ * The map image is 26×26 squares (A–Z down, 1–26 across). `pos[i]` is the pixel offset
+ * of column/row i. The "bumper" and "movement" numbers were tuned by hand for each
+ * Bootstrap screen-size breakpoint so tokens land exactly on the squares.
+ * Returns everything in one object, used by map.js and mapControler.js.
  */
 export function setMapValue()
 {
@@ -128,10 +158,8 @@ export function setMapValue()
 }
 
 /**
- * 
- * @param {*} word 
- * @returns 
- * Changes each word into titlecase of word given. (Ex. help me -> Help Me)
+ * Capitalises the first letter of every word: "help me" -> "Help Me".
+ * Used wherever names are shown, since many are typed or stored in lower case.
  */
 export function toTitleCase(word)
 {
@@ -141,7 +169,7 @@ export function toTitleCase(word)
         word = word.split(" "); 
         for(let singleWord of word)
         {
-            finalWord += `${singleWord[0].toUpperCase() + singleWord.slice(1)} `; //Capitilize each word in the varible
+            if(singleWord != ""){finalWord += `${singleWord[0].toUpperCase() + singleWord.slice(1)} `;} //Capitilize each word in the varible
         }
         finalWord = finalWord.slice(0, finalWord.length - 1);
     }
@@ -158,18 +186,17 @@ export function toTitleCase(word)
 }
 
 /**
- * 
- * @param {*} title 
- * @param {*} text 
- * @param {*} location 
- * Creates cards base on their title and text, it places these cards at location given.
+ * Builds a card and adds it to the element with id `location`.
+ *   title: card heading
+ *   text:  array of lines; each becomes its own paragraph
+ * Normally a parchment card ("card notes"); in quick-action mode a small button instead.
  */
 export function createCard(title, text, location)
 {
     if(!quickAction)
     {   
         let cardDiv = document.createElement("div");
-        cardDiv.setAttribute("class", "card .bg-UP-blue notes");
+        cardDiv.setAttribute("class", "card notes");
         let cardBody = document.createElement("div");
         cardBody.setAttribute("class", "card-body notes");
         let cardTitle = document.createElement("h5");
@@ -194,7 +221,7 @@ export function createCard(title, text, location)
     else
     {
         let card = document.createElement("button");
-        card.classList = "center gridButton card-body color-UP-yellow bg-UP-white";
+        card.classList = "center gridButton card-body text-brass bg-oak";
         card.innerHTML = title;
 
         let noteDisplay = document.getElementById(location);
@@ -203,10 +230,8 @@ export function createCard(title, text, location)
 }
 
 /**
- * 
- * @param {*} path 
- * @param {*} toChange 
- * Sets the doc at path to the new value toChange
+ * Writes `toChange` to the database at `path`, replacing whatever was there.
+ * Every save on the site goes through here (e.g. setDoc("currentMap/Ben/currentHp", "12")).
  */
 export function setDoc(path, toChange)
 {
@@ -214,15 +239,18 @@ export function setDoc(path, toChange)
 }
 
 /**
- * 
- * @param {*} path 
- * Deletes (Sets to null) the doc at path
+ * Deletes whatever is stored at `path` in the database (by setting it to null).
  */
 export function deleteDoc(path)
 {
     set(ref(database, path), null);
 }
 
+/**
+ * Picks the little health-bar picture shown under a token.
+ * Temp HP shows its own bar; otherwise the bar steps down at 100%, 80%, 60%, 40%, above 0 and 0.
+ * Max and current both "0" means "don't show a bar" (used for objects).
+ */
 export function returnHpImage(maxHp, tempHp, currentHp)
 {
     let fraction = parseInt(currentHp) / parseInt(maxHp);
@@ -272,9 +300,9 @@ export function returnHpImage(maxHp, tempHp, currentHp)
 }
 
 /**
- * Clenses input to stop hackers from gaining control
- * @param {*} toClense 
- * @returns 
+ * Basic safety check on text typed by players before it's used to build page content.
+ * Removes spaces, swaps double quotes/backticks for single quotes, and rejects (returns null,
+ * with an alert) anything containing < > ; @ ( ).
  */
 export function clenseInput(toClense)
 {
@@ -305,6 +333,9 @@ export function clenseInput(toClense)
     }
 }
 
+/**
+ * Shows a modifier the D&D way: 3 -> "+3", 0 -> "+0", -1 -> "-1".
+ */
 export function statFormat(stat)
 {
     stat = parseInt(stat);
@@ -320,20 +351,24 @@ export function statFormat(stat)
     }
 }
 
+/**
+ * Runs `fun` after `seconds` seconds.
+ */
 export function wait(seconds, fun)
 {
     setTimeout(fun, seconds * 1000);
 }
 
+/**
+ * Reloads the page after `seconds` seconds (lets a database write finish first).
+ */
 export function reload(seconds)
 {
     wait(seconds, function(){location.reload();})
 }
 
 /**
- * Places the new element elemToPlace before the referenceElement
- * @param {*} elemToPlace 
- * @param {*} referenceElement 
+ * Inserts `elemToPlace` into the page directly before `referenceElement`.
  */
 export function placeBefore(elemToPlace, referenceElement)
 { 
@@ -341,9 +376,7 @@ export function placeBefore(elemToPlace, referenceElement)
 }
 
 /**
- * Creates the basic label and returns it
- * @param {*} name 
- * @returns 
+ * Makes a small inline "Name:" label (an <h6>) for building forms in code.
  */
 export function createLabel(name)
 {
@@ -354,16 +387,20 @@ export function createLabel(name)
     return label;
 }
 
+/**
+ * Returns a random entry from `list`.
+ */
 export function getRandomItem(list)
 {
     let randomIndex = Math.floor(Math.random() * list.length);
     return list[randomIndex];
 }
 
- /**
-  * Sends message into the discord using a webhook
-  * @param {*} message 
-  */
+/**
+ * Announces something to the table: posts `message` to the Discord channel through
+ * the webhook saved in the database (playerChar/Vi/testingWebhook) and also adds it to
+ * the dashboard's Display feed. The ||   || line is a Discord spoiler bar used as a divider.
+ */
 export function sendDiscordMessage(message)
 {
     sendMessageToDisplay(message);
@@ -379,6 +416,10 @@ export function sendDiscordMessage(message)
     request.send(JSON.stringify(prams)); //Sends message
 }
 
+/**
+ * Adds a message to the Display feed's 10-slot circular buffer (display/0–9):
+ * moves display/current forward one slot (9 wraps back to 0) and writes the message there.
+ */
 function sendMessageToDisplay(message)
 {
     let current = parseInt(window.top.parent.wholeDisplay["current"]);

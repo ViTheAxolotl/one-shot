@@ -1,3 +1,18 @@
+/**
+ * skillTree.js — the Skill Tree tab (skillTree.html, shown in an iframe).
+ *
+ * The tree is one big picture with an HTML <map>: every circle on it is an <area>
+ * whose title is the skill's id (e.g. "Strength1", "all2", "start1", or a special
+ * infusion like "ferret3"). On load, every circle gets a dark "hide.png" cover.
+ * Unlocked skills (saved at playerChar/<Player>/skillTree/<id> = "active") have their
+ * cover made see-through.
+ *
+ * Below the tree it totals the bonuses: +1 to an ability score per ability circle
+ * ("all" gives +1 to all six), plus the special infusions, whose names, descriptions
+ * and infusion % come from src/skillTree.json. The total infusion % is saved to
+ * the character's stats as InfusedRate.
+ */
+
 "use strict";
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
 import { onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js';
@@ -10,11 +25,17 @@ let skillDesc;
 let infused = {};
 let infusedRate = 0;
 
+/**
+ * A circle's id is the skill name plus a one-digit number ("Strength1"); this drops the number.
+ */
 function getSkillName(skill)
 {
     return skill.slice(0, skill.length - 1);
 }
 
+// HTML image-map coordinates are fixed pixels for the original 1920px-wide picture.
+// This keeps the clickable circles lined up when the picture is shown at another size,
+// by rescaling every <area>'s coords whenever the window resizes.
 class ResponsiveImageMap {
     constructor(map, img, width) {
         this.img = img;
@@ -55,6 +76,8 @@ class ResponsiveImageMap {
 
 
 
+// Once logged in, listen to this player's unlocked skills and recalculate every bonus
+// from scratch each time they change. A brand-new player starts with "start1" unlocked.
 onAuthStateChanged(auth, (user) => 
 {
     if (!user) 
@@ -126,6 +149,11 @@ onAuthStateChanged(auth, (user) =>
     }
 });
 
+/**
+ * Sets up the clickable image map, the popup's Cancel/Unlock buttons, and loads the
+ * special-skill descriptions from skillTree.json. parent.skillsLoaded tells the dashboard
+ * this tab finished loading so it can hide the tab again.
+ */
 function init()
 {
     let map = document.getElementById('tree');
@@ -137,6 +165,10 @@ function init()
     parent.skillsLoaded = true;
 }
 
+/**
+ * Puts a dark round cover (images/hide.png) over every circle on the tree, positioned
+ * from each <area>'s x,y,radius. The covers are what the player actually clicks.
+ */
 function summonDarkness(map, image)
 {
     let tokens = map.children;
@@ -167,6 +199,10 @@ function summonDarkness(map, image)
     }
 }
 
+/**
+ * A cover was clicked. If that skill is already unlocked (cover see-through), clicking
+ * it un-learns the skill. Otherwise it opens the popup describing the skill.
+ */
 function handleClick()
 {
     if(this.style.opacity == "0")
@@ -181,11 +217,18 @@ function handleClick()
     }
 }
 
+/**
+ * Adds `modifier` to the running bonus total for one ability score.
+ */
 function changeSkill(modifier, skill)
 {
     skills[skill] = skills[skill] + modifier;
 }
 
+/**
+ * Writes the summary under the tree: the ability-score bonuses, then any special
+ * infusion abilities with the total infusion %.
+ */
 function updateDisplay()
 {
     let skillDisplay = document.getElementById("skillDisplay");
@@ -211,6 +254,13 @@ function updateDisplay()
     }
 }
 
+/**
+ * Runs the popup (#cover). Depending on what was clicked:
+ *   helpBtn    -> explains how the tree works
+ *   hideCovers -> Cancel: closes the popup
+ *   unlock     -> saves the skill as "active" and reloads
+ *   a circle   -> shows that skill's name and what it gives, ready to Unlock
+ */
 function handleButtonClick(elm)
 {
     let viewDiv = document.getElementById("cover");

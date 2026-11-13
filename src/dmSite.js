@@ -1,3 +1,26 @@
+/**
+ * dmSite.js — the DM's control panel (dmSite.html, the DmSite tab; only Vi can use it).
+ *
+ * The page starts as a grid of buttons. Clicking one removes the buttons (hideButtons,
+ * which also checks the user really is Vi) and builds that tool in #story. "Done"
+ * reloads the page back to the button grid.
+ *
+ *   Add Token / Remove Token  add a token, or edit/delete tokens on the map
+ *   Preset Tokens / Summons   saved monsters/NPCs (preset/) and the DM's summons
+ *                             (playerChar/Vi/summons/summonPreset): edit them or drop them on the map
+ *   Quick Change Hp           every token's HP in one list
+ *   Turn Order                set who goes when (currentTO/) and start the turn counter
+ *   Change / Save / Load Map  switch the map picture; save the whole board under a name
+ *                             (listed in lists/) or load a saved one
+ *   Interactive               push a picture + text popup to every player
+ *   Quests                    edit the quest list players see
+ *   Refresh Screens           force one player's page to reload
+ *   Upload Image              add a token/push/item/map picture to Firebase Storage
+ *   Open Page                 open this panel in its own browser tab
+ *
+ * All data comes from the dashboard through window.top.parent (filled by parent.js).
+ */
+
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
 import { toTitleCase, auth, database, setDoc, deleteDoc, returnHpImage, placeBefore, createLabel, wait, storage } from '../js/viMethods.js';
 import { uploadBytes, getDownloadURL, ref as sRef } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
@@ -13,6 +36,10 @@ let temp;
 let mode;
 let user;
 
+/**
+ * Connects each DM button (by its id) to its tool, and keeps a list of them so
+ * hideButtons() can clear them away.
+ */
 function init()
 {
     for(let button of document.getElementsByTagName("button"))
@@ -97,6 +124,9 @@ function init()
     }
 }
 
+/**
+ * Security check: if the logged-in account isn't Vi, show an error and reload.
+ */
 function getUser()
 {
     if(auth.currentUser == undefined){alert("Wrong Credentails!!!"); location.reload();}
@@ -104,6 +134,10 @@ function getUser()
     if(user != "Vi"){alert("Wrong Credentails!!!"); location.reload();}
 }
 
+/**
+ * "Add Token": shows the edit form for a brand-new token (defaults: invisible picture,
+ * 20 HP, square D5). Saving it adds it to the map.
+ */
 function handleAdd()
 {
     hideButtons();
@@ -119,22 +153,26 @@ function handleAdd()
     reset.onclick = handleDone;
 }
 
-function makeToken(key)
+/**
+ * Adds a small preview of a token (picture, border ring, HP bar) to the panel.
+ * Clicking the ring offers edit / delete for that token.
+ */
+function makeToken(key) 
 {
     let token = [document.createElement("div"), document.createElement("img"), document.createElement("img"), document.createElement("img")];
     token[0].id = `${key.id}-div`;
-    token[0].classList = "bg-UP-blue objectBorder";
+    token[0].classList = "bg-oak-deep objectBorder";
     token[0].style.margin = "5px";
     token[0].style.position = "relative";
     token[0].style.minHeight = "82px";
     token[0].style.minWidth = "82px";
-    token[1].src = `images/map/tokens/${key.name}.png`;
+    token[1].src = window.top.parent.imgs["tokens"][key.name];
     token[1].id = key.name;
     token[1].classList = `tokens ${key.name} char`;
-    token[2].src = `images/map/tokens/${key.border}Border.png`;
+    token[2].src = window.top.parent.imgs["borders"][key.border];
     token[2].id = key.border;
     token[2].classList = `tokens ${key.id} border_`;
-    token[3].src = updateHpPic(key.maxHp, key.currentHp);
+    token[3].src = window.top.parent.imgs["tokens"][key.name];
     token[3].id = "hp";
     token[3].classList = `tokens ${key.name} hp`;
     token[2].onclick = handleDeleteOrEdit;
@@ -145,6 +183,9 @@ function makeToken(key)
     div.appendChild(token[0]); 
 }
 
+/**
+ * "Remove Token": shows every token on the map; click one's ring to edit or delete it.
+ */
 function handleRemove()
 {
     hideButtons();
@@ -160,6 +201,10 @@ function handleRemove()
     addDone();
 }
 
+/**
+ * Clicked a token's ring: adds "edit" and "delete" buttons next to it
+ * (removing any from a previously clicked token).
+ */
 function handleDeleteOrEdit()
 {
     let currentDiv = this.parentElement;
@@ -189,6 +234,9 @@ function handleDeleteOrEdit()
     currentDiv.appendChild(deleteB);
 }
 
+/**
+ * Removes the chosen token from the map (currentMap/<id>), then redraws the list.
+ */
 function deleteToken()
 {
     for(let key of Object.keys(window.top.parent.wholeDB))
@@ -210,6 +258,11 @@ function deleteToken()
     resetDelete();
 }
  
+/**
+ * Shows the edit form for a token: border and picture dropdowns (the preview updates as
+ * you pick), max/current/temp HP, title (status keywords), x/y position, summon flag and AC.
+ * In preset mode it edits a saved preset instead, and its first button puts it on the map.
+ */
 function handleEdit()
 {
     let names = ["border", "name", "maxHp", "currentHp", "title", "xPos", "yPos", "tempHp", "isSummon", "ac"];
@@ -284,7 +337,7 @@ function handleEdit()
                 let currentBorder = window.top.parent.imgs["borders"][key];
                 let option = document.createElement("option");
                 option.value = key;
-                option.text = currentBorder.slice(currentBorder.indexOf("ns/") + 3).replace("Border.png", "");
+                option.text = key;
                 txtFeilds[i].appendChild(option);
                 txtFeilds[i].onchange = updateBorderPic;
             }
@@ -300,7 +353,7 @@ function handleEdit()
                 let currentBorder = window.top.parent.imgs["tokens"][key];
                 let option = document.createElement("option");
                 option.value = key;
-                option.text = currentBorder.slice(currentBorder.indexOf("ns/") + 3).replace(".png", "");
+                option.text = key;
                 txtFeilds[i].appendChild(option);
                 txtFeilds[i].onchange = updateTokenPic;
             }
@@ -342,16 +395,26 @@ function handleEdit()
     buttons.forEach(em => {editDiv.appendChild(em)});
 }
 
+/**
+ * Border dropdown changed: update the preview ring.
+ */
 function updateBorderPic()
 {
     this.parentNode.childNodes[1].src = window.top.parent.imgs["borders"][this[this.selectedIndex].value];
+    this.parentNode.childNodes[1].classList.remove("invisible");
 }
 
+/**
+ * Picture dropdown changed: update the preview picture.
+ */
 function updateTokenPic()
 {
     this.parentNode.childNodes[0].src = window.top.parent.imgs["tokens"][this[this.selectedIndex].value];
 }
 
+/**
+ * Current or temp HP changed: cap current HP at max HP and update the preview HP bar.
+ */
 function handleChangeCurrent()
 {
     let maxHp = document.getElementById("maxHp").value;
@@ -365,42 +428,64 @@ function handleChangeCurrent()
     this.parentNode.childNodes[2].src = updateHpPic(maxHp, currentHp);
 }
 
+/**
+ * Returns the HP-bar picture for the form's HP values.
+ */
 function updateHpPic(maxHp, currentHp)
 {
     let tempHp = document.getElementById("tempHp");
     return returnHpImage(maxHp, tempHp, currentHp);
 }
 
+/**
+ * Throws away the current tool's contents by replacing #story with a fresh empty one.
+ */
 function resetState()
 {
     let aboveDiv = div.parentElement;
     div.remove();
     div = document.createElement("div");
     div.id = "story";
-    div.classList = "bg-UP-purple color-UP-black col-md-12 col-sm-12";
+    div.classList = "bg-oak text-parchment col-md-12 col-sm-12";
     placeBefore(div, aboveDiv.childNodes[1]);
 }
 
+/**
+ * After 1.5s (to let the save land), redraw the Remove Token list.
+ */
 function resetDelete()
 {
     setTimeout(() => {resetState(); handleRemove();}, 1500);
 }
 
+/**
+ * After 1.5s, redraw the Quick Change Hp list.
+ */
 function resetQuick()
 {
     setTimeout(() => {resetState(); handleQuick();}, 1500);
 }
 
+/**
+ * After 1.5s, redraw the Preset Tokens list.
+ */
 function resetPreset()
 {
     setTimeout(() => {resetState(); handlePreset();}, 1500);
 }
 
+/**
+ * After 1.5s, redraw the Summons list.
+ */
 function resetSummons()
 {
     setTimeout(() => {resetState(); handleSummons();}, 1500);
 }
 
+/**
+ * "Quick Change Hp": lists every visible token with its position and an editable
+ * current-HP box plus an Upload button each.
+ */
 function handleQuick()
 {
     hideButtons();
@@ -451,6 +536,11 @@ function handleQuick()
     addDone();
 }
 
+/**
+ * Saves the new current HP for one token from the Quick Change Hp list.
+ * Note: it rewrites the whole token, and leaves out tempHp and isSummon, and reads AC from
+ * `.ac` (the map stores it as `AC`). Those values are lost when this is used.
+ */
 function quickUpdate()
 {
     let i = this.id;
@@ -473,6 +563,10 @@ function quickUpdate()
     resetQuick();
 }
 
+/**
+ * "Preset Tokens" (or "Summons", depending on preOrSumm): lists the saved tokens with
+ * Edit / Delete / Upload (= put on the map) buttons, and a Create New button.
+ */
 function handlePreset()
 {
     hideButtons();
@@ -521,6 +615,9 @@ function handlePreset()
     addDone();
 }
 
+/**
+ * Deletes a saved preset (or summon preset) and redraws the list.
+ */
 function deletePreset()
 {
     if(preOrSumm == 1)
@@ -536,6 +633,10 @@ function deletePreset()
     }
 }
 
+/**
+ * Opens the edit form for a preset. Called with no token (Create New) it starts from a
+ * blank invisible token.
+ */
 function addPreset()
 {
     let token;
@@ -562,6 +663,9 @@ function addPreset()
     addDone();
 }
 
+/**
+ * Saves the edited preset (to preset/) and redraws the list.
+ */
 function updatePreset()
 {
     mode = "preset";
@@ -570,6 +674,10 @@ function updatePreset()
     resetPreset();
 }
 
+/**
+ * Puts a preset onto the map. If its id is already taken it adds a number
+ * (goblin -> goblin1 -> goblin2 ...) so several copies can be on the map.
+ */
 function addToMap()
 {
     let id = db[preOrSumm][this.id].id;
@@ -589,6 +697,10 @@ function addToMap()
     setDoc(`currentMap/${id}`, token);
 }
 
+/**
+ * "Summons": adds a Turn Summons On/Off switch (when on, a player's summons appear with
+ * them on the map) and then lists the summon presets like handlePreset().
+ */
 function handleSummons()
 {
     if(preOrSumm == undefined){preOrSumm = 1;}
@@ -605,11 +717,15 @@ function handleSummons()
     handlePreset();
 }
 
+/**
+ * Adds one editable row to the turn-order tool: name, order number, "selected"
+ * (true = it's their turn) and a Remove button.
+ */
 function makeTORow(key)
 {
     let TORow = [document.createElement("div"), ["Name", "Order", "Selected"], [document.createElement("h6"), document.createElement("input"), document.createElement("input"), document.createElement("button")]];
     TORow[0].id = `${key.charName}-div`;
-    TORow[0].classList = "bg-UP-grey objectBorder center";
+    TORow[0].classList = "bg-stone objectBorder center";
     TORow[0].style.margin = "5px";
     TORow[0].style.position = "relative";
     TORow[0].style.minHeight = "82px";
@@ -635,6 +751,9 @@ function makeTORow(key)
     placeBefore(TORow[0], div.firstChild);
 }
 
+/**
+ * Removes the listed keys from an object and returns it.
+ */
 function DeleteKeys(myObj, array) 
 {
     for (let index = 0; index < array.length; index++) 
@@ -645,6 +764,9 @@ function DeleteKeys(myObj, array)
     return myObj;
 }
 
+/**
+ * Remove button on a turn-order row: drops that character from the list being edited.
+ */
 function removeFromTO()
 {
     let nodeName = this.id.replace("_Remove", "");
@@ -657,6 +779,9 @@ function removeFromTO()
     document.getElementById(`${nodeName}-div`).remove();
 }
 
+/**
+ * Adds a new character to the turn order being edited (position 0, not selected).
+ */
 function addTORow(rowName)
 {
     if(window.top.parent.wholeTO == null){window.top.parent.wholeTO = {};}
@@ -671,6 +796,10 @@ function addTORow(rowName)
     feilds[2].value = newRow.selected;
 }
 
+/**
+ * "Turn Order": shows the current turn order as editable rows (after 1.5s, so the data
+ * is fresh), plus a box and Add button for new rows and an Upload button.
+ */
 function handleTurn()
 {
     hideButtons();
@@ -721,6 +850,10 @@ function handleTurn()
     }, 1500);
 }
 
+/**
+ * Saves the edited turn order: clears currentTO/, writes each row, resets the turn
+ * counter to 1 and clears every character's rage flag. Reloads after 4s.
+ */
 function uploadTO()
 {
     temp = window.top.parent.wholeTO;
@@ -742,6 +875,10 @@ function uploadTO()
     wait(4, handleDone);
 }
 
+/**
+ * Writes one turn-order row from the form, plus an empty slot in currentTO/Var/<name>
+ * where that character's running spells/abilities get tracked.
+ */
 function uploadRowTO(key)
 {
     setDoc(`currentTO/${key}`,
@@ -754,6 +891,9 @@ function uploadRowTO(key)
     setDoc(`currentTO/Var/${key}`, {"temp" : "temp"});
 }
 
+/**
+ * "Change Map": a dropdown of every map picture and a Change button.
+ */
 function handleChangeMap()
 {
     hideButtons();
@@ -780,6 +920,9 @@ function handleChangeMap()
     addDone();
 }
 
+/**
+ * Saves the chosen map picture (currentMap/map) so every player's map switches.
+ */
 function updateMap()
 {
     let select = document.getElementById("select");
@@ -788,6 +931,9 @@ function updateMap()
     handleDone();
 }
 
+/**
+ * Adds a dropdown of saved boards (from lists/), filled in after 1.5s once they've loaded.
+ */
 function listSelect()
 {
     let collectionNames = [];
@@ -823,6 +969,9 @@ function listSelect()
     div.appendChild(selectNames);
 }
 
+/**
+ * "Save Map": pick an existing save to overwrite or type a new save name.
+ */
 function handleSave()
 {
     hideButtons();
@@ -844,6 +993,10 @@ function handleSave()
     addDone();
 }
 
+/**
+ * Copies every token on the current map into the save (a top-level database path named
+ * after the save) and records the name in lists/. An empty name overwrites the picked save.
+ */
 function handleUploadeSave()
 {
     let saveName = document.getElementById("saveName");
@@ -870,16 +1023,25 @@ function handleUploadeSave()
     handleDone();
 }
 
+/**
+ * Deletes everything at the top-level database path `cName`.
+ */
 function emptyCollection(cName)
 {
     deleteDoc(`${cName}/`);
 }
 
+/**
+ * Deletes the whole turn order (currentTO/).
+ */
 function emptyTOCollection()
 {
     deleteDoc(`currentTO/`);
 }
 
+/**
+ * "Load Map": pick a saved board and Load it.
+ */
 function handleLoad()
 {
     hideButtons();
@@ -894,6 +1056,9 @@ function handleLoad()
     addDone();
 }
 
+/**
+ * Clears the current map and copies every token from the chosen save onto it.
+ */
 function loadMap()
 {
     let selectNames = document.getElementById("selectNames");
@@ -920,6 +1085,10 @@ function loadMap()
     }, 90);
 }
 
+/**
+ * "Interactive": a form to push a popup to every player: text, an image link, or one of
+ * the preset "push" pictures from the dropdown below.
+ */
 function handleInteractive()
 {
     hideButtons();
@@ -960,6 +1129,9 @@ function handleInteractive()
     displayInteractive(exitButton);
 }
 
+/**
+ * Builds the picture dropdown for the Interactive tool from files/push.
+ */
 function displayInteractive(exitButton)
 {
     let labels = ["Push"];
@@ -1034,6 +1206,10 @@ function displayInteractive(exitButton)
     }
 }
 
+/**
+ * Builds one editable quest card: title, description, status, an Active Quest checkbox
+ * and a delete icon. "empty" makes a blank one.
+ */
 function createQuestCard(quest)
 {
     let card = document.createElement("div");
@@ -1071,10 +1247,10 @@ function createQuestCard(quest)
         deleteBtn.id = `empty-delete`;
     }
 
-    card.classList = "card color-UP-black bg-UP-blue";
+    card.classList = "card text-parchment bg-oak-deep";
     cardBody.classList = "card-body";
     
-    title.classList = "basicMargin color-UP-black";
+    title.classList = "basicMargin text-parchment";
     title.style.display = "inline";
     
     text.classList = "basicMargin card-text";
@@ -1114,16 +1290,26 @@ function createQuestCard(quest)
     return card;
 }
 
+/**
+ * Removes a quest card from the editor (saved when Upload is pressed).
+ */
 function handleDeleteQuest()
 {
     this.parentElement.parentElement.remove();
 }
 
+/**
+ * Adds a blank quest card above the Create button.
+ */
 function handleCreateQuest()
 {
     placeBefore(createQuestCard("empty"), this);
 }
 
+/**
+ * Reads every quest card and replaces the whole quest list (playerChar/Vi/quests).
+ * Note: wait(4, handleDone()) runs handleDone straight away; wait(4, handleDone) would wait 4s.
+ */
 function uploadQuests()
 {
     let children = div.children;
@@ -1148,6 +1334,9 @@ function uploadQuests()
     wait(4, handleDone());
 }
 
+/**
+ * "Quests": shows every quest as an editable card with Create / Upload / Back buttons.
+ */
 function handleQuest()
 {
     hideButtons();
@@ -1184,6 +1373,9 @@ function handleQuest()
     }
 }
 
+/**
+ * A picture in the dropdown was clicked: show its name on the dropdown button.
+ */
 function changeSourceSelect()
 {
     let select = document.getElementById(this.classList[0]);
@@ -1191,6 +1383,9 @@ function changeSourceSelect()
     select.click();
 }
 
+/**
+ * Opens or closes a picture dropdown (and closes any other open one).
+ */
 function handleShowSelect()
 {
     let divs = document.getElementsByClassName("sDropdown");
@@ -1221,6 +1416,10 @@ function handleShowSelect()
     
 }
 
+/**
+ * Sends the Interactive popup to everyone (playerChar/Vi/interactive). A picture picked
+ * from the dropdown wins over a typed image link.
+ */
 function handleUploadInteractive()
 {
     let text = document.getElementById("iText");
@@ -1235,6 +1434,9 @@ function handleUploadInteractive()
     handleDone();
 }
 
+/**
+ * Development helper: copies the "Okami" character to create four test players.
+ */
 function handleGenerate()
 {
     let players = ["Mish", "Mistah", "Kha", "Jane"];
@@ -1252,6 +1454,10 @@ function handleGenerate()
     handleDone();
 }
 
+/**
+ * Merges every player's favourite spells and actions into the site's spell and action
+ * lists and downloads them as spells.json and actions.json (to update src/).
+ */
 function backupFavorites()
 {
     let classes = ["Artificer", "Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard", "Infused Abilities"];
@@ -1299,6 +1505,9 @@ function backupFavorites()
     dlAnchorElem.click();
 }
 
+/**
+ * "Upload Image": a form to choose the type (token / push / item / map), a name and a file.
+ */
 function handleUploadImage()
 {
     // 1. Wipe out the main control grid layout buttons 
@@ -1393,6 +1602,10 @@ function handleUploadImage()
     addDone();
 }
 
+/**
+ * Uploads the chosen picture: compresses it, stores it in Firebase Storage, and records
+ * its link under files/<type>/<name>. Items also ask for a description.
+ */
 async function uploadImage()
 {
     let type = document.getElementById("dm-asset-type-select").value;
@@ -1467,6 +1680,9 @@ async function uploadImage()
     }
 }
 
+/**
+ * Opens this DM panel in a new browser tab.
+ */
 function handleOpenPage()
 {
     let window = document.createElement("a");
@@ -1476,11 +1692,17 @@ function handleOpenPage()
     handleDone();
 }
 
+/**
+ * "Done": reloads back to the button grid (after 1s).
+ */
 function handleDone()
 {
     setInterval(() => {location.reload();}, 1000);
 }
 
+/**
+ * Clears the DM button grid before a tool is shown. Also runs the Vi-only check.
+ */
 function hideButtons()
 {
     getUser(); 
@@ -1496,6 +1718,9 @@ function hideButtons()
     }
 }
 
+/**
+ * Adds a Done button under the current tool.
+ */
 function addDone()
 {
     let doneButton = document.createElement("button");
@@ -1508,6 +1733,12 @@ function addDone()
     div.appendChild(doneButton);
 }
 
+/**
+ * Saves the token from the edit form. A new token whose id is taken gets a number added.
+ * It goes to currentMap/<id>, or preset/<id> when editing presets.
+ * Note: the summon check above `let table` would crash if it ever ran (table isn't declared
+ * yet), but isSummon comes from a text box as "true"/"false", so `s == true` is never true.
+ */
 function addToken()
 {
     let b = document.getElementById("border").value;
@@ -1564,6 +1795,9 @@ function addToken()
     resetDelete();
 }
 
+/**
+ * "Refresh Screens": choose a player whose page should reload.
+ */
 function handleRefresh()
 {
     hideButtons();
@@ -1592,6 +1826,10 @@ function handleRefresh()
     addDone();
 }
 
+/**
+ * Writes that player's name to playerChar/Vi/playerRefresh; parent.js on their page sees
+ * it, clears it and reloads.
+ */
 function handleRefreshUpload()
 {
     let playerToRefresh = document.getElementById("playerSelect").value;
@@ -1599,4 +1837,5 @@ function handleRefreshUpload()
     alert("Done");
 }
 
+// Note: init() runs immediately here (the () calls it); setTimeout(init, 1000) would wait 1s.
 setTimeout(init(), 1000);

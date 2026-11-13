@@ -1,3 +1,29 @@
+/**
+ * mapControler.js — every control on the dashboard (index.html) below the map.
+ *
+ * map.js draws the board; this file handles what the player DOES with it:
+ *   • the token panel: D-pad / Ctrl+arrow movement, HP and temp-HP steppers, status
+ *     keywords, map and sheet zoom, Change Token
+ *   • the tab buttons (Stats, Actions, ★ Favorites, Sheet, Skill Tree...) and the spell /
+ *     ability browser with search
+ *   • using a spell or ability on targets: rolling to hit, damage, saves, healing,
+ *     summons, and posting the result (handleUseAction — the rules engine)
+ *   • the dice roller, quests, turn-order arrows and the DM's Interactive popups
+ *
+ * It starts once character data first arrives (setWholeCharCont -> init).
+ *
+ * Spells and abilities are written in a small markup inside their descriptions, which
+ * handleUseAction() reads. The main tags:
+ *   {@damage 2d8+3}        roll to hit against each target's AC, then this damage
+ *   {@save 2d6}            the targets must make a save (the ability is found from the text,
+ *                          or given with {@skill Perception}); optional damage
+ *   {@respond}             answer the DM's current save/check request
+ *   {@sDice 3d6}           extra dice (sneak attack, upcasting...) applied to every target
+ *   {@scaledamage a|b|c}   upcasting: adds a level dropdown that grows the damage dice
+ *   {@temp 5}              give temporary HP     {@Summon name:hp:border:AC:mods:qty}
+ *   {@Rage}  {@infuseRate}  {@sneak}  {@absorb}  {@Choice} (bullet list)  $stat$ (a stat value)
+ */
+
 "use strict";
 
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
@@ -5,8 +31,10 @@ import { toTitleCase, database, createCard, setDoc, deleteDoc, placeBefore, crea
 import { uploadBytes, getDownloadURL, ref as sRef } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 import imageCompression from 'https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.mjs';
 
+// Grid maths for token positions (see setMapValue in viMethods.js).
 let map = setMapValue();
 let currentPos;
+// The pictures of the token this player controls (picture, ring, HP bar).
 let currentCharacter;
 let playerName = document.getElementById("name");
 let key;
@@ -30,7 +58,9 @@ let curClass;
 let searchBar = document.getElementsByName("search");
 let upper = document.getElementById("cards");
 let favorite = false;
+// The spell/ability list currently shown (site list or the player's favourites).
 let db;
+// The spell / ability card last clicked, i.e. the one that will be used.
 let lastSpell;
 let lastAbility;
 let changeTokenBtn;
@@ -41,6 +71,10 @@ let discription;
 let currentToken;
 let favoriteRef;
 
+/**
+ * parent.js calls this when the DM pushes an Interactive popup: show it
+ * (skipped on the very first load).
+ */
 export function setWholeInteractive(data)
 { 
     if(!firstRun)
@@ -49,6 +83,11 @@ export function setWholeInteractive(data)
     }
 }
 
+/**
+ * parent.js calls this whenever character data changes. Updates the AC, infusion %
+ * and bardic inspiration lines, applies the player's saved map zoom and sheet zoom,
+ * and on the first call starts everything (init).
+ */
 export function setWholeCharCont(data)
 {
     let infusedRate = document.getElementById("infusionRate");
@@ -92,6 +131,9 @@ export function setWholeCharCont(data)
     }
 }
 
+/**
+ * parent.js calls this when quests change: shows the active quest's title and text.
+ */
 export function setWholeQuests(data)
 {
     let questTitle = document.getElementById("questTitle");
@@ -108,7 +150,8 @@ export function setWholeQuests(data)
 }
 
 /**
- * Runs when JS opens
+ * Hooks up the D-pad arrows, Ctrl+arrow keys, HP boxes, search bar, dice buttons and
+ * quest card, and remembers which token the player controls.
  */
 function init()
 {
@@ -139,7 +182,9 @@ function init()
 }
 
 /**
- * Sets the varibles for the map
+ * Connects all the panel buttons: the tab rows, spell-level and action-tag buttons, every
+ * +/- stepper (they all share changeValue), Roll, Quick Action and Change Token.
+ * Hides DM-only controls (class "isVi") from everyone except Vi, and works out the map edges.
  */
 function setMainVaribles()
 {   
@@ -178,6 +223,10 @@ function setMainVaribles()
     }
 }
 
+/**
+ * Clicking the map drops a "bubble" ring (in the player's border colour) where they
+ * clicked, so everyone sees where they're pointing. map.js animates and removes it.
+ */
 function handleGridClick(e)
 {
     let bubbleDB = {id : `${window.player}-bubble`, x : (e.offsetX * (100/zoomLevel) - map.bubble), y : (e.offsetY * (100/zoomLevel) - map.bubble), size : 1, src : window.imgs["borders"][window.wholeDB[window.wholeChar[window.player]["currentToken"]].border]};
@@ -185,6 +234,10 @@ function handleGridClick(e)
     setDoc(`bubbles/${bubbleDB.id}`, bubbleDB);
 }
 
+/**
+ * Opens the Quick Action overlay: the player's favourites as compact buttons, so they can
+ * act on the token they just clicked without leaving the map.
+ */
 function handleQuickAction()
 {
     let viewDiv = document.getElementById("cover");
@@ -205,10 +258,7 @@ function handleQuickAction()
 }
 
 /**
- * Rolls number of base dice with no modifier
- * @param {*} amount 
- * @param {*} dice 
- * @returns 
+ * Rolls `amount` dice with `dice` sides and returns each result in a list.
  */
 function basicRoll(amount, dice)
 {
@@ -225,12 +275,9 @@ function basicRoll(amount, dice)
 }
 
 /**
- * Rolls the amount of dice * d(dice) + modifier. If description is needed ifName is true
- * @param {*} amount 
- * @param {*} dice 
- * @param {*} modifier 
- * @param {*} ifName 
- * @returns 
+ * Rolls amountd(dice)+modifier and returns a message like " *2d6+3* : *(4+2)+3=* **9** ".
+ * ifName: "discord" puts the player's name in front; "finalResult" returns just the total.
+ * On a d20, a player holding Bardic Inspiration is asked whether to add a d6 (and it's used up).
  */
 function diceRoller(amount, dice, modifier, ifName)
 {
@@ -281,7 +328,11 @@ function diceRoller(amount, dice, modifier, ifName)
 }
 
 /**
- * Once the roll dice button is clicked
+ * The Roll button. Basic: XdY+Z from the three boxes. Checks / Saves / Misc: d20 + the bonus
+ * of the chosen stat. Advantage/Disadvantage rolls twice and keeps the higher/lower.
+ * The result is posted to Discord and the Display feed.
+ * Saves -> InfusedRate is a d100 infusion save; and if the chosen check/save is the one the
+ * DM asked for, it's sent as the answer instead.
  */
 function handleDiceRoll()
 {
@@ -352,6 +403,7 @@ function handleDiceRoll()
                 }
                 break;
             }
+        // Saves fall through into Checks, and both fall through to the normal d20 roll below.
         case "Checks":
             if(modifier[0] == window.saveOrCheck)
             {
@@ -390,7 +442,8 @@ function handleDiceRoll()
 }
 
 /**
- * When one of the buttons in the first list is clicked
+ * One of the main tab buttons was clicked: show that tab's section, hide the others,
+ * and move the highlight. The ★ tab also loads the player's favourites.
  */
 function handleChangeFirstDisplay()
 {
@@ -431,7 +484,9 @@ function handleChangeFirstDisplay()
 }
 
 /**
- * Displays the favored spells and actions
+ * Listens to the player's favourites (playerChar/<Player>/favorites) and builds a button
+ * for each spell level and action tag they've saved, plus "Create New Spell/Ability".
+ * In quick-action mode the buttons go into the overlay instead.
  */
 function handleFavoriteSelect()
 {
@@ -496,7 +551,7 @@ function handleFavoriteSelect()
 }
 
 /**
- * When one of the buttons in the second list is clicked
+ * Spells / Abilities toggle under the Actions tab: shows that list of buttons and the search bar.
  */
 function handleChangeSecondDisplay()
 {
@@ -537,7 +592,8 @@ function handleChangeSecondDisplay()
 }
 
 /**
- * When the temp hp is changed
+ * Saves the temp-HP box (never below 0) to the token on the map, to the player's own
+ * token copy if it's theirs, and to the DM's summon list if it's a summon.
  */
 function tempHpUpdate()
 {
@@ -555,12 +611,19 @@ function tempHpUpdate()
 }
 
 /**
- * When either the + or - button is clicked, it will change the variable associated with it
- * @returns 
+ * Shared handler for every +/- stepper; the button's name says which one:
+ *   current / temp   HP up or down (current is meant to stay between 0 and max)
+ *   zoom             map zoom 70%–170% (saved per player)
+ *   zoomSheet        sheet zoom 30%–100%
+ *   title            add/remove the keyword in the status box to the token's title. Players
+ *                    always keep their own name and "Infused" in it.
+ *   turn             DM's arrows to move the current turn
  */
 function changeValue()
 {
     let cHp = parseInt(currentHp.value);
+    // Note: maxHp is the "/ max" heading, not an input, so .value is undefined and mHp is NaN.
+    // That means the + button doesn't stop at max HP.
     let mHp = parseInt(maxHp.value);
     let tHp = parseInt(tempHp.value);
     let modifier = this.innerHTML;
@@ -689,9 +752,7 @@ function changeValue()
 }
 
 /**
- * Changes the selected field to true if isSet == set or false for anything else
- * @param {*} data 
- * @param {*} isSet 
+ * Saves one turn-order entry with selected = "true" (its turn) or "false".
  */
 function changeTOValue(data, isSet)
 {
@@ -711,8 +772,8 @@ function changeTOValue(data, isSet)
 }
 
 /**
- * Moves the current turn up or down based on direction
- * @param {*} direction 
+ * Moves "whose turn it is" to the next (or previous) position. Going past the last
+ * position wraps to the first and adds one to the turn counter (and the reverse).
  */
 function handleChangeInTurn(direction)
 {
@@ -759,36 +820,34 @@ function handleChangeInTurn(direction)
 }
 
 /**
- * Moves current token to the given X and Y locations from xPos and yPos
- * @param {*} xPos 
- * @param {*} yPos 
+ * Saves a new grid position for the controlled token after converting pixels back to
+ * a column number / row letter. Also updates the player's token copy or the summon list.
  */
 function moveChar(xPos, yPos)
 {
     let x, y;
-
     x = map.xPos[map.pos.indexOf(xPos)];
     y = map.yPos[map.pos.indexOf(yPos)];
-
-    setDoc(`currentMap/${currentCharacter[0].classList[1]}/xPos`, x);
-    setDoc(`currentMap/${currentCharacter[0].classList[1]}/yPos`, y);
-
-    if(currentCharacter[0].classList[1] == window.player)
+    
+    let currentId = currentCharacter[0].classList[1];
+    
+    setDoc(`currentMap/${currentId}/xPos`, x);
+    setDoc(`currentMap/${currentId}/yPos`, y);
+    
+    if(currentId == window.player)
     {
         setDoc(`playerChar/${window.player}/token/xPos`, x);
         setDoc(`playerChar/${window.player}/token/yPos`, y);
     }
-
-    if(window.wholeDB[currentCharacter[0].classList[1]]["isSummon"])
+    if(window.wholeDB[currentId]["isSummon"])
     {
-        setDoc(`playerChar/Vi/summons/${currentCharacter[0].classList[1]}/xPos`, x);
-        setDoc(`playerChar/Vi/summons/${currentCharacter[0].classList[1]}/yPos`, y);
+        setDoc(`playerChar/Vi/summons/${currentId}/xPos`, x);
+        setDoc(`playerChar/Vi/summons/${currentId}/yPos`, y);
     }
-
 }
 
 /**
- * Changes the hp image of the token then makes sure update class is added
+ * Saves the current-HP box to the controlled token (and the player's copy / summon list).
  */
 function updateHp()
 {
@@ -805,7 +864,8 @@ function updateHp()
 }
 
 /**
- * When the player hits the arrow button or types an arrow with cntl button moves the tokens
+ * Moves the controlled token one square (D-pad click or Ctrl+arrow). Bigger creatures
+ * have a closer edge so their whole body stays on the map.
  */
 function handleArrow()
 {
@@ -859,35 +919,36 @@ function handleArrow()
         case "up":
             if(bounds[0] < currentPos[1]) //If they are not on the top border
             {
-                moveChar(currentPos[0], currentPos[1] - map.movement);
+                moveChar(currentPos[0], currentPos[1] - map.movement, "up");
             }  
             break;
+        
         
         case "down":
             if(bounds[1] > currentPos[1]) //If they are not on the bottom border
             {
-                moveChar(currentPos[0], currentPos[1] + map.movement);
+                moveChar(currentPos[0], currentPos[1] + map.movement, "down");
             }    
             break;
-
+        
         case "left": 
             if(bounds[0] < currentPos[0]) //If they are not on the left border
             {
-                moveChar(currentPos[0] - map.movement, currentPos[1]);
+                moveChar(currentPos[0] - map.movement, currentPos[1], "left");
             }
             break;
-
+        
         case "right":
             if(bounds[1] > currentPos[0]) //If they are not on the right border
             {
-                moveChar(currentPos[0] + map.movement, currentPos[1]);
+                moveChar(currentPos[0] + map.movement, currentPos[1], "right");
             } 
             break;
     }
 }
 
 /**
- * Remove all cards displayed
+ * Removes every spell/ability card from the list (or from the quick-action overlay).
  */
 function emptyCards()
 {
@@ -908,7 +969,9 @@ function emptyCards()
 }
 
 /**
- * Show spells when a level is clicked
+ * A spell-level button was clicked: show every spell of that level as a card (from the
+ * site's list, or from the player's favourites on the ★ tab). If the search box has text,
+ * only matching spells are shown.
  */
 function handleShowSpells()
 {
@@ -952,7 +1015,8 @@ function handleShowSpells()
 }
 
 /**
- * Shows actions when a action tag is clicked
+ * An ability-tag button (Barbarian, Misc...) was clicked: show those abilities as cards,
+ * the same way as handleShowSpells.
  */
 function handleShowActions()
 {
@@ -996,10 +1060,9 @@ function handleShowActions()
 }
 
 /**
- * Sets up text to show spells and actions info, from lst (spells or actions database) and current (level or tag)
- * @param {*} current 
- * @param {*} lst 
- * @returns 
+ * Turns one spell/ability entry into the lines shown on its card: casting time, range,
+ * components, duration (spells only), then the description. {@Choice} lines become
+ * bullet points and {@enter} starts a new paragraph.
  */
 function setUpText(current, lst)
 {
@@ -1054,7 +1117,7 @@ function setUpText(current, lst)
 }
 
 /**
- * When the search bar text changes, it will show cards matching it
+ * The search box changed: show only the spells/abilities whose names contain the text.
  */
 function handleSearch()
 {
@@ -1085,7 +1148,11 @@ function handleSearch()
 }
 
 /**
- * When someone clicks the card, gives button options of Favorite button, Cast Button and upcast, or edit for favored cards
+ * A spell/ability card was clicked. The first click narrows the list to that card. Then
+ * it shows the card's options: favourite star, advantage, upcast level (spells with
+ * {@scaledamage} / {@absorb}), Sneak Attack (rogues), the crit option (Kody/Vi), flanking,
+ * Edit (on favourites) and the Select Targets / Use button. Clicking the same card
+ * again clears the search and shows the full list.
  */
 function handleCardClick()
 {
@@ -1354,6 +1421,9 @@ function handleCardClick()
     }
 }
 
+/**
+ * Shows a checkbox list of every token on the map (with its position) to pick targets.
+ */
 function handleTargetButton()
 {
     let div = document.getElementById("targetsDiv");
@@ -1392,6 +1462,12 @@ function handleTargetButton()
     }
 }
 
+/**
+ * A target checkbox changed: highlight or un-highlight that token on the map, and switch
+ * the button between "Select Targets" and "Use Ability".
+ * Note: `castBtn` here isn't defined in this function (the button was created in
+ * handleCardClick), so this relies on the browser treating its id as a global.
+ */
 function handleSelectedTarget()
 {
     if(this.checked)
@@ -1433,6 +1509,20 @@ function handleSelectedTarget()
     }
 }
 
+/**
+ * The rules engine: resolves the chosen spell/ability against `targets` (the highlighted
+ * token pictures) and posts what happened. `manual` is "{@respond}" when answering a save.
+ * In order it:
+ *   1. picks the entry, swaps in the upcast dice, and replaces $stat$ with the player's stats
+ *   2. handles each tag in the description (see the list at the top of this file):
+ *      saves ask the DM's response slot for a roll, {@respond} rolls the save and applies
+ *      full or half damage, {@damage} rolls to hit against each target's AC (natural 20
+ *      doubles the dice), healing spells add HP instead, {@sDice} adds extra dice,
+ *      summons create tokens, and so on
+ *   3. saves every changed token in one write (currentMap/)
+ *   4. if it lasts a while, records it in the turn order so the timer icon shows
+ *   5. sends the summary to Discord and the Display feed.
+ */
 function handleUseAction(targets, manual = null)
 {
     let display;
@@ -1471,6 +1561,7 @@ function handleUseAction(targets, manual = null)
         else if(description.includes("{@absorb")){description = `{@sDice ${upcast[0].value}}`}
     }
 
+    // Bardic Inspiration: give each target an inspiration die.
     if(description.includes("Bardic Inspiration die"))
     {
         display += "Giving Bardic Die to: "
@@ -1493,6 +1584,7 @@ function handleUseAction(targets, manual = null)
         }
     }
 
+    // $stat$ in a description is replaced by that stat from the player's sheet (e.g. $spellBonus$).
     if(description.includes("$"))
     {
         let stat;
@@ -1521,6 +1613,8 @@ function handleUseAction(targets, manual = null)
             if(curClass){display = display.replaceAll("cast", "use the ability");}
         }
 
+        // {@save}: store the request in playerChar/Vi/responses (which ability, DC, who cast it)
+        // so targets can answer with {@respond}.
         if(description.includes("{@save")) 
         {
             let skill = "unknown";
@@ -1563,6 +1657,8 @@ function handleUseAction(targets, manual = null)
             if(!spellLevel){display = display.replaceAll("cast", "used the ability");} //At the end
         }
 
+        // {@respond}: roll the requested save for this player and apply the original spell's
+        // damage (half on a success, where the spell says so).
         if(description.includes("{@respond}")) //Needs to check if half damage if sucess
         {
             let wholeRespone = window.wholeChar["Vi"]["responses"];
@@ -1663,6 +1759,8 @@ function handleUseAction(targets, manual = null)
             handleChangeHp(increase, window.wholeDB[targets[key].title.split(":")[0]], "+")
         }
 
+        // {@Summon name:hp:border:AC:modifiers:quantity}: create that many tokens on the map.
+        // HP can be based on level, e.g. currentLv*5.
         if(discription.includes("{@Summon"))
         {
             let info = discription.slice(discription.indexOf("{@Summon"));
@@ -1740,6 +1838,8 @@ function handleUseAction(targets, manual = null)
             setDoc(`playerChar/${window.player}/rage`, true);
         }
         
+        // {@damage}: attack roll (d20 + bonus, +2 when flanking) against each target's AC,
+        // then damage. A natural 20 doubles the number of dice; rage adds +2.
         if(description.includes("{@damage"))
         {
             let userAddTo = "";
@@ -1806,6 +1906,7 @@ function handleUseAction(targets, manual = null)
                 ad_dis = ` <strong>First Roll: ${take}, Second Roll: ${take2}.</strong>`;
             }
             
+            // Cantrips get stronger at levels 5, 11 and 17: use the matching part of the description.
             if(spellLevel == "0")
             {
                 if(parseInt(window.wholeChar[window.player]["stats"]["lv"]) >= 17)
@@ -1959,6 +2060,7 @@ function handleUseAction(targets, manual = null)
             display += ad_dis;
         }
         
+        // {@sDice}: extra damage dice that always land (no attack roll), on every target.
         if(description.includes("{@sDice"))
         {
             let sDices = description.split("{@sDice");
@@ -1982,6 +2084,7 @@ function handleUseAction(targets, manual = null)
             }
         }
 
+        // {@infuseRate}: d100 against the player's infusion rate.
         if(description.includes("{@infuseRate"))
         {
             let rate = parseInt(window.wholeChar[window.player]["infusedRate"]);
@@ -2030,6 +2133,8 @@ function handleUseAction(targets, manual = null)
         if(curClass){display = display.replaceAll("cast", "use the ability");}
     }
 
+    // How long it lasts, in turns, for the turn-order timer.
+    // This uses 1 minute = 9 turns and 1 hour = 514 turns (D&D rounds are 6 seconds, so 10 and 600).
     let timeActive = "0";
 
     if(listOf[lastUse]["duration"]) //spell set turn count down
@@ -2111,6 +2216,11 @@ function handleUseAction(targets, manual = null)
 
 window.handleUseAction = handleUseAction;
 
+/**
+ * Gets the number to add to an attack roll ("@damage") or the save DC to beat ("@save").
+ * The DM is always asked (and the answer is remembered). Players use their saved spell
+ * bonus / spell DC, and are asked only if it's missing.
+ */
 function spellOrAttackBonus(usage)
 {
     let userAddTo;
@@ -2154,6 +2264,10 @@ function spellOrAttackBonus(usage)
     return userAddTo;
 }
 
+/**
+ * Pulls a dice expression out of a description: for "{@damage 2d8+3}" and "@damage" it
+ * returns ["2", "8", "+3"] (count, sides, modifier; "0" if there is no modifier).
+ */
 function splitRoll(discription, splitValue)
 {[].join()
     let damage;
@@ -2166,6 +2280,10 @@ function splitRoll(discription, splitValue)
     return damage;
 }
 
+/**
+ * "Create New Spell/Ability" on the ★ tab: copies a starter entry (Sacred Flame or
+ * Magical Tinkering) into the player's favourites and opens it for editing.
+ */
 function handleCreateNew()
 {
     if(this.innerHTML == "Create New Spell")
@@ -2185,12 +2303,16 @@ function handleCreateNew()
     handleEditCard();
 }
 
+/**
+ * Shows a favourite spell/ability as an editable form (name, level or tag, casting time...)
+ * with a cheat sheet of the {@...} tags, and Upload / Cancel.
+ */
 function handleEditCard()
 {
     emptyCards();
 
     let cardDiv = document.createElement("div");
-    cardDiv.setAttribute("class", "card .bg-UP-blue notes");
+    cardDiv.setAttribute("class", "card notes");
     let cardBody = document.createElement("div");
     cardBody.setAttribute("class", "card-body notes");
     let cardTitle = document.createElement("h5");
@@ -2251,6 +2373,9 @@ function handleEditCard()
     cardDiv.appendChild(btnDiv);
 }
 
+/**
+ * Adds one labelled field to the edit form (Description gets a big text area).
+ */
 function editCardSetup(text, temp, cardBody, i)
 {
     let cardText = document.createElement("p");
@@ -2271,6 +2396,10 @@ function editCardSetup(text, temp, cardBody, i)
     cardBody.appendChild(document.createElement("br"));
 }
 
+/**
+ * Cancel on the edit form. If it was a brand-new entry (still the starter), delete it.
+ * Then go back to the ★ tab.
+ */
 function cancelEdit()
 {
     if(spellLevel)
@@ -2293,6 +2422,9 @@ function cancelEdit()
     firstMenu[2].click();
 }
 
+/**
+ * Saves the edited favourite under its (possibly new) level/tag and name, replacing the old one.
+ */
 function uploadEdit()
 {
     let spellDisc = document.getElementsByClassName("spellDisc");
@@ -2329,6 +2461,10 @@ function uploadEdit()
     emptyCards();
 }
 
+/**
+ * The star on a card: adds the spell/ability to the player's favourites (gold star) or
+ * removes it (empty star). "/" in names is saved as " or " because "/" can't be in a database key.
+ */
 function handleFavoriteBtn()
 {
     let cardName = this.lastChild.classList[0].replaceAll("_", " ");
@@ -2367,6 +2503,10 @@ function handleFavoriteBtn()
     }
 }
 
+/**
+ * "Change Token": turns the button into Submit and shows picture and border dropdowns
+ * (standard + custom images) plus Manage Custom Images and Cancel.
+ */
 function handleChangeToken()
 {
     changeTokenBtn.innerHTML = "Submit";
@@ -2395,7 +2535,7 @@ function handleChangeToken()
         selects[i].style.width = "100%";
 
         let dropBtn = document.createElement("button");
-        dropBtn.classList = `color-I-button dropbtn ${labels[i]}`;
+        dropBtn.classList = `text-brass dropbtn ${labels[i]}`;
         dropBtn.id = `${labels[i]}Button`;
         dropBtn.onclick = handleShowSelect;
         placeBefore(dropBtn, selects[i]);
@@ -2464,6 +2604,9 @@ function handleChangeToken()
     placeBefore(customsBtn, changeTokenBtn);
 }
 
+/**
+ * A picture in a dropdown was clicked: write its name on the dropdown button and close it.
+ */
 function changeSourceSelect()
 {
     let select = document.getElementById(this.classList[0]);
@@ -2471,6 +2614,9 @@ function changeSourceSelect()
     select.click();
 }
 
+/**
+ * Submit: saves the chosen picture and border to the controlled token on the map.
+ */
 function handleUpdateToken()
 {
     let name = document.getElementById("name").innerHTML;
@@ -2485,6 +2631,9 @@ function handleUpdateToken()
     handleCancelTokenChange();
 }
 
+/**
+ * Removes everything Change Token added around the button and turns it back into "Change Token".
+ */
 function handleCancelTokenChange()
 {
     let elements = changeTokenBtn.parentNode;
@@ -2518,6 +2667,9 @@ function handleCancelTokenChange()
     changeTokenBtn.onclick = handleChangeToken;
 }
 
+/**
+ * Opens or closes a picture dropdown (and closes any other open one).
+ */
 function handleShowSelect()
 {
     let divs = document.getElementsByClassName("sDropdown");
@@ -2548,6 +2700,13 @@ function handleShowSelect()
     
 }
 
+/**
+ * "Manage Custom Images": lists the player's uploaded images with Delete buttons, and a
+ * form to upload a new one.
+ * Note: the Delete buttons point at handleDeleteCustom, which is commented out below, so
+ * this stops with an error for players who have custom images. selection.js has a
+ * working copy of that function.
+ */
 function handleCustomsButton()
 {
     handleCancelTokenChange();
@@ -2585,7 +2744,7 @@ function handleCustomsButton()
     
     let fileLabel = document.createElement("h6");
     fileLabel.innerHTML = "Upload Image: ";
-    fileLabel.classList = "color-UP-yellow";
+    fileLabel.classList = "text-brass";
     fileLabel.style.margin = "5px";
     fileLabel.style.display = "inline";
 
@@ -2601,7 +2760,7 @@ function handleCustomsButton()
 
     let nameLabel = document.createElement("h6");
     nameLabel.innerHTML = "Nickname: ";
-    nameLabel.classList = "color-UP-yellow";
+    nameLabel.classList = "text-brass";
     nameLabel.style.margin = "5px";
     nameLabel.style.display = "inline";
 
@@ -2628,6 +2787,7 @@ function handleCustomsButton()
     placeBefore(cancelBtn, changeTokenBtn);
 }
 
+// Commented-out older version; see the note on handleCustomsButton().
 /**function handleDeleteCustom()
 {
     deleteDoc(`customImages/${this.id}`);
@@ -2647,6 +2807,10 @@ function handleCustomsButton()
     reload(.5);
 }*/
 
+/**
+ * Uploads a new custom token picture: checks a file and nickname, compresses it to ~0.2 MB,
+ * stores it in Firebase Storage and lists it under files/tokens/<nickname>-, then reloads.
+ */
 async function handleCreateCustom()
 {
     let fileElement = document.getElementById("CustomFileInput");
@@ -2707,6 +2871,9 @@ async function handleCreateCustom()
     }
 }
 
+/**
+ * Shows the DM's Interactive popup (picture + text) to this player in the #cover overlay.
+ */
 function displayInteractive()
 {
     let image = document.getElementById("viewToken");
@@ -2727,6 +2894,10 @@ function displayInteractive()
     text.innerHTML = window.wholeInteractive["text"];
 }
 
+/**
+ * First click on Select Targets: puts the player in "using" mode (clicking tokens now
+ * picks targets), adds a second Use button above the map, and continues in useAbility().
+ */
 function displaySelect()
 {
     this.onclick = useAbility;
@@ -2740,6 +2911,10 @@ function displaySelect()
     this.click();
 }
 
+/**
+ * No targets picked yet: show the target checklist. Otherwise run handleUseAction on the
+ * highlighted tokens, return to "waiting" mode and clear the cards, highlights and search.
+ */
 function useAbility()
 {
     let targets = document.getElementsByClassName("selected-temp");
@@ -2770,6 +2945,10 @@ function useAbility()
     }
 }
 
+/**
+ * Switches the dice roller between Basic (XdY+Z boxes) and Checks / Saves / Misc
+ * (a dropdown of stats from rolls.json, showing the chosen stat's bonus).
+ */
 function handleDiceSelect()
 {
     let selects = document.getElementsByClassName("diceSelect");
@@ -2824,6 +3003,10 @@ function handleDiceSelect()
     }
 }
 
+/**
+ * Clicking the quest card shows every other quest: incomplete ones below it, completed
+ * ones above it. Clicking again hides them (handleDeleteQuests).
+ */
 function handleLoadQuests()
 {
     let questDiv = document.getElementById("quest");
@@ -2845,7 +3028,7 @@ function handleLoadQuests()
         
         card.classList = "card temp-Card";
         cardBody.classList = "card-body";
-        title.classList = "card-title color-UP-black";
+        title.classList = "card-title text-parchment";
         title.innerHTML = questTitle;
         text.innerHTML = questText;
         text.classList = "card-text";
@@ -2871,6 +3054,9 @@ function handleLoadQuests()
     }
 }
 
+/**
+ * Hides the extra quest cards again.
+ */
 function handleDeleteQuests()
 {
     document.getElementById("questInstructions").innerHTML="<em><b>Click To See All Quest...</b></em>";
@@ -2892,6 +3078,9 @@ function handleDeleteQuests()
 
 }
 
+/**
+ * Dice roller: a stat was chosen; show its bonus next to the dropdown.
+ */
 function updateStat()
 {
     let diceMod = document.getElementById("diceMod");
@@ -2901,6 +3090,12 @@ function updateStat()
     else{diceMod.innerHTML = `${toTitleCase(stat)}: +0`;}
 }
 
+/**
+ * Changes a token's HP in the local copy (saved later by handleUseAction).
+ *   "+": heal, capped at max HP
+ *   "-": damage, which uses up temp HP first, never below 0
+ * If the ability's text mentions temporary hit points, it adds temp HP instead.
+ */
 function handleChangeHp(damage, token, modifier)
 {
     if(discription.toLowerCase().includes("temporary hit point"))

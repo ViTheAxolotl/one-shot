@@ -1,9 +1,33 @@
+/**
+ * parent.js — the live data hub for the Dashboard (index.html).
+ *
+ * Loaded once by index.html. It opens a real-time listener on every part of the
+ * Firebase database the dashboard needs and copies each one onto `window` (wholeDB,
+ * wholeChar, wholeTO, ...). Every page shown inside a dashboard iframe (Sheet, Notes,
+ * DM tools, Skill Tree...) reads its data from here through `window.top.parent`, so
+ * those pages never open their own database connection.
+ *
+ * Whenever Firebase reports a change, the matching `window.whole*` object is replaced
+ * and, where needed, handed to map.js / mapControler.js (setWholeDB, setWholeTO, ...)
+ * so they can redraw.
+ *
+ * Firebase paths it watches:
+ *   currentMap/        -> window.wholeDB        tokens on the battle map
+ *   playerChar/        -> window.wholeChar      every character (stats, sheet, zoom levels, Vi's DM data)
+ *   currentTO/         -> window.wholeTO        turn order
+ *   playerChar/Vi/...  -> summons, interactive objects, quests, playerRefresh
+ *   bubbles            -> window.wholeBubbles   spell-area circles drawn on the map
+ *   display/           -> window.wholeDisplay   the 10 most recent combat messages
+ *   files/, customImages/, preset/              shared images and preset tokens
+ */
+
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js'; 
 import { auth, database, toTitleCase, setDoc } from './js/viMethods.js';
 import { setMode, setWholeDB, setWholeTO, setWholeSummons, setWholeBubbles } from './src/map.js';
 import { setWholeInteractive, setWholeCharCont, setWholeQuests } from './js/mapControler.js';
 
+// Global stores, filled in by the listeners below. Other pages read them via window.top.parent.
 window.wholeCustom = {};
 window.wholeBubbles = {};
 window.wholeChar = {};
@@ -19,6 +43,8 @@ window.wholeActions = {};
 window.wholeSpells = {};
 window.wholeRolls = {};
 
+// Not logged in -> send them to the login page. Logged in -> remember the player's name
+// (the part of their email before @, title-cased) and mark them as "waiting" in map.js.
 onAuthStateChanged(auth, (user) => 
 {
     if (!user) 
@@ -35,10 +61,12 @@ onAuthStateChanged(auth, (user) =>
     }
 });
 
+// Static rules data (actions, spells, preset rolls) loaded once from the live site.
 fetch('https://infused.axol-apps.com/src/actions.json').then(res => res.json()).then((json) => wholeActions = json);
 fetch('https://infused.axol-apps.com/src/spells.json').then(res => res.json()).then((json) => wholeSpells = json);
 fetch('https://infused.axol-apps.com/src/rolls.json').then(res => res.json()).then((json) => wholeRolls = json);
 
+// --- Real-time listeners: each one fires immediately with the current value, then on every change ---
 const filesRef = ref(database, 'files/');
 onValue(filesRef, (snapshot) => 
 {
@@ -66,6 +94,7 @@ onValue(charRef, (snapshot) =>
 {
     const data = snapshot.val();
     wholeChar = data;
+    // The DM (Vi) can ask everyone for a save/check; saveOrCheck holds which ability is being asked for.
     window.wholeRespone = data["Vi"]["responses"];
     window.saveOrCheck = window.wholeRespone["ability"];
     setWholeCharCont(data);
@@ -125,6 +154,7 @@ onValue(presetRef, (snapshot) =>
     wholePre = data;
 });
 
+// The DM tools can force one player's page to reload by writing their name here.
 const refreshRef = ref(database, `playerChar/Vi/playerRefresh`);
 onValue(refreshRef, (snapshot) =>
 {
