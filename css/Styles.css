@@ -48,8 +48,74 @@
 }
 
 /* 2. BASE ------------------------------------------------------------- */
+/* =====================================================================
+   Infused — table companion styles
+   Theme: lantern-lit dungeon table. Oak & leather panels with brass trim,
+   parchment for anything you'd read (spells, notes, quests, sheets).
+
+   Layout:
+     1. Fonts & tokens          8. Overlay / token viewer
+     2. Base elements           9. Parchment: cards, notes, quests
+     3. Colour helper classes  10. DM tools
+     4. Navbar                 11. Character sheet (stats.html)
+     5. Panels & header        12. Spell slots
+     6. Buttons & states       13. Old pages (oldIndex, recap, login)
+     7. Dashboard              14. Responsive
+   ===================================================================== */
+
+/* 1. FONTS & TOKENS -------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&display=swap');
+
+:root
+{
+    /* surfaces */
+    --night:        #120e0b;   /* behind everything */
+    --oak:          #251b14;   /* panel base */
+    --oak-deep:     #1b140f;   /* insets, wells */
+    --leather:      #4a231c;   /* buttons */
+    --leather-hi:   #61302a;
+    --stone:        #3a332e;   /* small +/- buttons */
+
+    /* metal & paper */
+    --brass:        #c9a24a;
+    --brass-dim:    #7d6230;
+    --brass-glow:   rgba(233, 190, 92, .45);
+    --parchment:    #ecdcb6;   /* text on dark */
+    --parchment-dim:#b9a986;
+    --ink:          #2b1d12;   /* text on paper */
+    --ink-soft:     #5a4430;
+
+    /* meaning */
+    --moss:         #3f5f2e;   /* complete / good */
+    --blood:        #8e2a22;   /* danger / remove */
+
+    --font-display: 'IM Fell English SC', 'IM Fell English', Georgia, serif;
+    --font-title:   'IM Fell English', Georgia, serif;
+    --font-body:    'Alegreya', Georgia, 'Times New Roman', serif;
+
+    --radius:       4px;
+    --frame:        0 0 0 3px #0d0907, 0 0 0 4px var(--brass-dim), 0 14px 30px rgba(0, 0, 0, .55);
+}
+
+/* 2. BASE ------------------------------------------------------------- */
 body
 {
+    background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 176, 84, .10), transparent 70%),
+        linear-gradient(rgba(12, 8, 6, .55), rgba(12, 8, 6, .82)),
+        url(../images/background.jpg) var(--night);
+    background-attachment: fixed;
+    color: var(--parchment);
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    font-variant-numeric: lining-nums;
+}
+
+/* Pages that live inside an iframe on the dashboard blend into the panel */
+body.embedded
+{
+    background: var(--oak);
     background:
         radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 176, 84, .10), transparent 70%),
         linear-gradient(rgba(12, 8, 6, .55), rgba(12, 8, 6, .82)),
@@ -71,14 +137,23 @@ body.embedded
 body * { -webkit-text-size-adjust: none !important; }
 
 h1, h2, h3, h4, h5, h6
+h1, h2, h3, h4, h5, h6
 {
+    text-align: center;
+    margin-bottom: 10px;
+    line-height: 1.2;
     text-align: center;
     margin-bottom: 10px;
     line-height: 1.2;
 }
 
 h1, h2, h3
+h1, h2, h3
 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    color: #e6c77e;
+    letter-spacing: .02em;
     font-family: var(--font-display);
     font-weight: 400;
     color: #e6c77e;
@@ -86,11 +161,31 @@ h1, h2, h3
 }
 
 h4, h5
+h4, h5
 {
+    font-family: var(--font-title);
+    font-weight: 400;
     font-family: var(--font-title);
     font-weight: 400;
 }
 
+h5
+{
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+}
+
+h6
+{
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 1.05rem;
+}
+
+p
+{
+    text-indent: 30px;
 h5
 {
     text-decoration: underline;
@@ -127,8 +222,37 @@ hr
     opacity: 1;
     background: linear-gradient(90deg, transparent, var(--brass-dim) 20%, var(--brass-dim) 80%, transparent);
     margin: 14px 0;
+a
+{
+    color: #e6c77e;
 }
 
+a:hover
+{
+    color: #fff1c9;
+}
+
+hr
+{
+    border: 0;
+    height: 1px;
+    opacity: 1;
+    background: linear-gradient(90deg, transparent, var(--brass-dim) 20%, var(--brass-dim) 80%, transparent);
+    margin: 14px 0;
+}
+
+input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),
+select,
+textarea
+{
+    background: #f3e7c9;
+    color: var(--ink);
+    border: 1px solid var(--brass-dim);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-family: var(--font-body);
+    font-variant-numeric: lining-nums;
+    box-shadow: inset 0 1px 3px rgba(60, 35, 10, .35);
 input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),
 select,
 textarea
@@ -149,8 +273,23 @@ textarea:focus
 {
     outline: 2px solid var(--brass);
     outline-offset: 1px;
+input:focus,
+select:focus,
+textarea:focus
+{
+    outline: 2px solid var(--brass);
+    outline-offset: 1px;
 }
 
+input[type=checkbox], input[type=radio]
+{
+    accent-color: var(--leather);
+}
+
+::selection
+{
+    background: var(--brass);
+    color: var(--ink);
 input[type=checkbox], input[type=radio]
 {
     accent-color: var(--leather);
@@ -164,10 +303,42 @@ input[type=checkbox], input[type=radio]
 
 /* scrollbars inside panels & iframes */
 *
+/* scrollbars inside panels & iframes */
+*
 {
+    scrollbar-color: var(--brass-dim) var(--oak-deep);
     scrollbar-color: var(--brass-dim) var(--oak-deep);
 }
 
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--oak-deep); }
+::-webkit-scrollbar-thumb { background: var(--brass-dim); border: 3px solid var(--oak-deep); border-radius: 8px; }
+::-webkit-scrollbar-corner { background: var(--oak-deep); }
+
+iframe
+{
+    border: 1px solid var(--brass-dim);
+    border-radius: var(--radius);
+    background: var(--oak);
+}
+
+/* 3. COLOUR HELPER CLASSES -------------------------------------------
+   Named after the palette above. Used in the HTML and by the JS. */
+.bg-oak       { background-color: var(--oak) !important; }
+.bg-oak-deep  { background-color: var(--oak-deep) !important; }
+.bg-stone     { background-color: var(--stone) !important; }
+
+.text-parchment { color: var(--parchment); }
+.text-brass     { color: #e6c77e; }
+
+/* 4. NAVBAR ----------------------------------------------------------- */
+.navbar.bg-dark
+{
+    background:
+        linear-gradient(180deg, #1d1611, #120d0a) !important;
+    border-bottom: 1px solid var(--brass-dim);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .5);
+    padding: 6px 0;
 ::-webkit-scrollbar { width: 12px; height: 12px; }
 ::-webkit-scrollbar-track { background: var(--oak-deep); }
 ::-webkit-scrollbar-thumb { background: var(--brass-dim); border: 3px solid var(--oak-deep); border-radius: 8px; }
@@ -218,10 +389,20 @@ iframe
     font-size: 1.15rem;
     padding: 6px 12px !important;
     border-bottom: 1px solid transparent;
+.navbar-nav .nav-link.active, .nav-link
+{
+    color: var(--parchment);
+    font-family: var(--font-title);
+    font-size: 1.15rem;
+    padding: 6px 12px !important;
+    border-bottom: 1px solid transparent;
 }
 
 .navbar-nav .nav-link:hover
+.navbar-nav .nav-link:hover
 {
+    color: #fff1c9;
+    border-bottom-color: var(--brass);
     color: #fff1c9;
     border-bottom-color: var(--brass);
 }
@@ -256,8 +437,49 @@ iframe
 .navbar-primary .navbar-toggler-icon
 {
     background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(201,162,74,1)' stroke-width='3' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+/* user / login button at the right of the nav */
+.navbar button.link-primary
+{
+    width: auto;
+    margin: 0;
+    padding: 4px 18px;
+    background: transparent !important;
+    color: #e6c77e !important;
+    border: 1px solid var(--brass-dim);
+    border-radius: 999px;
+    font-family: var(--font-title);
+    font-size: 1.05rem;
+    text-decoration: none;
 }
 
+.navbar button.link-primary:hover
+{
+    border-color: var(--brass);
+    background: rgba(201, 162, 74, .12) !important;
+}
+
+.navbar .dropdown-menu.bg-dark
+{
+    background: var(--oak-deep) !important;
+    border: 1px solid var(--brass-dim);
+}
+
+.navbar-primary .navbar-toggler-icon
+{
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(201,162,74,1)' stroke-width='3' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
+
+.navbar-primary .navbar-toggler
+{
+    border-color: var(--brass-dim);
+    width: 56px;
+    margin: 0;
+    background: transparent;
+}
+
+/* 5. PANELS & HEADER -------------------------------------------------- */
+#info, #hometown, #footer, #header, #story, #list, #display, #map,
+#notes, #controls, #discDisplay, #gridMapWrapper, #login
 .navbar-primary .navbar-toggler
 {
     border-color: var(--brass-dim);
@@ -565,6 +787,7 @@ button[name="favorites"] img
 }
 
 #deleteButton, #addButton
+#deleteButton, #addButton
 {
     width: 75px;
     height: 75px;
@@ -572,7 +795,10 @@ button[name="favorites"] img
 
 /* Favorite star inside a spell card's button (size set inline by mapControler.js) */
 #favoriteBtn
+/* Favorite star inside a spell card's button (size set inline by mapControler.js) */
+#favoriteBtn
 {
+    margin-top: 0;
     margin-top: 0;
 }
 
@@ -582,8 +808,23 @@ button[name="favorites"] img
 {
     background: linear-gradient(180deg, #557a3d, var(--moss));
     border-color: #8fae6a;
+/* "Select Targets" / "Use Ability" on a spell card: the go button.
+   mapControler.js sets an inline green; this keeps it green, in the theme */
+#castBtn
+{
+    background: linear-gradient(180deg, #557a3d, var(--moss));
+    border-color: #8fae6a;
 }
 
+#castBtn:hover
+{
+    background: linear-gradient(180deg, #628b47, #4a6e36);
+}
+
+.eOrD
+{
+    width: 20%;
+    margin: 5px;
 #castBtn:hover
 {
     background: linear-gradient(180deg, #628b47, #4a6e36);
@@ -618,8 +859,32 @@ table, .itemSearch, #itemImg
 #gridMapWrapper #gridMap
 {
     flex: none;
+/* 7. DASHBOARD -------------------------------------------------------- */
+table, .itemSearch, #itemImg
+{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
+/* Battle map */
+/* Map on top, zoom buttons centred in the space left underneath it */
+/* no bottom padding, so the gap under the buttons matches the gap above
+   (.row > raises specificity over the phone padding rule further down) */
+.row > #gridMapWrapper
+{
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
+}
+
+#gridMapWrapper #gridMap
+{
+    flex: none;
+}
+
+.zoomBar
 .zoomBar
 {
     flex: 1;
@@ -627,8 +892,24 @@ table, .itemSearch, #itemImg
     justify-content: center;
     align-items: center;
     gap: 8px;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
 }
 
+.zoomBar .gridButton.inOrDe
+{
+    margin: 0;
+}
+
+#gridMap
+{
+    border: 3px solid #0d0907 !important;
+    outline: 1px solid var(--brass-dim);
+    border-radius: 2px;
+    background: #2b2622;
 .zoomBar .gridButton.inOrDe
 {
     margin: 0;
@@ -654,6 +935,13 @@ table, .itemSearch, #itemImg
     overflow-x: clip;
 }
 
+/* The sheet zoom scales the iframe down but its layout box stays wide;
+   clip that blank overflow so the page doesn't scroll sideways */
+#sheet
+{
+    overflow-x: clip;
+}
+
 #gridMap, #statSheet
 {
     position: relative;
@@ -661,6 +949,12 @@ table, .itemSearch, #itemImg
     width: 100%;
     overflow: scroll;
     object-fit: cover;
+}
+
+#gridMap
+{
+    transition: transform 0.3s ease;
+    transform-origin: center center;
 }
 
 #gridMap
@@ -686,6 +980,9 @@ table, .itemSearch, #itemImg
 .tokens  { z-index: 800; }
 .border_ { z-index: 1000; }
 .hp      { z-index: 900; }
+.tokens  { z-index: 800; }
+.border_ { z-index: 1000; }
+.hp      { z-index: 900; }
 
 .arrows
 {
@@ -693,7 +990,39 @@ table, .itemSearch, #itemImg
 }
 
 .customImg, #story .tokens
+.customImg, #story .tokens
 {
+    border-radius: 50%;
+}
+
+#gridMap .customImg
+{
+    width: 73px;
+    height: 73px;
+}
+
+#story .tokens
+{
+    width: 12vh;
+    height: 12vh;
+}
+
+/* Character name above the tabs */
+#controls #name
+{
+    font-size: clamp(1.8rem, 3.4vw, 2.4rem);
+    margin: 4px 0 14px;
+}
+
+/* Stats tab */
+#stats > table
+{
+    width: 100%;
+}
+
+#stats td
+{
+    padding: 4px 8px;
     border-radius: 50%;
 }
 
@@ -733,16 +1062,24 @@ table, .itemSearch, #itemImg
 }
 
 .labelS
+.labelS
 {
+    display: inline;
+    margin: 5px;
     display: inline;
     margin: 5px;
 }
 
 #titles .labelS
+#titles .labelS
 {
+    font-size: 1.1rem;
     font-size: 1.1rem;
 }
 
+/* Current & Temp HP share one grid so the steppers line up.
+   label | + | value | -   (the label column is as wide as "Current Hp:") */
+#hp
 /* Current & Temp HP share one grid so the steppers line up.
    label | + | value | -   (the label column is as wide as "Current Hp:") */
 #hp
@@ -782,8 +1119,44 @@ table, .itemSearch, #itemImg
     padding: 2px 0;
     margin: 0;
     text-align: left !important;
+    display: grid;
+    grid-template-columns: auto 48px 84px 48px;
+    justify-content: start;
+    align-items: center;
+    gap: 8px 6px;
 }
 
+#hp .labelS
+{
+    display: block;
+    margin: 0 6px 0 0;
+    font-size: 1.1rem;
+    text-align: left;
+}
+
+#hp .inOrDe, #hp .numberInput
+{
+    width: 100%;
+    min-width: 0;
+    height: 38px;
+    margin: 0;
+}
+
+/* Max HP text is still written by map.js, just not shown */
+#hp #max, #hp .blo
+{
+    display: none;
+}
+
+#ac, #infusionRate, #inspo
+{
+    grid-column: 1 / -1;
+    padding: 2px 0;
+    margin: 0;
+    text-align: left !important;
+}
+
+.numberInput
 .numberInput
 {
     margin: 5px;
@@ -822,10 +1195,114 @@ table, .itemSearch, #itemImg
     border-radius: var(--radius);
     background: var(--oak-deep);
     box-shadow: inset 0 0 0 3px #120d0a, inset 0 0 22px rgba(0, 0, 0, .6);
+    min-width: 56px;
+    text-align: center;
+}
+
+#status
+{
+    width: 50%;
+}
+
+#arrows svg
+{
+    width: 40%;
+    height: 40%;
+    margin-left: -25%;
+}
+
+#arrows svg
+{
+    max-width: 190px;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .6));
+}
+
+#arrows a
+{
+    cursor: pointer;
+}
+
+/* Turn order: a framed ledger */
+#turn
+{
+    border: 1px solid var(--brass-dim);
+    border-radius: var(--radius);
+    background: var(--oak-deep);
+    box-shadow: inset 0 0 0 3px #120d0a, inset 0 0 22px rgba(0, 0, 0, .6);
     margin: 5px;
+    padding: 10px 6px;
     padding: 10px 6px;
 }
 
+#turn h3
+{
+    margin-bottom: 2px;
+}
+
+#currentTurn
+{
+    color: var(--parchment-dim);
+    font-weight: 400;
+}
+
+#turnOrder > div
+{
+    border-radius: 3px;
+    padding: 2px 6px;
+    border-bottom: 1px solid rgba(125, 98, 48, .3);
+}
+
+#turnOrder > div.selected
+{
+    background: rgba(201, 162, 74, .14);
+    box-shadow: none;
+    outline: 1px solid var(--brass);
+}
+
+#turnOrder h6
+{
+    font-weight: 500;
+}
+
+#changeTokenBtn
+{
+    margin-top: 0;
+}
+
+/* Sub-menus under Actions / Favorites / Quick Action */
+#spells, #ability, #spellsF, #abilityF, #spellsFQ, #abilityFQ
+{
+    text-align: center;
+}
+
+/* Spell / ability browser search */
+#searchDiv h3
+{
+    vertical-align: middle;
+}
+
+#searchDiv input
+{
+    vertical-align: middle;
+    padding: 4px 10px;
+}
+
+/* Dice roller */
+.center input
+{
+    width: 7%;
+    min-width: 3.6rem;
+    text-align: center;
+}
+
+#diceRoller p
+{
+    text-indent: 0;
+    font-family: var(--font-title);
+    font-size: 1.4rem;
+    color: #e6c77e;
+    margin: 0 4px;
+    vertical-align: middle;
 #turn h3
 {
     margin-bottom: 2px;
@@ -955,8 +1432,70 @@ table, .itemSearch, #itemImg
 }
 
 /* 8. OVERLAY / TOKEN VIEWER ------------------------------------------- */
+#diceRoller input
+{
+    font-size: 1.15rem;
+    vertical-align: middle;
+}
+
+#adv
+{
+    padding: 4px 8px;
+}
+
+#rollDice
+{
+    margin-top: 12px;
+    padding: 10px;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: .06em;
+    background: linear-gradient(180deg, #7a2f26, #4f1e18);
+    border-color: var(--brass);
+}
+
+#rollDice:hover
+{
+    background: linear-gradient(180deg, #8d382d, #5c231c);
+}
+
+#discDisplay h3
+{
+    font-size: 2rem;
+}
+
+/* Help button */
+#helpBtn
+{
+    position: fixed;
+    bottom: 3%;
+    left: 3%;
+    width: 52px;
+    height: 52px;
+    z-index: 1005;
+    cursor: pointer;
+    border-radius: 50%;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .7)) sepia(.5) saturate(1.3) hue-rotate(-12deg);
+}
+
+/* Maps tab */
+.carousel-inner
+{
+    border-radius: var(--radius);
+}
+
+#carousel .d-block
+{
+    width: 150vh;
+}
+
+/* 8. OVERLAY / TOKEN VIEWER ------------------------------------------- */
 #cover, #spellFrame
 {
+    background-color: rgba(14, 10, 8, .95);
+    opacity: 1;
+    position: fixed;
+    top: 0px;
     background-color: rgba(14, 10, 8, .95);
     opacity: 1;
     position: fixed;
@@ -964,6 +1503,18 @@ table, .itemSearch, #itemImg
     left: 0px;
     width: 100%;
     height: 100%;
+    overflow-y: auto;
+    color: var(--parchment);
+}
+
+#cover h3
+{
+    color: #e6c77e !important;
+}
+
+#cover p, #cover li
+{
+    color: var(--parchment);
     overflow-y: auto;
     color: var(--parchment);
 }
@@ -987,10 +1538,18 @@ table, .itemSearch, #itemImg
 }
 
 #viewTitle, #viewTitles
+#viewTitle, #viewTitles
 {
     position: absolute;
     top: 70%;
     left: 30%;
+    color: #ecd08c;
+}
+
+#viewTitles
+{
+    position: static;
+    margin-top: 40px;
     color: #ecd08c;
 }
 
@@ -1005,10 +1564,15 @@ table, .itemSearch, #itemImg
     background: linear-gradient(180deg, #e2c06a, #b48d3a);
     color: var(--ink);
     border-color: #f1d690;
+    background: linear-gradient(180deg, #e2c06a, #b48d3a);
+    color: var(--ink);
+    border-color: #f1d690;
     width: 20%;
     position: absolute;
     top: 0px;
     left: 80%;
+    margin: 0;
+    border-radius: 0 0 var(--radius) var(--radius);
     margin: 0;
     border-radius: 0 0 var(--radius) var(--radius);
 }
@@ -1016,6 +1580,30 @@ table, .itemSearch, #itemImg
 #quickAction
 {
     left: 59%;
+    background: linear-gradient(180deg, var(--leather-hi), var(--leather));
+    color: var(--parchment);
+    border-color: var(--brass-dim);
+}
+
+#exitIframe
+{
+    margin: 8px;
+}
+
+/* 9. PARCHMENT: CARDS, NOTES, QUESTS ---------------------------------- */
+.paper
+{
+    background: url(../images/bigPaper.jpg) #e8d6ac;
+    background-size: 100% 100%;
+    color: var(--ink);
+}
+
+.card
+{
+    margin: 10px;
+    border: 1px solid #0d0907;
+    border-radius: var(--radius);
+    background-color: transparent;
     background: linear-gradient(180deg, var(--leather-hi), var(--leather));
     color: var(--parchment);
     border-color: var(--brass-dim);
@@ -1051,10 +1639,23 @@ table, .itemSearch, #itemImg
     border-radius: var(--radius);
     color: var(--ink);
     box-shadow: 0 6px 16px rgba(0, 0, 0, .45);
+/* Spell, ability and note cards */
+.notes
+{
+    background: url(../images/bigPaper.jpg) #e8d6ac no-repeat;
+    background-size: 100% 100%;
+    border: 1px solid #6b4a24;
+    border-radius: var(--radius);
+    color: var(--ink);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .45);
 }
 
 .notes .notes
+.notes .notes
 {
+    border: none;
+    box-shadow: none;
+    background: none;
     border: none;
     box-shadow: none;
     background: none;
@@ -1074,8 +1675,30 @@ table, .itemSearch, #itemImg
 .paper h1, .paper h3, .paper h5, .paper h6
 {
     color: var(--ink);
+#cards .card, #qaCards .card, #notesDisplay .card
+{
+    margin: 14px 4px;
 }
 
+.notes .card-body, .card-body.notes
+{
+    padding: 18px 26px 20px;
+}
+
+.notes h5, .notes .card-title,
+.paper h1, .paper h3, .paper h5, .paper h6
+{
+    color: var(--ink);
+}
+
+.notes h5, .notes .card-title
+{
+    font-family: var(--font-title);
+    font-size: 1.6rem;
+    text-decoration: none;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(90, 68, 48, .45);
 .notes h5, .notes .card-title
 {
     font-family: var(--font-title);
@@ -1107,8 +1730,30 @@ table, .itemSearch, #itemImg
 .complete, .incomplete
 {
     border-radius: var(--radius);
+.notes p, .notes li
+{
+    color: var(--ink);
+    line-height: 1.6;
 }
 
+.notes b, .notes strong
+{
+    color: #5e1d14;
+}
+
+.notes a
+{
+    color: #6e2418;
+}
+
+/* Quests: incomplete = red edge, complete = green edge.
+   Both are set by mapControler.js */
+.complete, .incomplete
+{
+    border-radius: var(--radius);
+}
+
+.card.incomplete, .card.complete
 .card.incomplete, .card.complete
 {
     background: url(../images/bigPaper.jpg) #e8d6ac;
@@ -1117,8 +1762,22 @@ table, .itemSearch, #itemImg
     border: 1px solid #6b4a24;
     cursor: pointer;
     box-shadow: 0 6px 16px rgba(0, 0, 0, .45);
+    background: url(../images/bigPaper.jpg) #e8d6ac;
+    background-size: 100% 100%;
+    color: var(--ink);
+    border: 1px solid #6b4a24;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .45);
 }
 
+.card.complete
+{
+    border-left: 8px solid var(--moss);
+}
+
+.card.incomplete
+{
+    border-left: 8px solid var(--blood);
 .card.complete
 {
     border-left: 8px solid var(--moss);
@@ -1148,8 +1807,33 @@ table, .itemSearch, #itemImg
     margin: 6px 0 0;
     color: var(--ink-soft) !important;
     font-size: .95rem;
+.card-body.incomplete, .card-body.complete,
+.card-text.incomplete, .card-text.complete
+{
+    background: none;
+    border: none;
 }
 
+.card.incomplete .card-title, .card.complete .card-title,
+.card.incomplete p, .card.complete p, #quest .card h5
+{
+    color: var(--ink) !important;
+}
+
+#questInstructions
+{
+    text-indent: 0;
+    margin: 6px 0 0;
+    color: var(--ink-soft) !important;
+    font-size: .95rem;
+}
+
+#quest > h6
+{
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: #e6c77e;
+    font-weight: 400;
 #quest > h6
 {
     font-family: var(--font-display);
@@ -1160,17 +1844,23 @@ table, .itemSearch, #itemImg
 
 /* 10. DM TOOLS -------------------------------------------------------- */
 .dropbtn
+/* 10. DM TOOLS -------------------------------------------------------- */
+.dropbtn
 {
+    background: var(--stone);
+    border-radius: 999px;
     background: var(--stone);
     border-radius: 999px;
     width: 48%;
 }
 
 .ddown
+.ddown
 {
     position: relative;
 }
 
+.ddown-content
 .ddown-content
 {
     display: none;
@@ -1178,36 +1868,68 @@ table, .itemSearch, #itemImg
     background-color: var(--oak-deep);
     border: 1px solid var(--brass-dim);
     box-shadow: 0px 8px 16px 0px #00000066;
+    background-color: var(--oak-deep);
+    border: 1px solid var(--brass-dim);
+    box-shadow: 0px 8px 16px 0px #00000066;
     z-index: 1;
+    border-radius: var(--radius);
     border-radius: var(--radius);
 }
 
+.ddown-content img
 .ddown-content img
 {
     margin: 5px;
     width: 20%;
     padding-left: 10px;
     border-radius: 3px;
+    border-radius: 3px;
 }
 
 .ddown-content img:hover
+.ddown-content img:hover
 {
+    background-color: rgba(201, 162, 74, .2);
     background-color: rgba(201, 162, 74, .2);
 }
 
 .ddown:hover .dropbtn
+.ddown:hover .dropbtn
 {
+    background-color: #4a423b;
     background-color: #4a423b;
 }
 
 .ddownShow .ddown-content { display: block; }
 .ddownHide .ddown-content { display: none; }
+.ddownShow .ddown-content { display: block; }
+.ddownHide .ddown-content { display: none; }
 
+.area
 .area
 {
     position: relative;
 }
 
+.basicMargin
+{
+    margin: 5px;
+}
+
+/* The DM button board */
+body.embedded #siteList > #story
+{
+    border: 1px solid var(--brass-dim);
+    border-radius: var(--radius);
+    background-color: var(--oak-deep) !important;
+    box-shadow: inset 0 0 0 3px #120d0a;
+    padding: 16px 12px;
+    margin-top: 18px;
+}
+
+#siteList p
+{
+    text-indent: 0px;
 .basicMargin
 {
     margin: 5px;
@@ -1239,10 +1961,21 @@ body.embedded #siteList > #story
 #story.stats
 {
     padding: 10px;
+/* 11. CHARACTER SHEET (stats.html) ------------------------------------ */
+.stats
+{
+    color: var(--ink);
+    font-size: 1rem;        /* sheet keeps its original 16px text size */
+}
+
+#story.stats
+{
+    padding: 10px;
 }
 
 .stats table, .stats td, .stats tr
 {
+    border: 1px solid rgba(70, 48, 26, .55);
     border: 1px solid rgba(70, 48, 26, .55);
     padding: 5px;
 }
@@ -1267,10 +2000,29 @@ body.embedded #siteList > #story
 }
 
 .stats h1, .stats h3, .stats h5, .stats h6
+.stats h1, .stats h3, .stats h5, .stats h6
 {
+    color: var(--ink);
     color: var(--ink);
 }
 
+.stats input:not([type=checkbox]):not([type=radio]),
+.stats select,
+.stats textarea
+{
+    background: rgba(255, 250, 235, .55);
+    box-shadow: none;
+    border-color: rgba(90, 68, 48, .6);
+}
+
+.stats button
+{
+    width: auto;
+}
+
+.statSheet p
+{
+    margin-bottom: 0px;
 .stats input:not([type=checkbox]):not([type=radio]),
 .stats select,
 .stats textarea
@@ -1294,7 +2046,15 @@ body.embedded #siteList > #story
    Built by stats.js (updateCheckboxes) */
 
 .spell-slot-label
+/* 12. SPELL SLOTS -----------------------------------------------------
+   Built by stats.js (updateCheckboxes) */
+
+.spell-slot-label
 {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background-image: url('../images/spellSlot.png');
     display: inline-block;
     width: 50px;
     height: 50px;
@@ -1305,18 +2065,99 @@ body.embedded #siteList > #story
     cursor: pointer;
     margin: 2px;
     transition: transform .12s;
+    transition: transform .12s;
 }
 
+.spell-slot-label:hover
 .spell-slot-label:hover
 {
     transform: scale(1.1);
 }
 
 .spell-check-hidden:checked + .spell-slot-label
+.spell-check-hidden:checked + .spell-slot-label
 {
     background-image: url('../images/usedSpellSlot.png');
 }
 
+/* 13. OLD PAGES (oldIndex, recap, login, item lookup) ----------------- */
+.itemSearch
+{
+    width: 40%;
+    display: block;
+}
+
+.m-bottom-margin
+{
+    margin-bottom: 20px;
+}
+
+#map
+{
+    text-align: center;
+}
+
+#map img
+{
+    width: 550px;
+    height: 425px;
+    border: solid #0d0907 4px;
+    outline: 1px solid var(--brass-dim);
+}
+
+#itemImg
+{
+    display: block;
+    width: 300px;
+    height: 300px;
+    margin: 10px auto 20px;
+    border: solid #0d0907 4px;
+    outline: 1px solid var(--brass-dim);
+}
+
+#hometown img, #info img
+{
+    height: fit-content;
+    max-width: 100%;
+    margin: 10px 0px 20px 0px;
+    border: solid #0d0907 4px;
+    outline: 1px solid var(--brass-dim);
+}
+
+/* Sheets site: the + and trash icons live in these panels, so no photo frame */
+#info #addButton, #hometown #trashcan
+{
+    border: none;
+    outline: none;
+    margin: 10px auto 20px;
+    display: block;
+    cursor: pointer;
+}
+
+#info p, #hometown p, #notes p
+{
+    text-align: left;
+}
+
+#notes #description
+{
+    text-align: center;
+    text-indent: 0;
+}
+
+.center
+{
+    text-align: center !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hide   { display: none; }
+
+#map ul
+{
+    text-align: left;
+}
 /* 13. OLD PAGES (oldIndex, recap, login, item lookup) ----------------- */
 .itemSearch
 {
@@ -1403,7 +2244,20 @@ body.embedded #siteList > #story
 {
     text-align: left;
 }
+#jaun { width: 413px; }
+#havenport { height: 300px; width: 313px; }
 
+#story span
+{
+    text-align: left;
+}
+
+/* Login */
+#login h5
+{
+    text-decoration: none;
+    font-size: 1.25rem;
+}
 /* Login */
 #login h5
 {
@@ -1457,15 +2311,67 @@ body.embedded #siteList > #story
         text-align: left;
         display: inline;
         margin: 5%;
+#login input
+{
+    padding: 6px 10px;
+    min-width: 240px;
+}
+
+#login #submit
+{
+    margin-top: 14px;
+}
+
+#login #back
+{
+    background: linear-gradient(180deg, #4a423b, var(--stone));
+}
+
+/* Skill tree */
+#skillImg
+{
+    border-radius: var(--radius);
+}
+
+#skillDisplay, #beast
+{
+    text-indent: 0;
+}
+
+/* Side-by-side panels on oldIndex / recap: shave the 7-col panel so the
+   5-col one still fits next to it with its 10px margin */
+.col-md-7
+{
+    flex: 0 0 auto;
+    width: 56.8% !important;
+}
+
+/* 14. RESPONSIVE ------------------------------------------------------ */
+@media (max-width: 1399px) {
+    .col-md-7 { width: 56.5% !important; }
+
+    #turn { width: 70%; }
+
+    #login h5
+    {
+        text-align: left;
+        display: inline;
+        margin: 5%;
     }
 
+    #login span
     #login span
     {
         display: block;
         margin: 1% 0px;
+        display: block;
+        margin: 1% 0px;
     }
 }
+}
 
+@media (max-width: 1199px) {
+    .col-md-7 { width: 56.2% !important; }
 @media (max-width: 1199px) {
     .col-md-7 { width: 56.2% !important; }
 
@@ -1474,9 +2380,15 @@ body.embedded #siteList > #story
 
 @media (max-width: 991px) {
     .col-md-7 { width: 55.5% !important; }
+    .gridButton { width: 31%; }
+}
+
+@media (max-width: 991px) {
+    .col-md-7 { width: 55.5% !important; }
 
     #grid
     {
+        margin: 0%;
         margin: 0%;
         width: 2200px;
         height: 2200px;
@@ -1488,6 +2400,7 @@ body.embedded #siteList > #story
     }
 
     #info img, #havenport
+    #info img, #havenport
     {
         height: 140px;
         width: 290px;
@@ -1495,6 +2408,25 @@ body.embedded #siteList > #story
 
     #helpBtn
     {
+        bottom: 12px;
+        left: 12px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .navbar-collapse
+    {
+        padding: 8px 0;
+    }
+
+    .navbar button.link-primary
+    {
+        margin: 6px 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .col-md-7 { width: 100% !important; }
         bottom: 12px;
         left: 12px;
         width: 44px;
@@ -1533,9 +2465,25 @@ body.embedded #siteList > #story
     #stats > table, #stats > table > tbody, #stats > table > tbody > tr, #stats > table > tbody > tr > td
     {
         display: block;
+    #story, #map, #controls, #discDisplay, #gridMapWrapper, #login
+    {
+        margin-top: 22px !important;
+    }
+
+    .gridButton { width: 48%; }
+
+    .gridButton.inOrDe { width: 64px; }
+
+    /* stack the stats table: d-pad/turn order above hp/quests */
+    #stats > table, #stats > table > tbody, #stats > table > tbody > tr, #stats > table > tbody > tr > td
+    {
+        display: block;
         width: 100% !important;
     }
 
+    #turn { width: auto; }
+
+    #arrows svg
     #turn { width: auto; }
 
     #arrows svg
@@ -1547,7 +2495,15 @@ body.embedded #siteList > #story
 
 @media (max-width: 574px) {
     body { font-size: 1rem; }
+        width: 50%;
+        margin-left: 0;
+    }
+}
 
+@media (max-width: 574px) {
+    body { font-size: 1rem; }
+
+    #info img, #havenport
     #info img, #havenport
     {
         height: 201px !important;
@@ -1555,17 +2511,25 @@ body.embedded #siteList > #story
     }
 
     #info, #hometown, #story, #list, #display, #notes, #controls, #discDisplay, #gridMap
+    #info, #hometown, #story, #list, #display, #notes, #controls, #discDisplay, #gridMap
     {
+        margin: 0px;
+        margin-top: 20px;
+    }
         margin: 0px;
         margin-top: 20px;
     }
 
     #info, #hometown, #footer, #header, #story, #list, #display, #map,
     #notes, #controls, #discDisplay, #gridMapWrapper, #login
+    #info, #hometown, #footer, #header, #story, #list, #display, #map,
+    #notes, #controls, #discDisplay, #gridMapWrapper, #login
     {
+        padding: 12px 10px;
         padding: 12px 10px;
     }
 
+    #map img
     #map img
     {
         height: 225px;
@@ -1579,7 +2543,9 @@ body.embedded #siteList > #story
     }
 
     .inOrDe { width: 15%; }
+    .inOrDe { width: 15%; }
 
+    .numberInput { width: 30%; }
     .numberInput { width: 30%; }
 
     .veiwTokens
@@ -1590,7 +2556,9 @@ body.embedded #siteList > #story
     }
 
     #status { width: 60%; }
+    #status { width: 60%; }
 
+    #arrows svg
     #arrows svg
     {
         width: 70%;

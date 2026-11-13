@@ -162,16 +162,20 @@ function makeToken(key)
     let token = [document.createElement("div"), document.createElement("img"), document.createElement("img"), document.createElement("img")];
     token[0].id = `${key.id}-div`;
     token[0].classList = "bg-oak-deep objectBorder";
+    token[0].classList = "bg-oak-deep objectBorder";
     token[0].style.margin = "5px";
     token[0].style.position = "relative";
     token[0].style.minHeight = "82px";
     token[0].style.minWidth = "82px";
     token[1].src = window.top.parent.imgs["tokens"][key.name];
+    token[1].src = window.top.parent.imgs["tokens"][key.name];
     token[1].id = key.name;
     token[1].classList = `tokens ${key.name} char`;
     token[2].src = window.top.parent.imgs["borders"][key.border];
+    token[2].src = window.top.parent.imgs["borders"][key.border];
     token[2].id = key.border;
     token[2].classList = `tokens ${key.id} border_`;
+    token[3].src = window.top.parent.imgs["tokens"][key.name];
     token[3].src = window.top.parent.imgs["tokens"][key.name];
     token[3].id = "hp";
     token[3].classList = `tokens ${key.name} hp`;
@@ -338,6 +342,7 @@ function handleEdit()
                 let option = document.createElement("option");
                 option.value = key;
                 option.text = key;
+                option.text = key;
                 txtFeilds[i].appendChild(option);
                 txtFeilds[i].onchange = updateBorderPic;
             }
@@ -353,6 +358,7 @@ function handleEdit()
                 let currentBorder = window.top.parent.imgs["tokens"][key];
                 let option = document.createElement("option");
                 option.value = key;
+                option.text = key;
                 option.text = key;
                 txtFeilds[i].appendChild(option);
                 txtFeilds[i].onchange = updateTokenPic;
@@ -402,6 +408,7 @@ function updateBorderPic()
 {
     this.parentNode.childNodes[1].src = window.top.parent.imgs["borders"][this[this.selectedIndex].value];
     this.parentNode.childNodes[1].classList.remove("invisible");
+    this.parentNode.childNodes[1].classList.remove("invisible");
 }
 
 /**
@@ -446,6 +453,7 @@ function resetState()
     div.remove();
     div = document.createElement("div");
     div.id = "story";
+    div.classList = "bg-oak text-parchment col-md-12 col-sm-12";
     div.classList = "bg-oak text-parchment col-md-12 col-sm-12";
     placeBefore(div, aboveDiv.childNodes[1]);
 }
@@ -725,6 +733,7 @@ function makeTORow(key)
 {
     let TORow = [document.createElement("div"), ["Name", "Order", "Selected"], [document.createElement("h6"), document.createElement("input"), document.createElement("input"), document.createElement("button")]];
     TORow[0].id = `${key.charName}-div`;
+    TORow[0].classList = "bg-stone objectBorder center";
     TORow[0].classList = "bg-stone objectBorder center";
     TORow[0].style.margin = "5px";
     TORow[0].style.position = "relative";
@@ -1248,8 +1257,10 @@ function createQuestCard(quest)
     }
 
     card.classList = "card text-parchment bg-oak-deep";
+    card.classList = "card text-parchment bg-oak-deep";
     cardBody.classList = "card-body";
     
+    title.classList = "basicMargin text-parchment";
     title.classList = "basicMargin text-parchment";
     title.style.display = "inline";
     

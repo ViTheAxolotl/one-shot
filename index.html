@@ -46,20 +46,22 @@
       <img id="helpBtn" src="images/helpBtn.png"/>
 
       <div class="row align-items-top">
-        <div id = "header" class = "col-12 bg-UP-blue">
+        <div id = "header" class = "col-12 bg-oak-deep">
           <h1>Dashboard</h1><br>
         </div>
 
-        <div id = "gridMapWrapper" class = "bg-UP-purple color-UP-white col-md-12 col-sm-12 center" style="height: 90vh; -webkit-text-size-adjust: none;">      
+        <div id = "gridMapWrapper" class = "bg-oak text-parchment col-md-12 col-sm-12 center" style="height: 90vh; -webkit-text-size-adjust: none;">      
           <div id = "gridMap" style="height: 90%; border: solid black 5px;" >
             <img id = "grid" src = "images/grid.png" draggable="false"/>
           </div>
 
-          <button name="zoom" class = "gridButton inOrDe" style="color: white; height: 50px;">+</button>
-		      <button name="zoom" class = "gridButton inOrDe" style="color: white; height: 50px;">-</button>
+          <div class="zoomBar">
+            <button name="zoom" class = "gridButton inOrDe" style="color: white; height: 50px;">+</button>
+            <button name="zoom" class = "gridButton inOrDe" style="color: white; height: 50px;">-</button>
+          </div>
         </div>
 
-        <div id = "controls" class = "bg-UP-purple color-UP-black col-md-12 col-sm-12">
+        <div id = "controls" class = "bg-oak text-parchment col-md-12 col-sm-12">
           <h3 id = "name"></h3>
           <div class="center">
             <button name="stats" class = "gridButton firstMenu selected">Stats</button>
@@ -155,7 +157,7 @@
                     <h6>Quests:</h6>
                     <div class="card incomplete" id="questCard">
                       <div class="card-body incomplete">
-                          <h5 id="questTitle" class="card-title color-UP-black"></h5>
+                          <h5 id="questTitle" class="card-title text-parchment"></h5>
                           <p id="questText" class="card-text incomplete"></p>
                           <p id="questInstructions"><em><b>Click To See All Quest...</b></em></p>
                       </div>
@@ -312,14 +314,16 @@
           <button id = "rollDice">Roll</button>
         </div>
 
-        <div id = "discDisplay" class = "bg-UP-purple color-UP-black col-md-12 col-sm-12" style="height: 600px;">
+        <div id = "discDisplay" class = "bg-oak text-parchment col-md-12 col-sm-12" style="height: 600px;">
           <h3>Display</h3>
           <hr>
           <iframe class="displayCombat.html" title="dmSite" style="width: 100%; height: 80%; overflow-x: hidden; overflow-y: scroll;"></iframe>
         </div>
       </div>
     
-      <div id = "footer" class = "col-12 bg-UP-blue">
+      <div class="row">
+        <div id = "footer" class = "col-12 bg-oak-deep">
+        </div>
       </div>
     </div>
 
