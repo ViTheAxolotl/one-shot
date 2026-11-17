@@ -1790,7 +1790,7 @@ function handleUseAction(targets, manual = null)
             {
                 let token = {border : "blue", currentHp : `0`, maxHp : `0`, tempHp : "0", map : "", id : "", name : "", title : ` ${window.player}, `, xPos : "1", yPos : "A", isSummon : false, AC : "10"};
                  
-                token.AC = `${info[3]}`;
+                token.AC = (info[3] == undefined || info[3].trim() == "") ? "10" : `${info[3]}`; //Old {@Summon} strings have no AC part
                 if(info[4] != "none"){token.title += `${info[4]}, `;}
                 let currentToken = window.wholeDB[window.wholeChar[window.player]["currentToken"]];
                 
