@@ -17,9 +17,7 @@
 "use strict";
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js';
-import { toTitleCase, auth, database, setDoc, clenseInput, deleteDoc, reload, placeBefore, storage } from './viMethods.js';
-import { uploadBytes, getDownloadURL, ref as sRef } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
-import imageCompression from 'https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.mjs';
+import { toTitleCase, auth, database, setDoc, clenseInput, deleteDoc, reload, placeBefore } from './viMethods.js';
 
 let player;
 let wholeChars = {};
@@ -38,7 +36,6 @@ let firstRun = true;
 let firstRunCustom = true;
 let imgs = {};
 let oldToken = {};
-let firstLoad = true;
 
 // Only the first read of character data is used to build the page.
 const charRef = ref(database, 'playerChar/');
@@ -68,14 +65,6 @@ onValue(filesRef, (snapshot) =>
 {
     const data = snapshot.val();
     imgs = data;
-
-    if(firstLoad)
-    {
-        let temp = imgs["borders"];
-        for(let border of Object.keys(temp)){if(border != "invisible"){borders.push([border, temp[border]]);}} //Populates the borders with each border
-        firstLoad = false;
-        setUpCharacters();
-    }
 });
 
 onAuthStateChanged(auth, (user) => 
@@ -99,6 +88,7 @@ function userLoggedIn()
     oldToken = wholeChars[player]["token"];
     init();
     charName.value = wholeChars[player]["charName"];
+    setUpCharacters();
 }
 
 /**
@@ -120,8 +110,11 @@ function init()
     hp.classList = "blo";
     hp.style.margin = "5px";
 
-    //enter.onclick = setUpCharacters;
+    enter.onclick = setUpCharacters;
     go.onclick = handleGoButton;
+    
+    let temp = imgs["borders"];
+    for(let border of Object.keys(temp)){if(border != "invisible"){borders.push(border);}} //Populates the borders with each border
 }
 
 /**
@@ -136,13 +129,7 @@ function setUpCharacters()
         elem.classList = "hide";
     }
 
-    if(imgs["tokens"][player+"-"]){people.push(player+"-");}
-
-    if(!people.includes(wholeChars[player]["token"]["name"]))
-    {
-        people.push(wholeChars[player]["token"]["name"]);
-    }
-
+    people.push(player+"-");
     div.appendChild(char);
 
     addCharacters()
@@ -186,15 +173,12 @@ function addCharacters()
 {
     for(let char of people)
     {
-        if(imgs["tokens"][char])
-        {
-            let person = document.createElement("img");
-            person.id = char;
-            person.src = imgs["tokens"][char];
-            person.classList = "char";
-            person.onclick = handleChoose;
-            div.appendChild(person);
-        }
+        let person = document.createElement("img");
+        person.id = char;
+        person.src = imgs["tokens"][char];
+        person.classList = "char";
+        person.onclick = handleChoose;
+        div.appendChild(person);
     }
 }
 
@@ -221,7 +205,7 @@ function addCustomImgs()
 
     let customsBtn = document.createElement("button");
     customsBtn.classList = "gridButton";
-    customsBtn.innerHTML = "Manage/Add Imgs";
+    customsBtn.innerHTML = "Manage Imgs";
     customsBtn.style.width = "100%";
     customsBtn.onclick = handleCustomImg;
     placeBefore(customsBtn, bord);
@@ -278,37 +262,24 @@ function handleCustomImg()
     let newDiv = document.createElement("div");
     newDiv.classList.add("center");
 
-    let fileLabel = document.createElement("h6");
-    fileLabel.innerHTML = "Upload Image: ";
-    fileLabel.style.margin = "5px";
-    fileLabel.style.display = "inline";
+    for(let i = 0; i < names.length; i++)
+    {
+        let span = document.createElement("span");
+        span.style.display = "block";
 
-    let tokenFileInput = document.createElement("input");
-    tokenFileInput.type = "file";
-    tokenFileInput.id = "CustomFileInput";
-    tokenFileInput.accept = "image/*";
-    tokenFileInput.style.margin = "5px";
-    tokenFileInput.style.setProperty("width", "40%", "important");
+        let label = document.createElement("h6");
+        label.innerHTML = `${names[i]}:`;
+        label.style.display = "inline";
+        label.style.margin = "5px";
 
-    let br = document.createElement("span");
-    br.style.display = "block";
-
-    let nameLabel = document.createElement("h6");
-    nameLabel.innerHTML = "Nickname: ";
-    nameLabel.style.margin = "5px";
-    nameLabel.style.display = "inline";
-
-    let tokenNameInput = document.createElement("input");
-    tokenNameInput.type = "text";
-    tokenNameInput.id = "Nickname";
-    tokenNameInput.style.margin = "5px";
-    tokenNameInput.style.width = "40%";
-
-    newDiv.appendChild(fileLabel);
-    newDiv.appendChild(tokenFileInput);
-    newDiv.appendChild(br);
-    newDiv.appendChild(nameLabel);
-    newDiv.appendChild(tokenNameInput);
+        objects[i].id = names[i];
+        objects[i].style.margin = "5px";
+        objects[i].style.width = "40%";
+        
+        newDiv.appendChild(label);
+        newDiv.appendChild(objects[i]);
+        newDiv.appendChild(span);
+    }
 
     let createBtn = document.createElement("button");
     createBtn.innerHTML = "Create Custom Img";
@@ -355,65 +326,17 @@ function handleDeleteCustom()
  * nickname, compresses the image to about 0.2 MB, uploads it to Storage, saves the
  * link under files/tokens/<nickname>-, makes it this player's token, and reloads.
  */
-async function handleCreateCustom()
+function handleCreateCustom()
 {
-    let fileElement = document.getElementById("CustomFileInput");
-    let nicknameInput = document.getElementById("Nickname").value;
-    let dbPath;
-    let storagePath;
-
-    if (!fileElement.files || fileElement.files.length === 0) 
-    {
-        alert("Please select a file to upload first!");
-        return;
-    }
-
-    if (!nicknameInput.trim()) 
-    {
-        alert("Please enter a nickname for this custom token!");
-        return;
-    }
-
-    let nickname = clenseInput(nicknameInput);
-    nickname = nickname + "-";
-    dbPath = `files/tokens/${nickname}`;
-    storagePath = `images/map/tokens/${nickname}`;
-
-    // Setup Compression configuration boundaries
-    const compressionOptions = 
-    {
-        maxSizeMB: 0.2,          
-        maxWidthOrHeight: 1024,  
-        useWebWorker: true
-    };
-
-    try 
-    {
-        const compressedFile = await imageCompression(fileElement.files[0], compressionOptions);
-        
-        // Match the token folder tree requirements
-        const storageReference = sRef(storage, storagePath);
-
-        console.log("Pushing compressed element to Cloud storage path: ", storagePath);
-        const snapshot = await uploadBytes(storageReference, compressedFile);
-        
-        // Grab the static production link target
-        const downloadURL = await getDownloadURL(snapshot.ref);
-
-        // Update database maps pointing to our newly uploaded asset link
-        setDoc(dbPath, downloadURL);
-        setDoc(`playerChar/${player}/token/name`, nickname);
-        
-        alert("Custom Token Successfully Uploaded! Now reloading to be able to apply");
-        reload(.5);
-
-    } 
+    let url = document.getElementById("Url").value;
+    let nickname = document.getElementById("Nickname").value;
     
-    catch (error) 
-    {
-        console.error("Custom token upload transaction process broken: ", error);
-        alert("Upload failed. Check logs for detail.");
-    }
+    url = clenseInput(url);
+    nickname = clenseInput(nickname);
+    nickname = "custom-" + nickname;
+
+    setDoc(`customImages/${nickname}`, {"name" : nickname, "player" : player, "src" : url});
+    reload(.5);
 }
 
 /**
@@ -421,16 +344,19 @@ async function handleCreateCustom()
  */
 function addBorders()
 {
-    div.appendChild(bord);
-
     for(let i = 0; i < borders.length; i++)
     {
-        let color = borders[i][0];
-        let border = document.createElement("img");
-        border.src = borders[i][1];
-        border.id = color;
-        border.classList = "bord";
-        border.onclick = handleChoose;
+        let color = borders[i];
+        borders[i] = document.createElement("img");
+        borders[i].src = `images/map/tokens/${color}Border.png`;
+        borders[i].id = color;
+        borders[i].classList = "bord";
+        borders[i].onclick = handleChoose;
+    }
+
+    div.appendChild(bord);
+    for(let border of borders)
+    {
         div.appendChild(border);
     }
 }
@@ -523,13 +449,13 @@ function handleGoButton()
 
         let loading = document.createElement("h3");
         let loadingGif = document.createElement("img");
-        loading.innerHTML = "Loading, Axol Map V1.11.5, Updating to Current Info..."; 
+        loading.innerHTML = "Loading, Axol Map V1.11 Bug Fixes, Adding new Modifiers to Attacks, Updating to Current Info...";
         loadingGif.src = "images/loadingGif.gif";
         loadingGif.style.minWidth = "10%";
         div.classList.add("center"); 
         div.appendChild(loading);
         div.appendChild(loadingGif);
-        setInterval(() => {window.location.href= `index.html`;}, 2000);
+        setInterval(() => {window.location.href= `map.html`;}, 2000);
     }
 }
 
@@ -542,7 +468,7 @@ function createChar(curCharacter, curBorder)
 {
     let charName = curCharacter.slice(0, curCharacter.length - 1);
     if(curCharacter.includes("ustom")){charName = curCharacter.slice(7);}
-    let char = {border : curBorder, currentHp : `${document.getElementById("Current Hp").value}`, maxHp : `${document.getElementById("Max Hp").value}`, tempHp : document.getElementById("Temp Hp").value, map : "", id : charName, name : curCharacter, title : " " + charName + ", ", xPos : "1", yPos : "A", isSummon : false, AC : document.getElementById("AC").value};
+    let char = {border : curBorder, currentHp : `${document.getElementById("Current Hp").value}`, maxHp : `${document.getElementById("Max Hp").value}`, tempHp : document.getElementById("Temp Hp").value, map : "", id : charName, name : curCharacter, title : " " + charName + ", ", xPos : "1", yPos : "A", isSummon : false, AC : document.getElementById("AC").value || "10"}; //Blank AC box -> 10
 
     
     if(oldToken != null || oldToken != undefined)
