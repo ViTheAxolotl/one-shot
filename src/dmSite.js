@@ -26,6 +26,8 @@ import { toTitleCase, auth, database, setDoc, deleteDoc, returnHpImage, placeBef
 import { uploadBytes, getDownloadURL, ref as sRef } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 import imageCompression from 'https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.mjs';
 
+const QUEST_PLACEHOLDER = "Placeholder"; //Hidden quest that keeps playerChar/Vi/quests from being empty
+const REFRESH_ALL = "All"; //Refresh Screens value meaning every player
 let fiveButtons = [];
 let db;
 let div = document.getElementById("story");
@@ -613,16 +615,22 @@ function handlePreset()
 {
     hideButtons();
     if(preOrSumm == undefined){preOrSumm = 0;}
-    db = [window.top.parent.wholePre, window.top.parent.wholeSummons];
+    db = [window.top.parent.wholePre ?? {}, window.top.parent.wholeSummons ?? {}];
 
     for(let token of Object.keys(db[preOrSumm]))
     {
-        if(token == "isSummonOn")
+        let entry = db[preOrSumm][token];
+
+        //Only list whole tokens. The summons list also holds leftover scraps with just a
+        //position (from the old isSummon:"false" bug); one of those used to crash this screen
+        //before its buttons (and Done) were added.
+        if(token == "isSummonOn" || entry == null || typeof entry != "object" || typeof entry.name != "string")
         {
             continue;
         }
 
-        makeToken(db[preOrSumm][token]);
+        if(entry.id == undefined){entry.id = token;} //makeToken names the row after the id
+        makeToken(entry);
         let currentDiv = document.getElementById(`${db[preOrSumm][token].id}-div`);
         let names = ["Edit", "Delete", "Upload"]; //Upload = put it on the map
         let feilds = [];
@@ -763,21 +771,19 @@ function makeTORow(key)
 {
     let TORow = [document.createElement("div"), ["Name", "Order", "Selected"], [document.createElement("h6"), document.createElement("input"), document.createElement("input"), document.createElement("button")]];
     TORow[0].id = `${key.charName}-div`;
-    TORow[0].classList = "bg-stone objectBorder center";
-    TORow[0].style.margin = "5px";
-    TORow[0].style.position = "relative";
-    TORow[0].style.minHeight = "82px";
-    TORow[0].style.minWidth = "82px";
+    TORow[0].classList = "bg-stone objectBorder center toRow";
 
     for(let i = 0; i < 3; i++)
     {
+        let group = document.createElement("span"); //"Label: box" kept together, with space around each group
+        group.classList = "toField";
         let label = createLabel(TORow[1][i]);
-        label.style.margin = `5px`;
+        label.style.margin = "0";
 
-        TORow[2][i].style.display = "inline";
         TORow[2][i].id = `${TORow[1][i]}_${key.charName}`;
-        TORow[0].appendChild(label);
-        TORow[0].appendChild(TORow[2][i]);                
+        group.appendChild(label);
+        group.appendChild(TORow[2][i]);
+        TORow[0].appendChild(group);
     }
 
     TORow[2][3].innerHTML = "Remove";
@@ -1413,6 +1419,8 @@ function uploadQuests()
         }
     }
 
+    //The hidden placeholder keeps playerChar/Vi/quests from ever being empty
+    quests[QUEST_PLACEHOLDER] = {"Desc" : "Placeholder", "activeQuest" : false, "name" : QUEST_PLACEHOLDER, "status" : "placeholder"};
     setDoc("playerChar/Vi/quests", quests);
     wait(4, handleDone); //Give the save a moment before reloading
 }
@@ -1427,8 +1435,9 @@ function handleQuest()
     let buttons = ["Create", "Upload"];
     let actionButtons = [];
 
-    for(let quest of Object.keys(window.top.parent.wholeQuests))
+    for(let quest of Object.keys(window.top.parent.wholeQuests ?? {}))
     {
+        if(quest == QUEST_PLACEHOLDER){continue;} //Hidden: it only keeps the quest list from being empty
         div.appendChild(createQuestCard(quest));
     }
 
@@ -1674,6 +1683,20 @@ function handleUploadImage()
  * Uploads the chosen picture: compresses it, stores it in Firebase Storage, and records
  * its link under files/<type>/<name>. Items also ask for a description.
  */
+/**
+ * Resolves to the picture file's real size in pixels: {width, height}.
+ */
+function getImageSize(file)
+{
+    return new Promise((resolve) =>
+    {
+        let img = new Image();
+        img.onload = () => {resolve({width: img.naturalWidth, height: img.naturalHeight}); URL.revokeObjectURL(img.src);};
+        img.onerror = () => resolve({width: 0, height: 0});
+        img.src = URL.createObjectURL(file);
+    });
+}
+
 async function uploadImage()
 {
     let type = document.getElementById("dm-asset-type-select").value;
@@ -1719,7 +1742,20 @@ async function uploadImage()
             dbPath = `files/mapName/${name}`;
             storagePath = `images/map/${name}`;
             options.maxWidthOrHeight = 2030;
+            //Maps must stay 2030px: tokens are placed for a 2030px grid. With the 0.4MB limit
+            //a detailed map (grass, stone) got shrunk to ~1300px and the grid no longer lined up.
+            options.maxSizeMB = 4;
             break;
+    }
+
+    if(type == "map")
+    {
+        let size = await getImageSize(files[0]);
+        if(size.width != 2030 || size.height != 2030)
+        {
+            let goOn = confirm(`This map is ${size.width} x ${size.height} pixels. Maps need to be 2030 x 2030 (the size of images/grid.png) or tokens won't line up with its squares. Upload anyway?`);
+            if(!goOn){return;}
+        }
     }
 
     try {
@@ -1910,6 +1946,11 @@ function handleRefresh()
 
     playerSelect = document.createElement("select");
     playerSelect.id = "playerSelect";
+
+    let allOption = document.createElement("option");
+    allOption.value = REFRESH_ALL;
+    allOption.innerHTML = "All Players";
+    playerSelect.appendChild(allOption);
     
     for(let player of Object.keys(window.top.parent.wholeChar))
     {
@@ -1935,7 +1976,18 @@ function handleRefresh()
 function handleRefreshUpload()
 {
     let playerToRefresh = document.getElementById("playerSelect").value;
-    setDoc("playerChar/Vi/playerRefresh", playerToRefresh);
+
+    if(playerToRefresh == REFRESH_ALL)
+    {
+        //Everyone reloads. The time stamp lets each page reload once (parent.js remembers the
+        //last one it handled), since no single player can clear it for everybody.
+        setDoc("playerChar/Vi/playerRefresh", {"target" : REFRESH_ALL, "at" : Date.now()});
+    }
+
+    else
+    {
+        setDoc("playerChar/Vi/playerRefresh", playerToRefresh);
+    }
     alert("Done");
 }
 
