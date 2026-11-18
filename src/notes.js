@@ -8,6 +8,10 @@
  * Edit mode: every card turns into a title box + text box + order dropdown, with a trash
  * icon each, plus Create Note / Cancel / Upload Notes. Upload checks that the order
  * numbers are 1..N with no repeats, then replaces the whole notes object in one write.
+ *
+ * Every player also has a hidden note called "Placeholder" (pos 0). It's never shown, so it
+ * can't be deleted by accident, and it's always saved back, so the notes path is never
+ * empty (an empty path broke the page).
  */
 
 "use strict"
@@ -23,6 +27,20 @@ let currentText;
 let isFirstRead = true;
 let display = document.getElementById("notesDisplay");
 let deleteProtection = true;
+const NOTE_PLACEHOLDER = "Placeholder";
+
+/**
+ * The player's notes without the hidden placeholder ({} if they have none).
+ */
+function visibleNotes()
+{
+    let notes = {};
+    for(let key of Object.keys(wholeNotes ?? {}))
+    {
+        if(key != NOTE_PLACEHOLDER){notes[key] = wholeNotes[key];}
+    }
+    return notes;
+}
 
 // Once we know who is logged in, listen to their notes. Only the first read builds the
 // page, so a save from another device doesn't wipe out edits in progress.
@@ -84,10 +102,7 @@ function handleDeleteButton()
     {
         this.parentNode.parentNode.remove();
         
-        for(let note of Object.keys(wholeNotes))
-        {
-            document.getElementById(`${note}-pos`).lastChild.remove();
-        }
+        fixOrderOptions(); //One fewer note, so one fewer order number
     }
 }
 
@@ -101,9 +116,9 @@ function setAddScreen()
     {
         if(child.tagName != 'DIV'){continue;}
 
-        let title = child.id.slice(0, child.id.indexOf("-"));
+        let title = child.id.slice(0, child.id.lastIndexOf("-div"));
         let text = wholeNotes[title]["desc"];
-        let pos = wholeNotes[title]["pos"];
+        let pos = child.dataset.order; //Its place in the list (1..N), not the saved number
         let display = child.children[0];
 
         while(display.children.length > 0)
@@ -162,7 +177,7 @@ function createEditableNote(title, text, pos, display)
     desc.innerHTML = "--Select the order you want the note in--";
     cardPos.appendChild(desc);
 
-    for(let i = 1; i < Object.keys(wholeNotes).length + 1; i++)
+    for(let i = 1; i < Object.keys(visibleNotes()).length + 1; i++)
     {
         let option = document.createElement("option");
         option.value = `${i}`;
@@ -191,19 +206,34 @@ function handleCreate()
     cardBody.appendChild(createDeleteButton());
     placeBefore(cardDiv, this);
     
-    let i = display.children.length - 3;
-    let option = document.createElement("option");
-    option.value = `${i}`;
-    option.innerHTML = `${i}`;
-    document.getElementById("Title-pos").appendChild(option);
-    document.getElementById("Title-pos").value = `${i}`;
+    fixOrderOptions();
+    let newSelect = cardBody.querySelector("select");
+    newSelect.value = `${newSelect.options.length - 1}`; //New note goes last
+}
 
-    for(let note of Object.keys(wholeNotes))
+/**
+ * Makes every note's order dropdown offer exactly 1..N (N = notes on the page), keeping
+ * each one's choice if it's still in range.
+ */
+function fixOrderOptions()
+{
+    let selects = display.querySelectorAll("select");
+    let count = selects.length;
+
+    for(let select of selects)
     {
-        let option = document.createElement("option");
-        option.value = `${i}`;
-        option.innerHTML = `${i}`;
-        document.getElementById(`${note}-pos`).appendChild(option);
+        let chosen = select.value;
+        while(select.options.length > 1){select.lastChild.remove();} //Keep the "--Select--" line
+
+        for(let i = 1; i <= count; i++)
+        {
+            let option = document.createElement("option");
+            option.value = `${i}`;
+            option.innerHTML = `${i}`;
+            select.appendChild(option);
+        }
+
+        select.value = parseInt(chosen) <= count ? chosen : "";
     }
 }
 
@@ -312,6 +342,10 @@ async function addNote()
             }
         }
 
+        //Keep the hidden placeholder (a player can't have a real note with that title)
+        if(notes[NOTE_PLACEHOLDER] != undefined){alert(`"${NOTE_PLACEHOLDER}" is a reserved title, please rename that note.`); upload = false;}
+        notes[NOTE_PLACEHOLDER] = {"desc" : "Placeholder", "pos" : 0};
+
         if(upload)
         {
             setDoc(`playerChar/${player}/notes`, null);
@@ -335,18 +369,18 @@ async function readNotes() //Need to do manual
     display.innerHTML = "";
     let orderedNotes = {};
 
-    for(let key of Object.keys(wholeNotes))
-    {
-        let text = [];
-        let pos;
-        text.push(wholeNotes[key]["desc"]);
-        pos = wholeNotes[key]["pos"];
-        
-        orderedNotes[pos] = createNoteCard(key, text);
-    }
+    let notes = visibleNotes(); //The hidden placeholder isn't shown
 
-    for(let noteNumber = 1; noteNumber < Object.keys(orderedNotes).length + 1; noteNumber++)
-    {display.appendChild(orderedNotes[noteNumber]);}
+    //Sort by saved order number. Shown 1..N even if the saved numbers have gaps (older
+    //saves put the placeholder at 1), so nothing goes missing.
+    let keys = Object.keys(notes).sort((a, b) => (parseInt(notes[a]["pos"]) || 0) - (parseInt(notes[b]["pos"]) || 0));
+
+    keys.forEach((key, index) =>
+    {
+        let card = createNoteCard(key, [notes[key]["desc"]]);
+        card.dataset.order = `${index + 1}`;
+        display.appendChild(card);
+    });
 
     //for(let key of document.getElementsByClassName("card-body")){key.onclick = handleCardClick;}
 }
