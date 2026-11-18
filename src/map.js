@@ -17,6 +17,7 @@
  *   Invisible                   only its owner sees it
  *   Hidden: Name                only that character (and the DM) can see it
  *   Dup X n / Dup Y n           repeat it n squares across/down (walls, rivers...)
+ *   Dup XY n / Dup XY w x h     fill an n-by-n (or w-wide, h-tall) box with it (floors, pits...)
  *   Exp X n / Exp Y n           stretch it n squares across/down
  *
  * Data arrives from parent.js through the exported set* functions. Clicking tokens,
@@ -646,12 +647,17 @@ function addCharacter(character, update)
             }
         }
 
-        if(title.includes("Dup X"))
+        if(/Dup\s*XY/.test(title))
+        {
+            dupBox(char, character, title);
+        }
+
+        if(/Dup\s*X(?!\s*Y)/.test(title)) //"Dup XY" is the box above, not a line
         {
             dup("x", char, character, [x, y], title);
         }
 
-        if(title.includes("Dup Y"))
+        if(/Dup\s*Y/.test(title))
         {
             dup("y", char, character, [x, y], title);
         }
@@ -780,30 +786,9 @@ function getTokenTransform(title)
  */
 function dup(xOrY, char, character, locations, title) 
 {
-    let num;
-    let dupNum;
     let rotate = getTokenTransform(title); //Copies get the same rotation and flips
-    
-    if(xOrY == "x"){dupNum = title.slice(title.indexOf("Dup X"));}
-    else{dupNum = title.slice(title.indexOf("Dup Y"));}
-    
-    if(dupNum[5] != ",") 
-    {
-        if(dupNum[6] != ",") 
-        {
-            num = parseInt(dupNum[5] + dupNum[6]);
-        } 
-        
-        else 
-        {
-            num = parseInt(dupNum[5]);
-        }
-    } 
-    
-    else 
-    {
-        num = 12;
-    }
+    let found = xOrY == "x" ? title.match(/Dup\s*X(?!\s*Y)\s*(\d+)?/) : title.match(/Dup\s*Y\s*(\d+)?/);
+    let num = (found && found[1]) ? parseInt(found[1]) : 12;
 
     let baseIndex;
     let posArray;
@@ -832,9 +817,52 @@ function dup(xOrY, char, character, locations, title)
 }
 
 /**
+ * "Dup XY n" fills an n-by-n box, "Dup XY w x h" (e.g. Dup XY4x3) a box w squares wide and
+ * h tall, starting at the token's square and going right and down. No number means 12.
+ * Like Dup X / Dup Y the count includes the token's own square, so Dup XY3 covers 3x3.
+ */
+function dupBox(char, character, title)
+{
+    let rotate = getTokenTransform(title);
+    let found = title.match(/Dup\s*XY\s*(\d+)?(?:\s*[x*]\s*(\d+))?/i);
+    let width = (found && found[1]) ? parseInt(found[1]) : 12;
+    let height = (found && found[2]) ? parseInt(found[2]) : width;
+
+    let startX = map.xPos.indexOf(character["xPos"]);
+    let startY = map.yPos.indexOf(character["yPos"]);
+    if(startX === -1 || startY === -1) return;
+
+    for(let row = 0; row < height; row++)
+    {
+        for(let col = 0; col < width; col++)
+        {
+            if(row == 0 && col == 0){continue;} //The token itself is already there
+
+            let xIndex = startX + col;
+            let yIndex = startY + row;
+
+            //Stop at the map's edge
+            if(xIndex < map.pos.length && yIndex < map.pos.length && xIndex < map.xPos.length && yIndex < map.yPos.length)
+            {
+                drawDupCopy(char, character, rotate, map.pos[xIndex], map.pos[yIndex]);
+            }
+        }
+    }
+}
+
+/**
  * Draws one copy (picture, ring and HP bar) of a duplicated token at grid offset `offSet`.
  */
 function setupDup(char, character, xOrY, locations, rotate, offSet) 
+{
+    if(xOrY == "x"){drawDupCopy(char, character, rotate, map.pos[offSet], locations[1]);}
+    else{drawDupCopy(char, character, rotate, locations[0], map.pos[offSet]);}
+}
+
+/**
+ * Draws one copy (picture, ring and HP bar) of a duplicated token at map position (x, y).
+ */
+function drawDupCopy(char, character, rotate, x, y)
 {
     let stuffs = [document.createElement("img"), document.createElement("img"), document.createElement("img")];
     
@@ -845,16 +873,7 @@ function setupDup(char, character, xOrY, locations, rotate, offSet)
         stuffs[d].style.zIndex = char[d].style.zIndex;
         stuffs[d].style.transform = rotate;
         stuffs[d].classList.add(character["id"]);
-        
-        if(xOrY == "x") 
-        {
-            placeTokens(map.pos[offSet], locations[1], stuffs[d]);
-        } 
-        
-        else 
-        {
-            placeTokens(locations[0], map.pos[offSet], stuffs[d]);
-        }
+        placeTokens(x, y, stuffs[d]);
         
         switch(d) 
         {
@@ -1041,6 +1060,7 @@ function changeInstructions()
         "FlipX / FlipY" : "Mirrors your token left-to-right (<b>FlipX</b>) or top-to-bottom (<b>FlipY</b>). You can use both, and combine them with Rotate.",
         "OpacNN" : "Makes your token see-through, e.g. <b>Opac50</b> for half visible.",
         "Dup X n / Dup Y n" : "Repeats your token n squares to the right / down, e.g. <b>Dup X4</b>. Handy for walls and rivers.",
+        "Dup XY n" : "Fills a box with your token, starting at its square and going right and down: <b>Dup XY3</b> covers 3x3, <b>Dup XY4x2</b> covers 4 wide by 2 tall. Handy for floors and pits.",
         "Exp X n / Exp Y n" : "Stretches your token across n squares to the right / down, e.g. <b>Exp X2</b>."};
     let display = document.getElementById("showInstructions");
 
