@@ -1267,6 +1267,44 @@ table, .itemSearch, #itemImg
     border-radius: var(--radius);
 }
 
+/* DM tools: every tool's bottom buttons (its action, then Done) sit in one centred row
+   and share one size, so no tool mixes full-width and small buttons. */
+.actionRow
+{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin: 14px 0 6px;
+}
+
+.actionRow .actionBtn
+{
+    width: auto;
+    min-width: 150px;
+    margin: 0;
+    padding: 6px 18px;
+}
+
+/* Small buttons inside a list row (token Edit/Delete/Upload, turn-order Remove/Add) */
+.rowButton
+{
+    display: inline-block;
+    width: auto;
+    min-width: 84px;
+    margin: 5px;
+    padding: 4px 14px;
+    vertical-align: middle;
+}
+
+@media (max-width: 575px) {
+    .actionRow .actionBtn { min-width: 0; flex: 1 1 40%; }
+}
+
+/* Interactive's picture button before anything is picked (its text must stay empty) */
+.dropbtn:empty::before { content: "Pick a picture \25BE"; opacity: .75; }
+
 /* Button that opens a picker in the DM token form */
 .pickerBtn
 {
