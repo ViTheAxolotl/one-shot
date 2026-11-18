@@ -10,7 +10,9 @@
  * how it's drawn — see addCharacter():
  *   Large / Huge / Gargantuan   2×2 / 3×3 / 4×4 squares
  *   Top / Bottom                drawn above / below other tokens
- *   90 / 180 / 270, FlipX/FlipY rotate or mirror
+ *   Rotate N / RotN             rotate N degrees, any angle (Rotate 45, Rot-30); a bare
+ *                               number between commas (", 180,") still works too
+ *   FlipX / FlipY               mirror left-right / top-bottom (as seen on the map)
  *   OpacNN                      see-through, e.g. Opac50
  *   Invisible                   only its owner sees it
  *   Hidden: Name                only that character (and the DM) can see it
@@ -478,8 +480,11 @@ function addCharacter(character, update)
 {
     let char = [document.createElement("img"), document.createElement("img"), document.createElement("img")];
     let tokenImg = character["name"];
-    let x = map.pos[0];
-    let y = map.pos[0];
+    //Always place the token at its saved square. (This used to happen only when it had a status,
+    //so a token whose status was emptied was drawn at 1A and every move started from 1A.)
+    let x = map.pos[map.xPos.indexOf(character["xPos"])] ?? map.pos[0];
+    let y = map.pos[map.yPos.indexOf(character["yPos"])] ?? map.pos[0];
+    if(character["title"] == undefined){character["title"] = " ";}
 
     char[0].classList = `tokens ${character["id"]} char`;
 
@@ -535,8 +540,6 @@ function addCharacter(character, update)
     if(character.title != "")
     {
         let title = character.title;
-        x = map.pos[map.xPos.indexOf(character["xPos"])];
-        y = map.pos[map.yPos.indexOf(character["yPos"])];
 
         if(title.includes("Large"))
         {
@@ -567,7 +570,7 @@ function addCharacter(character, update)
 
                 else
                 {
-                    image.style.zIndex = `${parseInt(image.style.zIndex) + 600}`;
+                    image.style.zIndex = `${parseInt(image.style.zIndex) + 550}`;
                 }
             }
         }
@@ -588,27 +591,13 @@ function addCharacter(character, update)
             }
         }
 
-        if(title.includes("90"))
+        let transform = getTokenTransform(title); //Rotate / FlipX / FlipY
+
+        if(transform != "")
         {
             for(let image of char)
             {
-                image.style.transform = 'rotate(90deg)';
-            }
-        }
-
-        else if(title.includes("180"))
-        {
-            for(let image of char) 
-            {
-                image.style.transform = 'rotate(180deg)';
-            }
-        }
-
-        else if(title.includes("270"))
-        {
-            for(let image of char)
-            {
-                image.style.transform = 'rotate(270deg)';
+                image.style.transform = transform;
             }
         }
 
@@ -620,22 +609,6 @@ function addCharacter(character, update)
             for(let image of char)
             {
                 image.style.opacity = `.${opac}`;
-            } 
-        }
-
-        if(title.includes("FlipX"))
-        {
-            for(let image of char)
-            {
-                image.style.transform += 'scaleX(-1)';
-            } 
-        }
-
-        if(title.includes("FlipY"))
-        {
-            for(let image of char)
-            {
-                image.style.transform += 'scaleY(-1)';
             } 
         }
 
@@ -766,21 +739,53 @@ function setupExp(num, char, xOrY)
 }
 
 /**
+ * Reads the rotation and flips from a token's status line and returns the CSS transform
+ * ("" if none). Rotation, any angle, in degrees:
+ *   "Rotate 45", "Rotate45", "Rot 12.5", "Rot-30"   (Rotate/Rot, any capitalisation)
+ *   a bare number between commas, e.g. " 180, Bottom,"   (older tokens use this)
+ * Flips: "FlipX" / "Flip X" mirrors left-right, "FlipY" / "Flip Y" mirrors top-bottom.
+ * Flips are applied after the rotation, so they always mirror along the map's own axes.
+ * Numbers inside other keywords (Opac90, Dup X18, T11) are never read as a rotation.
+ */
+function getTokenTransform(title)
+{
+    let degrees = null;
+    let named = title.match(/\brot(?:ate)?\s*(-?\d+(?:\.\d+)?)/i);
+
+    if(named)
+    {
+        degrees = parseFloat(named[1]);
+    }
+
+    else
+    {
+        for(let part of title.split(","))
+        {
+            let bare = part.trim().match(/^(-?\d+(?:\.\d+)?)\s*(?:deg|°)?$/i);
+            if(bare){degrees = parseFloat(bare[1]); break;}
+        }
+    }
+
+    let flips = "";
+    if(/\bflip\s*x/i.test(title)){flips += "scaleX(-1) ";}
+    if(/\bflip\s*y/i.test(title)){flips += "scaleY(-1) ";}
+
+    let rotate = (degrees != null && degrees % 360 != 0) ? `rotate(${degrees}deg)` : "";
+    return `${flips}${rotate}`.trim();
+}
+
+/**
  * Reads the number after "Dup X" / "Dup Y" (12 if there is no number) and draws that many
- * copies of the token in a line to the right / downward, keeping its rotation.
+ * copies of the token in a line to the right / downward, keeping its rotation and flips.
  */
 function dup(xOrY, char, character, locations, title) 
 {
     let num;
     let dupNum;
-    let rotate = "0";
+    let rotate = getTokenTransform(title); //Copies get the same rotation and flips
     
     if(xOrY == "x"){dupNum = title.slice(title.indexOf("Dup X"));}
     else{dupNum = title.slice(title.indexOf("Dup Y"));}
-    
-    if(title.includes("90")){rotate = "90";}
-    else if(title.includes("180")){rotate = "180";}
-    else if(title.includes("270")){rotate = "270";}
     
     if(dupNum[5] != ",") 
     {
@@ -838,7 +843,7 @@ function setupDup(char, character, xOrY, locations, rotate, offSet)
         stuffs[d].classList.add("tokens");
         stuffs[d].src = char[d].src;
         stuffs[d].style.zIndex = char[d].style.zIndex;
-        stuffs[d].style.transform = `rotate(${rotate}deg)`;
+        stuffs[d].style.transform = rotate;
         stuffs[d].classList.add(character["id"]);
         
         if(xOrY == "x") 
@@ -1031,7 +1036,12 @@ function changeInstructions()
 {
     let labels = ["Map", "Stats", "Actions", "Favorites"];
     let fill = ["The map will change once a character moves, if you click on a character you can see it enlarged. If you click on one of your own summons you will become it.", "The stats section contains controls to change the maps status. To move your token you can use the D-Pad or hold Ctrl and the arrow key. You can also change your token through keywords in the status:", "Here is all the spells and abilities for your characters. You can search or scroll to find the spell/ability you wish to use. Once you find it click on it, from here you can use the ability or add it to your favorites. Abilities that have a {@ will preform actions on cast. Then it will display the results on the display section on the webpage.", "In this section it will show your spells and actions you have favorited, this can be used to organize your abilities. If you click on one of the abilities it will let you edit them. You can also create custom abilites and spells from here. If you wish to create a button to better organise your abilites, all you need to do is select edit on the ability and change the Tag into what you want."];
-    let keyWords = {"Large" : "This will make your token a large creature taking up a 2 x 2 square.", "Huge" : "This will make your token a huge creature taking up a 3 x 3 square.", "Gargantuan" : "This will make your token an Gargantuan creature taking up a 4 x 4 square.", "Top" : "This will make your token on top of other tokens.", "Bottom" : "This will make your token underneath others.", "Invisible" : "This will make only you be able to see your token."};
+    let keyWords = {"Large" : "This will make your token a large creature taking up a 2 x 2 square.", "Huge" : "This will make your token a huge creature taking up a 3 x 3 square.", "Gargantuan" : "This will make your token an Gargantuan creature taking up a 4 x 4 square.", "Top" : "This will make your token on top of other tokens.", "Bottom" : "This will make your token underneath others.", "Invisible" : "This will make only you be able to see your token.",
+        "Rotate" : "Rotates your token by any number of degrees, e.g. <b>Rotate 45</b> or <b>Rotate -30</b> (Rot 45 works too). Positive turns clockwise.",
+        "FlipX / FlipY" : "Mirrors your token left-to-right (<b>FlipX</b>) or top-to-bottom (<b>FlipY</b>). You can use both, and combine them with Rotate.",
+        "OpacNN" : "Makes your token see-through, e.g. <b>Opac50</b> for half visible.",
+        "Dup X n / Dup Y n" : "Repeats your token n squares to the right / down, e.g. <b>Dup X4</b>. Handy for walls and rivers.",
+        "Exp X n / Exp Y n" : "Stretches your token across n squares to the right / down, e.g. <b>Exp X2</b>."};
     let display = document.getElementById("showInstructions");
 
     for(let label of labels)
@@ -1052,10 +1062,10 @@ function changeInstructions()
     switch(this.name)
     {
         case "Stats":
-            display.innerHTML = fill[labels.indexOf(this.name)];
-            display.innerHTML += "<ul>";
-            for(let key of Object.keys(keyWords)){display.innerHTML += `<li>${key}: ${keyWords[key]}</li>`}
-            display.innerHTML += "</ul>";
+            //Build the whole list first: adding "<ul>" to innerHTML on its own closes it straight away
+            display.innerHTML = fill[labels.indexOf(this.name)] + "<ul style='text-align:left'>" +
+                Object.keys(keyWords).map(key => `<li><b>${key}</b>: ${keyWords[key]}</li>`).join("") +
+                "</ul>Separate keywords with commas, e.g. <b>Large, Rotate 45, FlipX</b>";
             break;
 
         case "Map":
