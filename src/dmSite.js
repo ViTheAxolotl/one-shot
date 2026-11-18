@@ -362,7 +362,7 @@ function handleEdit()
             pickers.push(makeImagePicker(names[i], i == 0 ? "borders" : "tokens", txtFeilds[i]));
         }
 
-        else if(i == 3 || i == 7)
+        else if(i == 2 || i == 3 || i == 7)
         {
             txtFeilds[i] = document.createElement("input");
             txtFeilds[i].name = names[i];
@@ -474,27 +474,29 @@ function makeImagePicker(fieldName, kind, input)
 }
 
 /**
- * Current or temp HP changed: cap current HP at max HP and update the preview HP bar.
+ * Max, current or temp HP changed: cap current HP at max HP and update the preview HP bar.
  */
 function handleChangeCurrent()
 {
-    let maxHp = document.getElementById("maxHp").value;
-    let currentHp = document.getElementById("currentHp").value;;
+    let maxField = document.getElementById("maxHp");
+    let currentField = document.getElementById("currentHp");
 
-    if(parseInt(currentHp) > parseInt(maxHp))
+    if(parseInt(currentField.value) > parseInt(maxField.value))
     {
-        this.value = maxHp;
+        currentField.value = maxField.value; //Always cap current HP (not whichever box was edited)
     }
 
-    this.parentNode.childNodes[2].src = updateHpPic(maxHp, currentHp);
+    this.parentNode.childNodes[2].src = updateHpPic(maxField.value, currentField.value);
 }
 
 /**
- * Returns the HP-bar picture for the form's HP values.
+ * Returns the HP-bar picture for the form's HP values. Passes the temp HP *value*
+ * (blank counts as 0): passing the box itself always showed the temp HP bar.
  */
 function updateHpPic(maxHp, currentHp)
 {
-    let tempHp = document.getElementById("tempHp");
+    let tempHp = document.getElementById("tempHp").value.trim();
+    if(tempHp == "" || parseInt(tempHp) == 0){tempHp = "0";}
     return returnHpImage(maxHp, tempHp, currentHp);
 }
 
