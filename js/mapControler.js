@@ -2606,60 +2606,50 @@ function handleChangeToken()
         selects[i].appendChild(selectDiv);
         selectDiv.id = `${labels[i]}Select`;
 
-        let sources = [];
-        let temp;
+        //Each choice is {name, src}. The name comes from the image list's own key, never from
+        //the picture's web address: uploaded pictures live in Firebase Storage
+        //(".../o/images%2Ftokens%2Fgoblin-.png?alt=media..."), and cutting the name out of
+        //that address saved junk like "images%2Ftokens%2Fgoblin-" as the token's name.
+        let choices = [];
 
         switch(i)
         {
             case 0:
-                temp = window.wholeCustom;
-                for(let token of Object.keys(temp)){if(token != "hold"){sources.push(temp[token]["src"]);}} //Populates Sources with all the selectable token images
-                temp = window.imgs["tokens"];
-                for(let token of Object.keys(temp)){if(token != "invisible-"){sources.push(temp[token]);}} //Populates Sources with all the selectable token images
+                for(let token of Object.keys(window.wholeCustom ?? {}))
+                {
+                    let custom = window.wholeCustom[token];
+                    if(token != "hold" && custom?.src && custom?.name){choices.push({name : custom.name, src : custom.src});}
+                }
+
+                for(let token of Object.keys(window.imgs["tokens"] ?? {}))
+                {
+                    if(token != "invisible-"){choices.push({name : token, src : window.imgs["tokens"][token]});}
+                }
+
                 dropBtn.innerHTML = window.wholeDB[currentCharacter[0].id]["name"];
                 break;
             
             case 1:
-                temp = window.imgs["borders"];
-                for(let border of Object.keys(temp)){if(border != "invisible"){sources.push(temp[border]);}} //Populates Sources with all the selectable border images
+                for(let border of Object.keys(window.imgs["borders"] ?? {}))
+                {
+                    if(border != "invisible"){choices.push({name : border, src : window.imgs["borders"][border]});}
+                }
+
                 dropBtn.innerHTML = window.wholeDB[currentCharacter[0].id]["border"];
                 break;
         }
 
-        for(let x = 0; x < sources.length; x++)
+        for(let choice of choices)
         {
             let img = document.createElement("img");
-            img.src = sources[x];
+            img.src = choice.src;
             img.onclick = changeSourceSelect;
-            img.classList.add(dropBtn.id);
-            
-            temp = img.src;
-            temp = temp.split("/");
-            temp = temp[temp.length - 1];
-
-            if(temp.includes("Border"))
-            {
-                temp = temp.slice(0, temp.indexOf("Border"));
-            }
-
-            else if(temp.includes("-."))
-            {
-                temp = temp.slice(0, temp.indexOf("."));
-            }
-
-            else
-            {
-                for(let token of Object.keys(window.wholeCustom))
-                {
-                    if(window.wholeCustom[token]["src"] == img.src){temp = window.wholeCustom[token]["name"];}
-                }
-            }
-
-            img.classList.add(temp);
+            img.dataset.button = dropBtn.id; //Which dropdown button this picture fills in
+            img.dataset.name = choice.name;
             img.classList.add("char");
-            img.title = temp; //Name on hover
+            img.title = choice.name; //Name on hover
             img.onerror = function () {this.remove();}; //Skip pictures whose file is gone (showed as broken icons)
-            if(temp == dropBtn.innerHTML){img.classList.add("picked");} //Highlight the current one
+            if(choice.name == dropBtn.innerHTML){img.classList.add("picked");} //Highlight the current one
             selectDiv.appendChild(img); 
         }
     }
@@ -2673,10 +2663,10 @@ function handleChangeToken()
  */
 function changeSourceSelect()
 {
-    let select = document.getElementById(this.classList[0]);
+    let select = document.getElementById(this.dataset.button);
     for(let img of Array.from(this.parentNode.getElementsByClassName("picked"))){img.classList.remove("picked");}
     this.classList.add("picked");
-    select.innerHTML = this.classList[1];
+    select.innerHTML = this.dataset.name;
     select.click();
 }
 
