@@ -1263,47 +1263,20 @@ function displayInteractive(buttonRow)
         selects[i].appendChild(selectDiv);
         selectDiv.id = `${labels[i]}Select`;
 
-        let sources = [];
-        let temp;
+        //Use the image list's own names; cutting a name out of a Firebase Storage address
+        //gave junk, so Upload saved "undefined" as the picture.
+        let pushImages = window.top.parent.imgs["push"] ?? {};
 
-        switch(i)
-        {
-            case 0:
-                temp = window.top.parent.imgs["push"];
-                for(let img of Object.keys(temp)){sources.push(temp[img]);} //Populates Sources with all the selectable images
-                break;
-        }
-
-        for(let x = 0; x < sources.length; x++)
+        for(let name of Object.keys(pushImages))
         {
             let img = document.createElement("img");
-            img.src = sources[x];
+            img.src = pushImages[name];
             img.onclick = changeSourceSelect; 
-            img.classList.add(dropBtn.id);
+            img.dataset.button = dropBtn.id;
+            img.dataset.name = name;
+            img.title = name;
             img.onerror = function () {this.remove();};
-            
-            temp = img.src;
-            temp = temp.split("/");
-            temp = temp[temp.length - 1];
-
-            if(temp.includes("Border"))
-            {
-                temp = temp.slice(0, temp.indexOf("Border"));
-            }
-
-            else if(temp.includes("-."))
-            {
-                temp = temp.slice(0, temp.indexOf("."));
-            }
-
-            else
-            {
-                temp = temp.slice(0, temp.indexOf("."));
-            }
-
-            img.classList.add(temp);
-            img.classList.add("char");
-            selectDiv.appendChild(img); 
+            selectDiv.appendChild(img);
         }
     }
 }
@@ -1481,8 +1454,10 @@ function handleQuest()
  */
 function changeSourceSelect()
 {
-    let select = document.getElementById(this.classList[0]);
-    select.innerHTML = this.classList[1];
+    let select = document.getElementById(this.dataset.button);
+    for(let img of Array.from(this.parentNode.getElementsByClassName("picked"))){img.classList.remove("picked");}
+    this.classList.add("picked");
+    select.innerHTML = this.dataset.name;
     select.click();
 }
 
