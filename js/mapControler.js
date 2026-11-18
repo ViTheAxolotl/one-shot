@@ -151,6 +151,20 @@ function applySheetZoom(level)
 }
 
 /**
+ * True only for a real summon. isSummon was sometimes saved as the text "false", which
+ * counts as true in an if(); every move, HP or status change on such a token then also
+ * wrote a stray copy into playerChar/Vi/summons.
+ */
+function isSummonToken(id)
+{
+    let value = window.wholeDB[id]?.["isSummon"];
+    return value === true || value === "true";
+}
+
+/** Hidden quest that keeps playerChar/Vi/quests from being empty; never shown. */
+const QUEST_PLACEHOLDER = "Placeholder";
+
+/**
  * parent.js calls this when quests change: shows the active quest's title and text.
  */
 export function setWholeQuests(data)
@@ -158,8 +172,9 @@ export function setWholeQuests(data)
     let questTitle = document.getElementById("questTitle");
     let questText = document.getElementById("questText");
     
-    for(let quest of Object.keys(window.wholeQuests))
+    for(let quest of Object.keys(window.wholeQuests ?? {}))
     {
+        if(quest == QUEST_PLACEHOLDER){continue;}
         if(window.wholeQuests[quest]["activeQuest"])
         {
             questTitle.innerHTML = window.wholeQuests[quest]["name"];
@@ -626,7 +641,7 @@ function tempHpUpdate()
     setDoc(`currentMap/${currentCharacter[0].classList[1]}/tempHp`, tempHp.value);
 
     if(window.player == currentCharacter[0].classList[1]){setDoc(`playerChar/${window.player}/token/tempHp`, tempHp.value);}
-    if(window.wholeDB[currentCharacter[0].classList[1]]["isSummon"]){setDoc(`playerChar/Vi/summons/${currentCharacter[0].classList[1]}/tempHp`, tempHp.value);}
+    if(isSummonToken(currentCharacter[0].classList[1])){setDoc(`playerChar/Vi/summons/${currentCharacter[0].classList[1]}/tempHp`, tempHp.value);}
 }
 
 /**
@@ -753,7 +768,7 @@ function changeValue()
             if(title == ""){title = " ";} //Removing the last keyword: keep a blank status like every other token, never ""
             setDoc(`currentMap/${currentToken}/title`, title);
             if(currentToken == window.player){setDoc(`playerChar/${window.player}/token/title`, title);}
-            if(window.wholeDB[currentCharacter[0].classList[1]]["isSummon"]){setDoc(`playerChar/Vi/summons/${currentCharacter[0].classList[1]}/title`, title);}
+            if(isSummonToken(currentCharacter[0].classList[1])){setDoc(`playerChar/Vi/summons/${currentCharacter[0].classList[1]}/title`, title);}
             break;
         
         case "turn":
@@ -858,7 +873,7 @@ function moveChar(xPos, yPos)
         setDoc(`playerChar/${window.player}/token/xPos`, x);
         setDoc(`playerChar/${window.player}/token/yPos`, y);
     }
-    if(window.wholeDB[currentId]["isSummon"])
+    if(isSummonToken(currentId))
     {
         setDoc(`playerChar/Vi/summons/${currentId}/xPos`, x);
         setDoc(`playerChar/Vi/summons/${currentId}/yPos`, y);
@@ -879,7 +894,7 @@ function updateHp()
         setDoc(`playerChar/${window.player}/token/currentHp`, `${current.value}`);
     }
 
-    if(window.wholeDB[currentCharacter[0].classList[1]]["isSummon"]){setDoc(`playerChar/Vi/summons/${currentCharacter[0].classList[1]}/currentHp`, `${current.value}`);}
+    if(isSummonToken(currentCharacter[0].classList[1])){setDoc(`playerChar/Vi/summons/${currentCharacter[0].classList[1]}/currentHp`, `${current.value}`);}
 }
 
 /**
@@ -3059,8 +3074,9 @@ function handleLoadQuests()
     document.getElementById("questInstructions").innerHTML="<em><b>Click To Hide Other Quests...</b></em>";
     this.onclick = handleDeleteQuests;
 
-    for(let quest of Object.keys(window.wholeQuests))
+    for(let quest of Object.keys(window.wholeQuests ?? {}))
     {
+        if(quest == QUEST_PLACEHOLDER){continue;}
         let questTitle, questText;
 
         if(!window.wholeQuests[quest]["activeQuest"]){ questTitle = window.wholeQuests[quest]["name"]; questText = window.wholeQuests[quest]["Desc"]; }
