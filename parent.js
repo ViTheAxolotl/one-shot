@@ -159,6 +159,27 @@ const refreshRef = ref(database, `playerChar/Vi/playerRefresh`);
 onValue(refreshRef, (snapshot) =>
 {
     const data = snapshot.val();
+
+    if(data == null){return;}
+
+    //"Refresh all players": {target: "All", at: <time>}. Nobody can clear it for everyone,
+    //so each page remembers the last one it handled and reloads once. Old requests
+    //(over 5 minutes) are ignored, and the DM's own page isn't reloaded.
+    if(typeof data == "object" && data.target == "All")
+    {
+        if(window.player == "Vi"){return;}
+
+        let handled = null;
+        try{handled = localStorage.getItem("lastRefreshAll");}catch(e){}
+
+        if(handled != String(data.at) && Math.abs(Date.now() - data.at) < 5 * 60 * 1000)
+        {
+            try{localStorage.setItem("lastRefreshAll", String(data.at));}catch(e){}
+            location.reload(true);
+        }
+
+        return;
+    }
     
     if(window.player == data)
     {
