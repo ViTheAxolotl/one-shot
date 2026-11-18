@@ -2637,6 +2637,9 @@ function handleChangeToken()
 
             img.classList.add(temp);
             img.classList.add("char");
+            img.title = temp; //Name on hover
+            img.onerror = function () {this.remove();}; //Skip pictures whose file is gone (showed as broken icons)
+            if(temp == dropBtn.innerHTML){img.classList.add("picked");} //Highlight the current one
             selectDiv.appendChild(img); 
         }
     }
@@ -2651,6 +2654,8 @@ function handleChangeToken()
 function changeSourceSelect()
 {
     let select = document.getElementById(this.classList[0]);
+    for(let img of Array.from(this.parentNode.getElementsByClassName("picked"))){img.classList.remove("picked");}
+    this.classList.add("picked");
     select.innerHTML = this.classList[1];
     select.click();
 }
