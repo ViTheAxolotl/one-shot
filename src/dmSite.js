@@ -660,12 +660,11 @@ function handlePreset()
 }
 
 /**
- * Delete on a preset or summon row: asks first, deletes that entry and redraws the list.
+ * Delete on a preset or summon row: deletes that entry and redraws the list.
  */
 function deletePreset()
 {
     let key = this.dataset.key;
-    if(!confirm(`Delete ${key}?`)){return;}
 
     if(preOrSumm == 1)
     {
