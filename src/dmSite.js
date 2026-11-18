@@ -286,6 +286,7 @@ function handleEdit()
     let buttons = [document.createElement("button"), document.createElement("button")];
     let buttonsName = ["edit", "back"];
     let currentEOrD = document.getElementsByClassName("eOrD");
+    let pickers = [];
 
     if(currentEOrD.length > 0)
     {
@@ -304,7 +305,7 @@ function handleEdit()
     }
 
     buttons[0].onclick = addToken;
-    buttons[0].style.margin = "5px 2.5px 5px 42%";
+    buttons[0].style.margin = "5px 2.5px 5px 5px";
     buttons[1].onclick = resetDelete;
     buttons[1].style.margin = "5px 5px 5px 2.5px";
     buttons[1].id = "reset";
@@ -351,36 +352,14 @@ function handleEdit()
     {
         let label = createLabel(names[i]);
         
-        if(i == 0)
+        if(i == 0 || i == 1)
         {
-            txtFeilds[i] = document.createElement("select");
+            //Border / picture: a button that opens a grid of the actual pictures (like Change Token
+            //on the stats tab). The chosen key lives in a hidden input so addToken() reads it as before.
+            txtFeilds[i] = document.createElement("input");
+            txtFeilds[i].type = "hidden";
             txtFeilds[i].name = names[i];
-
-            for(let key of Object.keys(window.top.parent.imgs["borders"]))
-            {
-                let currentBorder = window.top.parent.imgs["borders"][key];
-                let option = document.createElement("option");
-                option.value = key;
-                option.text = key;
-                txtFeilds[i].appendChild(option);
-                txtFeilds[i].onchange = updateBorderPic;
-            }
-        }
-
-        else if(i == 1)
-        {
-            txtFeilds[i] = document.createElement("select");
-            txtFeilds[i].name = names[i];
-
-            for(let key of Object.keys(window.top.parent.imgs["tokens"]))
-            {
-                let currentBorder = window.top.parent.imgs["tokens"][key];
-                let option = document.createElement("option");
-                option.value = key;
-                option.text = key;
-                txtFeilds[i].appendChild(option);
-                txtFeilds[i].onchange = updateTokenPic;
-            }
+            pickers.push(makeImagePicker(names[i], i == 0 ? "borders" : "tokens", txtFeilds[i]));
         }
 
         else if(i == 3 || i == 7)
@@ -403,6 +382,7 @@ function handleEdit()
         txtFeilds[i].style.margin = "5px";
         editDiv.appendChild(label);
         editDiv.appendChild(txtFeilds[i]);
+        if(i == 0 || i == 1){editDiv.appendChild(pickers[i].button);}
     }
 
     txtFeilds[0].value = curCharacter.border;
@@ -416,25 +396,81 @@ function handleEdit()
     txtFeilds[8].value = curCharacter.isSummon;
     let curAC = curCharacter.AC ?? curCharacter.ac; //Map tokens store it as AC
     txtFeilds[9].value = (curAC == undefined || curAC === "" || curAC == "undefined") ? "10" : curAC;
-    editDiv.appendChild(document.createElement("h6"));
-    buttons.forEach(em => {editDiv.appendChild(em)});
+    pickers.forEach(p => {p.setValue(p.input.value); editDiv.appendChild(p.panel);}); //Grids go on their own line under the fields
+    let buttonRow = document.createElement("div"); //Centers edit/back under the form
+    buttonRow.style.textAlign = "center";
+    buttonRow.style.whiteSpace = "nowrap";
+    buttons.forEach(em => {buttonRow.appendChild(em)});
+    editDiv.appendChild(buttonRow);
 }
 
 /**
- * Border dropdown changed: update the preview ring.
+ * Builds a picture picker for the token form: a button showing the current choice and a
+ * scrolling grid of every picture in imgs[kind] ("tokens" or "borders"). Picking one stores
+ * its key in `input`, updates the button and the token preview, and closes the grid.
+ * Opening one picker closes any other.
  */
-function updateBorderPic()
+function makeImagePicker(fieldName, kind, input)
 {
-    this.parentNode.childNodes[1].src = window.top.parent.imgs["borders"][this[this.selectedIndex].value];
-    this.parentNode.childNodes[1].classList.remove("invisible");
-}
+    let images = window.top.parent.imgs[kind];
+    let button = document.createElement("button");
+    let panel = document.createElement("div");
 
-/**
- * Picture dropdown changed: update the preview picture.
- */
-function updateTokenPic()
-{
-    this.parentNode.childNodes[0].src = window.top.parent.imgs["tokens"][this[this.selectedIndex].value];
+    button.type = "button";
+    button.classList = "pickerBtn";
+    button.id = `${fieldName}Picker`;
+    button.style.margin = "5px";
+
+    panel.classList = "imgPicker";
+    panel.id = `${fieldName}PickerGrid`;
+
+    let keys = Object.keys(images).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: "base"}));
+
+    for(let key of keys)
+    {
+        let img = document.createElement("img");
+        img.src = images[key];
+        img.title = key;
+        img.alt = key;
+        img.dataset.key = key;
+        img.loading = "lazy";
+        img.onerror = function () {this.remove();}; //Skip pictures whose file is gone
+        img.onclick = function () {setValue(key); panel.classList.remove("open");};
+        panel.appendChild(img);
+    }
+
+    function setValue(key)
+    {
+        input.value = key;
+        button.innerHTML = `${key} &#9662;`;
+        button.title = key;
+
+        for(let img of panel.children){img.classList.toggle("picked", img.dataset.key == key);}
+
+        //Update the preview: child 0 is the picture, child 1 the border ring (see makeToken)
+        let preview = editDiv.childNodes[kind == "borders" ? 1 : 0];
+        if(preview && images[key])
+        {
+            let hpLayer = editDiv.childNodes[2]; //makeToken fills the HP layer with the picture too, and it sits on top
+            if(kind == "tokens" && hpLayer && hpLayer.src == preview.src){hpLayer.src = images[key];}
+            preview.src = images[key];
+            preview.classList.remove("invisible");
+        }
+    }
+
+    button.onclick = function ()
+    {
+        let opening = !panel.classList.contains("open");
+        for(let other of document.getElementsByClassName("imgPicker")){other.classList.remove("open");}
+        if(opening)
+        {
+            panel.classList.add("open");
+            let picked = panel.querySelector(".picked");
+            if(picked){picked.scrollIntoView({block: "nearest"});}
+        }
+    };
+
+    return {button, panel, input, setValue};
 }
 
 /**
@@ -1198,6 +1234,7 @@ function displayInteractive(exitButton)
 
         let selectDiv = document.createElement("div");
         selectDiv.classList.add("ddown-content");
+        selectDiv.classList.add("large");
         selects[i].appendChild(selectDiv);
         selectDiv.id = `${labels[i]}Select`;
 
@@ -1218,8 +1255,7 @@ function displayInteractive(exitButton)
             img.src = sources[x];
             img.onclick = changeSourceSelect; 
             img.classList.add(dropBtn.id);
-            img.style.width = "20vw";
-            img.style.height = "20vw";
+            img.onerror = function () {this.remove();};
             
             temp = img.src;
             temp = temp.split("/");
