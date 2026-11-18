@@ -1171,37 +1171,75 @@ table, .itemSearch, #itemImg
     position: relative;
 }
 
-.ddown-content
+/* Picture pickers (Change Token on the stats tab, and the DM token form).
+   A fixed-height scrolling grid that stays inside its section, instead of a
+   floating panel that covered the page and doubled its height. */
+.ddown-content, .imgPicker
 {
     display: none;
-    position: absolute;
+    position: static;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 6px;
+    justify-items: center;
+    align-items: center;
+    max-height: 280px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 8px;
+    margin: 6px 0;
     background-color: var(--oak-deep);
     border: 1px solid var(--brass-dim);
-    box-shadow: 0px 8px 16px 0px #00000066;
-    z-index: 1;
+    box-shadow: inset 0 0 12px #00000066;
     border-radius: var(--radius);
 }
 
-.ddown-content img
+.ddown-content img, .imgPicker img
 {
-    margin: 5px;
-    width: 20%;
-    padding-left: 10px;
-    border-radius: 3px;
+    width: 100%;
+    max-width: 64px;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    margin: 0;
+    padding: 3px;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
-.ddown-content img:hover
+.ddown-content img:hover, .imgPicker img:hover
 {
     background-color: rgba(201, 162, 74, .2);
 }
+
+.ddown-content img.picked, .imgPicker img.picked
+{
+    outline: 2px solid var(--brass, #c9a24a);
+    background-color: rgba(201, 162, 74, .25);
+}
+
+/* Bigger cells for the Interactive tool's push pictures */
+.ddown-content.large, .imgPicker.large { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); max-height: 360px; }
+.ddown-content.large img, .imgPicker.large img { max-width: 120px; }
 
 .ddown:hover .dropbtn
 {
     background-color: #4a423b;
 }
 
-.ddownShow .ddown-content { display: block; }
+.ddownShow .ddown-content, .imgPicker.open { display: grid; }
 .ddownHide .ddown-content { display: none; }
+
+/* Button that opens a picker in the DM token form */
+.pickerBtn
+{
+    background: var(--stone);
+    border-radius: 999px;
+    min-width: 120px;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
 
 .area
 {
@@ -1598,7 +1636,7 @@ body.embedded #siteList > #story
         margin-left: 0.1%;
     }
 
-    .ddown-content img { width: 25%; }
+    .ddown-content, .imgPicker { grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); max-height: 240px; }
 
     /* Change Token's picture dropdown button (mapControler.js builds its id) */
     #CharacterButton { width: 38%; }
