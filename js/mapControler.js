@@ -750,6 +750,7 @@ function changeValue()
             }
 
             title = title.innerHTML.slice(title.innerHTML.indexOf(": ") + 2).trim();
+            if(title == ""){title = " ";} //Removing the last keyword: keep a blank status like every other token, never ""
             setDoc(`currentMap/${currentToken}/title`, title);
             if(currentToken == window.player){setDoc(`playerChar/${window.player}/token/title`, title);}
             if(window.wholeDB[currentCharacter[0].classList[1]]["isSummon"]){setDoc(`playerChar/Vi/summons/${currentCharacter[0].classList[1]}/title`, title);}
