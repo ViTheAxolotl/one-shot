@@ -1860,7 +1860,7 @@ function addToken()
         AC : ac
     });
 
-    resetDelete();
+    alert(`${table} has been uploaded`);
 }
 
 /**
