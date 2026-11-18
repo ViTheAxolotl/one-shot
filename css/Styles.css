@@ -1228,6 +1228,45 @@ table, .itemSearch, #itemImg
 .ddownShow .ddown-content, .imgPicker.open { display: grid; }
 .ddownHide .ddown-content { display: none; }
 
+/* Change Map (DM site): named map thumbnails and a large preview */
+.imgPicker.mapGrid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); max-height: 340px; align-items: start; }
+.mapGrid figure
+{
+    margin: 0;
+    padding: 5px;
+    width: 100%;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.mapGrid figure:hover { background-color: rgba(201, 162, 74, .2); }
+.mapGrid figure.picked { outline: 2px solid var(--brass, #c9a24a); background-color: rgba(201, 162, 74, .25); }
+.mapGrid figure img
+{
+    width: 100%;
+    max-width: none;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    padding: 0;
+    border-radius: 4px;
+}
+.mapGrid figcaption, .mapPreview figcaption
+{
+    font-size: .85em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 3px;
+}
+.mapPreview { margin: 6px auto; text-align: center; }
+.mapPreview img
+{
+    max-width: 100%;
+    max-height: 38vh;
+    object-fit: contain;
+    border: 1px solid var(--brass-dim);
+    border-radius: var(--radius);
+}
+
 /* Button that opens a picker in the DM token form */
 .pickerBtn
 {
