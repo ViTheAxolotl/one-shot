@@ -151,14 +151,18 @@ function applySheetZoom(level)
 }
 
 /**
- * True only for a real summon. isSummon was sometimes saved as the text "false", which
+ * True only for a real summon that's on the summons list. isSummon was sometimes saved as the text "false", which
  * counts as true in an if(); every move, HP or status change on such a token then also
  * wrote a stray copy into playerChar/Vi/summons.
  */
 function isSummonToken(id)
 {
     let value = window.wholeDB[id]?.["isSummon"];
-    return value === true || value === "true";
+    //Only copy changes to a summon that's actually on the summons list. A numbered copy
+    //(milo1 placed from the Summons screen) has no entry there, and writing just its
+    //position would create a scrap entry with no name.
+    let isListed = window.wholeSummons?.[id] != undefined && typeof window.wholeSummons[id] == "object";
+    return (value === true || value === "true") && isListed;
 }
 
 /** Hidden quest that keeps playerChar/Vi/quests from being empty; never shown. */
