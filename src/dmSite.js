@@ -208,7 +208,7 @@ function handleRemove()
 
     for(let key of Object.keys(window.top.parent.wholeDB))
     {
-        if(key != "invisible")
+        if(key != "invisible" && typeof window.top.parent.wholeDB[key] == "object") //Skip the map setting, it isn't a token
         {
             makeToken(window.top.parent.wholeDB[key]);
         }
@@ -237,15 +237,14 @@ function handleDeleteOrEdit()
     }
 
     editDiv = currentDiv;
-    editB.innerHTML = "edit";
+    editB.innerHTML = "Edit";
     editB.onclick = handleEdit;
     temp = this.classList[1];
-    editB.classList = `eOrD ${this.classList[1]}`;
+    editB.classList = `eOrD ${this.classList[1]} rowButton`;
     editB.id = "edit";
-    editB.style.margin = `5px`;
-    deleteB.innerHTML = "delete";
+    deleteB.innerHTML = "Delete";
     deleteB.onclick = deleteToken;
-    deleteB.classList = `eOrD ${this.classList[1]}`;
+    deleteB.classList = `eOrD ${this.classList[1]} rowButton`;
     currentDiv.appendChild(editB);
     currentDiv.appendChild(deleteB);
 }
@@ -284,7 +283,7 @@ function handleEdit()
     let names = ["border", "name", "maxHp", "currentHp", "title", "xPos", "yPos", "tempHp", "isSummon", "ac"];
     let txtFeilds = [];
     let buttons = [document.createElement("button"), document.createElement("button")];
-    let buttonsName = ["edit", "back"];
+    let buttonsName = ["Upload", "Back"];
     let currentEOrD = document.getElementsByClassName("eOrD");
     let pickers = [];
 
@@ -298,16 +297,13 @@ function handleEdit()
 
     for(let i = 0; i < 2; i++)
     {
-        buttons[i].id = buttonsName[i];
         buttons[i].innerHTML = buttonsName[i];
-        buttons[i].style.display = "inline";
-        buttons[i].style.width = "80px";
+        buttons[i].classList = "rowButton";
     }
 
+    buttons[0].id = "edit"; //Other tools find these two by id
     buttons[0].onclick = addToken;
-    buttons[0].style.margin = "5px 2.5px 5px 5px";
     buttons[1].onclick = resetDelete;
-    buttons[1].style.margin = "5px 5px 5px 2.5px";
     buttons[1].id = "reset";
 
     if(temp != undefined)
@@ -560,6 +556,7 @@ function handleQuick()
 
     for(let key of Object.keys(window.top.parent.wholeDB))
     {
+        if(typeof window.top.parent.wholeDB[key] != "object"){continue;} //Skip the map setting (currentMap/map), it isn't a token
         if(key != "invisible" && window.top.parent.wholeDB[key].border != "invisible")
         {
             makeToken(window.top.parent.wholeDB[key]);
@@ -571,7 +568,7 @@ function handleQuick()
             feilds[1].innerHTML = window.top.parent.wholeDB[key].yPos;
             feilds[2].value = window.top.parent.wholeDB[key].currentHp;
             feilds[2].id = "newHp_" + window.top.parent.wholeDB[key].id;
-            feilds[2].style.width = "3%";
+            feilds[2].style.width = "60px";
             feilds[3].innerHTML = window.top.parent.wholeDB[key].maxHp;
 
             for(let i = 0; i < 4; i++)
@@ -585,12 +582,8 @@ function handleQuick()
                 currentDiv.appendChild(feilds[i]);
             }
 
-            let upload = document.createElement("button");
+            let upload = makeRowButton("Upload", quickUpdate);
             upload.id = window.top.parent.wholeDB[key].id;
-            upload.onclick = quickUpdate;
-            upload.style.margin = "5px";
-            upload.style.width = "6%";
-            upload.innerHTML = "Upload";
             currentDiv.appendChild(upload);
         }
     }
@@ -631,21 +624,14 @@ function handlePreset()
 
         makeToken(db[preOrSumm][token]);
         let currentDiv = document.getElementById(`${db[preOrSumm][token].id}-div`);
-        let names = ["Edit", "Delete", "Upload"];
-        let feilds = [document.createElement("button"), document.createElement("button"), document.createElement("button")];
+        let names = ["Edit", "Delete", "Upload"]; //Upload = put it on the map
+        let feilds = [];
 
         for(let i = 0; i < 3; i++)
         {
-            let label = createLabel(names[i]);
-
-            label.style.margin = `5px`;
-
-            feilds[i].style.display = "inline";
+            //Each button already says what it does, so no "Edit:" style label in front of it
+            feilds[i] = makeRowButton(names[i]);
             feilds[i].id = db[preOrSumm][token].name.slice(0, db[preOrSumm][token].name.length - 1);
-            feilds[i].style.margin = "5px";
-            feilds[i].style.width = "9%";
-            feilds[i].innerHTML = names[i];
-            currentDiv.appendChild(label);
             currentDiv.appendChild(feilds[i]);
         }
 
@@ -656,11 +642,10 @@ function handlePreset()
     
     let addButton = document.createElement("button");
     addButton.innerHTML = "Create New";
-    addButton.style.margin = "5px";
     addButton.onclick = function () {addPreset();};
-    div.appendChild(addButton);
 
-    addDone();
+    if(preOrSumm == 1){addActions(makeSummonToggle(), addButton);}
+    else{addActions(addButton);}
 }
 
 /**
@@ -706,9 +691,8 @@ function addPreset()
     mode = "";
     let editBtn = document.getElementById("edit");
     editBtn.onclick = updatePreset;
-    editBtn.innerHTML = "Add/Edit";
-    document.getElementById("reset").onclick = resetPreset;
-    addDone();
+    editBtn.innerHTML = "Upload";
+    document.getElementById("reset").onclick = resetPreset; //Back returns to the list (the form's Upload / Back are this screen's buttons)
 }
 
 /**
@@ -752,17 +736,23 @@ function addToMap()
 function handleSummons()
 {
     if(preOrSumm == undefined){preOrSumm = 1;}
+    handlePreset(); //Adds the Turn Summons On/Off switch to its button row
+}
 
+/**
+ * The Summons screen's Turn Summons On / Off switch.
+ */
+function makeSummonToggle()
+{
     let changeIsSummons = document.createElement("button");
-    if(window.top.parent.wholeSummons["isSummonOn"]){changeIsSummons.innerHTML = "Turn Summon's Off";}
-    else{changeIsSummons.innerHTML = "Turn Summon's On";}
+    if(window.top.parent.wholeSummons["isSummonOn"]){changeIsSummons.innerHTML = "Turn Summons Off";}
+    else{changeIsSummons.innerHTML = "Turn Summons On";}
     changeIsSummons.onclick = (event) => 
         {
-            if(window.top.parent.wholeSummons["isSummonOn"]){changeIsSummons.innerHTML = "Turn Summon's On"; setDoc(`playerChar/Vi/summons/isSummonOn`, false);}
-            else{changeIsSummons.innerHTML = "Turn Summon's Off"; setDoc(`playerChar/Vi/summons/isSummonOn`, true);}
+            if(window.top.parent.wholeSummons["isSummonOn"]){changeIsSummons.innerHTML = "Turn Summons On"; setDoc(`playerChar/Vi/summons/isSummonOn`, false);}
+            else{changeIsSummons.innerHTML = "Turn Summons Off"; setDoc(`playerChar/Vi/summons/isSummonOn`, true);}
         };
-    div.appendChild(changeIsSummons);
-    handlePreset();
+    return changeIsSummons;
 }
 
 /**
@@ -791,10 +781,9 @@ function makeTORow(key)
     }
 
     TORow[2][3].innerHTML = "Remove";
-    TORow[2][3].classList = "gridButton";
+    TORow[2][3].classList = "rowButton";
     TORow[2][3].onclick = removeFromTO;
     TORow[2][3].id = `${key.charName}_Remove`;
-    TORow[2][3].style.margin = "5px";
     TORow[0].appendChild(TORow[2][3]);
     placeBefore(TORow[0], div.firstChild);
 }
@@ -869,32 +858,23 @@ function handleTurn()
             }
         }
     
-        let buttons = [document.createElement("button"), document.createElement("button")];
-        let names = ["Add", "Upload"];
-        buttons[0].onclick = function () {let txtFeild = document.getElementById("newRow"); addTORow(txtFeild.value); txtFeild.value = "";};
-        buttons[1].onclick = uploadTO;
+        //New row: name box with a small Add button beside it
+        let newRowLine = document.createElement("div");
+        let rowName = document.createElement("input");
+        let addButton = makeRowButton("Add", function () {addTORow(rowName.value); rowName.value = "";});
+        newRowLine.style.textAlign = "center";
+        rowName.id = "newRow";
+        rowName.placeholder = "Name of New Row";
+        addButton.id = "AddTO";
+        newRowLine.appendChild(rowName);
+        newRowLine.appendChild(addButton);
+        div.appendChild(newRowLine);
 
-        for(let i = 0; i < 2; i++)
-        {
-            buttons[i].style.margin = "5px";
-            buttons[i].innerHTML = names[i];
-            buttons[i].id = `${names[i]}TO`;
-            div.appendChild(buttons[i]); 
-            
-            if(i == 0)
-            {
-                let rowName = document.createElement("input");
-
-                rowName.id = "newRow";
-                rowName.placeholder = "Name of New Row";
-                rowName.style.display = "inline";
-                buttons[i].style.display = "inline";
-                buttons[i].style.width = "80%";
-                div.appendChild(rowName);
-            }
-        }
-    
-        addDone();
+        let uploadButton = document.createElement("button");
+        uploadButton.innerHTML = "Upload";
+        uploadButton.id = "UploadTO";
+        uploadButton.onclick = uploadTO;
+        addActions(uploadButton);
     }, 1500);
 }
 
@@ -996,17 +976,16 @@ function handleChangeMap()
     }
 
     let button = document.createElement("button");
-    button.innerHTML = "Change";
+    button.innerHTML = "Upload";
     button.onclick = updateMap;
 
     div.appendChild(previewBox);
     div.appendChild(grid);
     div.appendChild(chosen);
-    div.appendChild(button);
     pick(current);
     let picked = grid.querySelector(".picked");
     if(picked){picked.scrollIntoView({block: "nearest"});}
-    addDone();
+    addActions(button);
 }
 
 /**
@@ -1069,16 +1048,18 @@ function handleSave()
     let label = createLabel(`Save Name`);
     let button = document.createElement("button");
     
-    label.style.margin = "5px 5px 5px 40%";
+    let nameLine = document.createElement("div"); //Label and box centred together
+    nameLine.style.textAlign = "center";
+    label.style.margin = "5px";
     saveName.id = "saveName";
     saveName.style.margin = "5px";
     button.innerHTML = "Save";
     button.onclick = handleUploadeSave;
     
-    div.appendChild(label);
-    div.appendChild(saveName);
-    div.appendChild(button);
-    addDone();
+    nameLine.appendChild(label);
+    nameLine.appendChild(saveName);
+    div.appendChild(nameLine);
+    addActions(button);
 }
 
 /**
@@ -1137,11 +1118,9 @@ function handleLoad()
 
     let goButton = document.createElement("button");
 
-    goButton.style.margin = "5px";
     goButton.innerHTML = "Load";
     goButton.onclick = loadMap;
-    div.appendChild(goButton);
-    addDone();
+    addActions(goButton);
 }
 
 /**
@@ -1183,11 +1162,9 @@ function handleDelete()
 
     let goButton = document.createElement("button");
 
-    goButton.style.margin = "5px";
     goButton.innerHTML = "Delete";
     goButton.onclick = deleteMap;
-    div.appendChild(goButton);
-    addDone();
+    addActions(goButton);
 }
 
 /**
@@ -1229,29 +1206,17 @@ function handleInteractive()
         div.appendChild(divider);
     }
 
-    let buttons = ["Exit", "Upload"];
-    let exitButton;
+    let uploadButton = document.createElement("button");
+    uploadButton.innerHTML = "Upload";
+    uploadButton.onclick = handleUploadInteractive;
 
-    for(let i = 0; i < buttons.length; i++)
-    {
-        let button = document.createElement("button");
-        button.innerHTML = buttons[i];
-        button.classList.add("gridButton");
-        button.style.margin = "5px";
-
-        if(i == 0){button.onclick = handleDone; exitButton = button;}
-        else if(i == 1){button.onclick = handleUploadInteractive;}
-
-        div.appendChild(button);
-    }
-
-    displayInteractive(exitButton);
+    displayInteractive(addActions(uploadButton)); //Picture dropdown goes above the button row
 }
 
 /**
  * Builds the picture dropdown for the Interactive tool from files/push.
  */
-function displayInteractive(exitButton)
+function displayInteractive(buttonRow)
 {
     let labels = ["Push"];
     let selects = [document.createElement("div")];
@@ -1261,7 +1226,7 @@ function displayInteractive(exitButton)
         let label = createLabel(labels[i]);
 
         label.style.padding = "5%";
-        placeBefore(selects[i], exitButton);
+        placeBefore(selects[i], buttonRow);
         placeBefore(label, selects[i]);
         selects[i].classList = "ddown ddownHide sDropdown";
         selects[i].id = labels[i];
@@ -1418,11 +1383,11 @@ function handleDeleteQuest()
 }
 
 /**
- * Adds a blank quest card above the Create button.
+ * Adds a blank quest card above the button row.
  */
 function handleCreateQuest()
 {
-    placeBefore(createQuestCard("empty"), this);
+    placeBefore(createQuestCard("empty"), this.closest(".actionRow") ?? this); //New card goes above the button row
 }
 
 /**
@@ -1453,13 +1418,14 @@ function uploadQuests()
 }
 
 /**
- * "Quests": shows every quest as an editable card with Create / Upload / Back buttons.
+ * "Quests": shows every quest as an editable card with Create / Upload / Done buttons.
  */
 function handleQuest()
 {
     hideButtons();
     
-    let buttons = ["Create", "Upload", "Back"];
+    let buttons = ["Create", "Upload"];
+    let actionButtons = [];
 
     for(let quest of Object.keys(window.top.parent.wholeQuests))
     {
@@ -1481,14 +1447,12 @@ function handleQuest()
             case "Upload":
                 btn.onclick = uploadQuests;
                 break;
-
-            case "Back":
-                btn.onclick = handleDone;
-                break;
         }
 
-        div.appendChild(btn);
+        actionButtons.push(btn);
     }
+
+    addActions(...actionButtons);
 }
 
 /**
@@ -1676,9 +1640,6 @@ function handleUploadImage()
     let uploadBtn = document.createElement("button");
     uploadBtn.id = "dm-upload-btn";
     uploadBtn.innerHTML = "Upload";
-    uploadBtn.style.margin = "10px";
-    uploadBtn.style.padding = "6px 12px";
-    uploadBtn.classList = "gridButton"; // Inherits your styling parameters safely 
 
     // Empty template for your upcoming Firebase Storage integration execution block
     uploadBtn.onclick = uploadImage;
@@ -1704,10 +1665,9 @@ function handleUploadImage()
 
     // Append the whole setup box to your global 'story' div workspace element 
     div.appendChild(formWrapper);
-    div.appendChild(uploadBtn);
 
-    // 8. Call your existing utility function to cleanly place the "Done" button underneath 
-    addDone();
+    // 8. Upload and Done share the tool's button row
+    addActions(uploadBtn);
 }
 
 /**
@@ -1833,14 +1793,49 @@ function hideButtons()
  */
 function addDone()
 {
+    return addActions();
+}
+
+/**
+ * Adds the tool's bottom button row: the given buttons, then Done, all the same size and
+ * centred together (.actionRow). Every DM tool uses this so its buttons match.
+ * Returns the row, so things can be placed above it.
+ */
+function addActions(...buttons)
+{
+    let row = document.createElement("div");
+    row.classList = "actionRow";
+
     let doneButton = document.createElement("button");
     doneButton.id = "done";
     doneButton.innerHTML = "Done";
-    doneButton.style.margin = "10px";
-    doneButton.style.padding = "6px 12px";
-    doneButton.classList.add("gridButton");
     doneButton.onclick = handleDone;
-    div.appendChild(doneButton);
+
+    for(let button of [...buttons, doneButton])
+    {
+        button.classList.add("actionBtn");
+        button.style.removeProperty("margin");
+        button.style.removeProperty("width");
+        button.style.removeProperty("padding");
+        button.style.removeProperty("display");
+        row.appendChild(button);
+    }
+
+    div.appendChild(row);
+    return row;
+}
+
+/**
+ * Makes a small button for inside a list row (a token, turn-order row...). All of them
+ * share .rowButton so they're the same size everywhere.
+ */
+function makeRowButton(text, onclick)
+{
+    let button = document.createElement("button");
+    button.innerHTML = text;
+    button.classList = "rowButton";
+    if(onclick){button.onclick = onclick;}
+    return button;
 }
 
 /**
@@ -1929,9 +1924,8 @@ function handleRefresh()
     upload.onclick = handleRefreshUpload;
 
     div.appendChild(playerSelect);
-    div.appendChild(upload);
 
-    addDone();
+    addActions(upload);
 }
 
 /**
