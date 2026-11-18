@@ -647,17 +647,17 @@ function addCharacter(character, update)
             }
         }
 
-        if(/Dup\s*XY/.test(title))
+        if(/Dup\s*XY/i.test(title)) //Any case: the status box title-cases words, so "dup xy3" arrives as "Dup Xy3"
         {
             dupBox(char, character, title);
         }
 
-        if(/Dup\s*X(?!\s*Y)/.test(title)) //"Dup XY" is the box above, not a line
+        if(/Dup\s*X(?!\s*Y)/i.test(title)) //"Dup XY" is the box above, not a line
         {
             dup("x", char, character, [x, y], title);
         }
 
-        if(/Dup\s*Y/.test(title))
+        if(/Dup\s*Y/i.test(title))
         {
             dup("y", char, character, [x, y], title);
         }
@@ -787,7 +787,7 @@ function getTokenTransform(title)
 function dup(xOrY, char, character, locations, title) 
 {
     let rotate = getTokenTransform(title); //Copies get the same rotation and flips
-    let found = xOrY == "x" ? title.match(/Dup\s*X(?!\s*Y)\s*(\d+)?/) : title.match(/Dup\s*Y\s*(\d+)?/);
+    let found = xOrY == "x" ? title.match(/Dup\s*X(?!\s*Y)\s*(\d+)?/i) : title.match(/Dup\s*Y\s*(\d+)?/i);
     let num = (found && found[1]) ? parseInt(found[1]) : 12;
 
     let baseIndex;
