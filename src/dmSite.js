@@ -32,6 +32,7 @@ let fiveButtons = [];
 let db;
 let div = document.getElementById("story");
 let preOrSumm;
+let presetKey; //Key of the preset/summon being edited (null when creating a new one)
 let editDiv;
 let curCharacter;
 let temp;
@@ -639,7 +640,9 @@ function handlePreset()
         {
             //Each button already says what it does, so no "Edit:" style label in front of it
             feilds[i] = makeRowButton(names[i]);
-            feilds[i].id = db[preOrSumm][token].name.slice(0, db[preOrSumm][token].name.length - 1);
+            //The entry's own key, not its picture name: purifier1..purifier4 all use the
+            //"purifier" picture, so the name would point every button at purifier.
+            feilds[i].dataset.key = token;
             currentDiv.appendChild(feilds[i]);
         }
 
@@ -657,19 +660,22 @@ function handlePreset()
 }
 
 /**
- * Deletes a saved preset (or summon preset) and redraws the list.
+ * Delete on a preset or summon row: asks first, deletes that entry and redraws the list.
  */
 function deletePreset()
 {
+    let key = this.dataset.key;
+    if(!confirm(`Delete ${key}?`)){return;}
+
     if(preOrSumm == 1)
     {
-        deleteDoc(`playerChar/Vi/summons/summonPreset/${this.id}`);
+        deleteDoc(`playerChar/Vi/summons/${key}`); //Summons live straight under summons/ (there's no summonPreset folder)
         resetSummons();
     }
 
     else
     {
-        deleteDoc(`preset/${this.id}`);
+        deleteDoc(`preset/${key}`);
         resetPreset();
     }
 }
@@ -682,13 +688,19 @@ function addPreset()
 {
     let token;
      
-    if(this == undefined)
+    if(this?.dataset?.key == undefined) //Create New (not a row's Edit button)
     {
         token = {border : "invisible", currentHp : "20", maxHp : "20", tempHp : "0", isSummon: false, map : "", name : "invisible-", title : " ", xPos : "1", yPos : "A", ac: "10"};
         if(preOrSumm == 1){token["isSummon"] = true};
         db[preOrSumm]["invisible"] = token;
+        presetKey = null; //New entry: Upload picks a key from its picture name
     }
-    else{token = db[preOrSumm][this.id]}
+    else
+    {
+        presetKey = this.dataset.key;
+        token = db[preOrSumm][presetKey];
+        if(token.id == undefined){token.id = presetKey;}
+    }
 
     resetState();
     makeToken(token);
@@ -704,7 +716,7 @@ function addPreset()
 }
 
 /**
- * Saves the edited preset (to preset/) and redraws the list.
+ * Saves the edited preset (to preset/) or summon (to playerChar/Vi/summons/) and redraws the list.
  */
 function updatePreset()
 {
@@ -720,8 +732,9 @@ function updatePreset()
  */
 function addToMap()
 {
-    let id = db[preOrSumm][this.id].id;
-    let token = db[preOrSumm][this.id];
+    let key = this.dataset.key;
+    let token = {...db[preOrSumm][key]}; //A copy, so the preset itself keeps its own id
+    let id = token.id ?? key;
     
     if(Object.keys(window.top.parent.wholeDB).includes(id))
     {
@@ -1912,7 +1925,27 @@ function addToken()
     let table = `currentMap/${id}`;
     if(mode == "preset")
     {
-        table = `preset/${id}`;    
+        let list = db[preOrSumm] ?? {};
+
+        if(presetKey){id = presetKey;} //Editing: save over the same entry, even if its picture changed
+        else
+        {
+            //New: don't overwrite an existing entry with the same picture (goblin -> goblin1...)
+            let base = id;
+            let number = 1;
+            while(list[id] != undefined && id != "invisible"){id = `${base}${number}`; number++;}
+        }
+
+        if(preOrSumm == 1)
+        {
+            table = `playerChar/Vi/summons/${id}`;
+            s = true; //Everything on the Summons list is a summon
+        }
+
+        else
+        {
+            table = `preset/${id}`;
+        }
     }
  
     setDoc(table,
