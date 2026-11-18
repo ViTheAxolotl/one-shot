@@ -940,31 +940,72 @@ function uploadRowTO(key)
 }
 
 /**
- * "Change Map": a dropdown of every map picture and a Change button.
+ * "Change Map": a big preview of the chosen map, a scrolling grid of every map picture
+ * (with names) to pick from, and a Change button. Opens on the map that's showing now.
  */
 function handleChangeMap()
 {
     hideButtons();
 
-    let select = document.createElement("select");
-    select.classList = "center blo";
-    select.id = "select";
+    let maps = window.top.parent.imgs["mapName"];
+    let keys = Object.keys(maps).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: "base"}));
+    let current = window.top.parent.wholeDB["map"];
+    if(maps[current] == undefined){current = keys[0];}
 
-    for(let keys of Object.keys(window.top.parent.imgs["mapName"]))
+    let chosen = document.createElement("input"); //Holds the picked map's name for updateMap()
+    chosen.type = "hidden";
+    chosen.id = "select";
+
+    let previewBox = document.createElement("figure");
+    previewBox.classList = "mapPreview";
+    let preview = document.createElement("img");
+    let previewName = document.createElement("figcaption");
+    previewBox.appendChild(preview);
+    previewBox.appendChild(previewName);
+
+    let grid = document.createElement("div");
+    grid.classList = "imgPicker open mapGrid";
+
+    function pick(key)
     {
-        let mapImg = window.top.parent.imgs["mapName"][keys];
-        let option = document.createElement("option");
-        option.value = keys;
-        option.text = keys;
-        select.appendChild(option);
+        chosen.value = key;
+        preview.src = maps[key];
+        preview.alt = key;
+        previewName.innerHTML = key == window.top.parent.wholeDB["map"] ? `${key} (showing now)` : key;
+        for(let cell of grid.children){cell.classList.toggle("picked", cell.dataset.key == key);}
+    }
+
+    for(let key of keys)
+    {
+        let cell = document.createElement("figure");
+        let img = document.createElement("img");
+        let name = document.createElement("figcaption");
+
+        cell.dataset.key = key;
+        cell.title = key;
+        img.src = maps[key];
+        img.alt = key;
+        img.loading = "lazy";
+        img.onerror = function () {cell.remove();}; //Skip maps whose picture is gone
+        name.innerHTML = key;
+
+        cell.appendChild(img);
+        cell.appendChild(name);
+        cell.onclick = function () {pick(key);};
+        grid.appendChild(cell);
     }
 
     let button = document.createElement("button");
     button.innerHTML = "Change";
     button.onclick = updateMap;
 
-    div.appendChild(select);
+    div.appendChild(previewBox);
+    div.appendChild(grid);
+    div.appendChild(chosen);
     div.appendChild(button);
+    pick(current);
+    let picked = grid.querySelector(".picked");
+    if(picked){picked.scrollIntoView({block: "nearest"});}
     addDone();
 }
 
@@ -973,8 +1014,7 @@ function handleChangeMap()
  */
 function updateMap()
 {
-    let select = document.getElementById("select");
-    setDoc(`currentMap/map`, select[select.selectedIndex].value);
+    setDoc(`currentMap/map`, document.getElementById("select").value);
 
     handleDone();
 }
@@ -1860,7 +1900,7 @@ function addToken()
         AC : ac
     });
 
-    alert(`${table} has been uploaded`);
+    resetDelete();
 }
 
 /**
