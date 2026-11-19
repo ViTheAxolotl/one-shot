@@ -17,6 +17,7 @@
  *   currentTO/         -> window.wholeTO        turn order
  *   playerChar/Vi/...  -> summons, interactive objects, quests, playerRefresh
  *   bubbles            -> window.wholeBubbles   spell-area circles drawn on the map
+ *   rulers             -> window.wholeRulers    distance rulers being measured on the map
  *   display/           -> window.wholeDisplay   the 10 most recent combat messages
  *   files/, customImages/, preset/              shared images and preset tokens
  */
@@ -24,7 +25,7 @@
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js'; 
 import { auth, database, toTitleCase, setDoc } from './js/viMethods.js';
-import { setMode, setWholeDB, setWholeTO, setWholeSummons, setWholeBubbles } from './src/map.js';
+import { setMode, setWholeDB, setWholeTO, setWholeSummons, setWholeBubbles, setWholeRulers } from './src/map.js';
 import { setWholeInteractive, setWholeCharCont, setWholeQuests } from './js/mapControler.js';
 
 // Global stores, filled in by the listeners below. Other pages read them via window.top.parent.
@@ -122,6 +123,13 @@ onValue(bubbleRef, (snapshot) =>
     const data = snapshot.val();
     wholeBubbles = data;
     setWholeBubbles(data);
+});
+
+//Distance rulers (right-click measuring on the map), one per player
+const rulerRef = ref(database, 'rulers');
+onValue(rulerRef, (snapshot) => 
+{
+    setWholeRulers(snapshot.val());
 });
 
 const interactiveRef = ref(database, 'playerChar/Vi/interactive');
