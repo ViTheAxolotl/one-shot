@@ -23,6 +23,11 @@
  * Data arrives from parent.js through the exported set* functions. Clicking tokens,
  * moving, HP and actions are handled by mapControler.js; this file mostly draws.
  * Spell "bubbles" (area-of-effect rings) grow every quarter-second and then disappear.
+ *
+ * Distance ruler: right-click a square, move the mouse (a line and running distance follow
+ * it), right-click another square to finish. Everyone sees it, in the measuring player's
+ * border colour, and it fades 10 seconds after the second click. Esc cancels. Stored at
+ * rulers/<player>. Distance uses 5ft squares with diagonals alternating 5ft / 10ft.
  */
 
 
@@ -77,6 +82,15 @@ export function setWholeTO(data)
 export function setWholeSummons(data)
 {
     isSummonOn = window.wholeSummons["isSummonOn"];
+}
+
+/**
+ * parent.js calls this when anyone's distance ruler changes: redraw the rulers.
+ */
+export function setWholeRulers(data)
+{
+    window.wholeRulers = data ?? {};
+    drawRulers();
 }
 
 /**
@@ -136,6 +150,7 @@ function hideSkill()
 // Click-and-drag to scroll the map: remember where the drag started...
 const startDragging = (e) => 
 {
+    if(e.button !== 0){return;} //Only the left button pans (right-click is the ruler)
     mouseDown = true;
     startX = e.pageX - slider.offsetLeft;
     startY = e.pageY - slider.offsetTop;
@@ -1083,7 +1098,7 @@ function handleViewTokens(t)
 function changeInstructions()
 {
     let labels = ["Map", "Stats", "Actions", "Favorites"];
-    let fill = ["The map will change once a character moves, if you click on a character you can see it enlarged. If you click on one of your own summons you will become it.", "The stats section contains controls to change the maps status. To move your token you can use the D-Pad or hold Ctrl and the arrow key. You can also change your token through keywords in the status:", "Here is all the spells and abilities for your characters. You can search or scroll to find the spell/ability you wish to use. Once you find it click on it, from here you can use the ability or add it to your favorites. Abilities that have a {@ will preform actions on cast. Then it will display the results on the display section on the webpage.", "In this section it will show your spells and actions you have favorited, this can be used to organize your abilities. If you click on one of the abilities it will let you edit them. You can also create custom abilites and spells from here. If you wish to create a button to better organise your abilites, all you need to do is select edit on the ability and change the Tag into what you want."];
+    let fill = ["The map will change once a character moves, if you click on a character you can see it enlarged. If you click on one of your own summons you will become it. Click an empty spot to drop a bubble everyone can see.<br><br><b>Measuring distance:</b> right-click a square, move the mouse, then right-click another square. Everyone sees the line and distance in your token's colour for 10 seconds. Each square is 5ft; diagonals alternate 5ft and 10ft. Press Esc to cancel.", "The stats section contains controls to change the maps status. To move your token you can use the D-Pad or hold Ctrl and the arrow key. You can also change your token through keywords in the status:", "Here is all the spells and abilities for your characters. You can search or scroll to find the spell/ability you wish to use. Once you find it click on it, from here you can use the ability or add it to your favorites. Abilities that have a {@ will preform actions on cast. Then it will display the results on the display section on the webpage.", "In this section it will show your spells and actions you have favorited, this can be used to organize your abilities. If you click on one of the abilities it will let you edit them. You can also create custom abilites and spells from here. If you wish to create a button to better organise your abilites, all you need to do is select edit on the ability and change the Tag into what you want."];
     let keyWords = {"Large" : "This will make your token a large creature taking up a 2 x 2 square.", "Huge" : "This will make your token a huge creature taking up a 3 x 3 square.", "Gargantuan" : "This will make your token an Gargantuan creature taking up a 4 x 4 square.", "Top" : "This will make your token on top of other tokens.", "Bottom" : "This will make your token underneath others.", "Invisible" : "This will make only you be able to see your token.",
         "Rotate" : "Rotates your token by any number of degrees, e.g. <b>Rotate 45</b> or <b>Rotate -30</b> (Rot 45 works too). Positive turns clockwise.",
         "FlipX / FlipY" : "Mirrors your token left-to-right (<b>FlipX</b>) or top-to-bottom (<b>FlipY</b>). You can use both, and combine them with Rotate.",
@@ -1183,6 +1198,250 @@ function hideCover()
 /**
  * Moves one picture to pixel position (x, y) on the map.
  */
+/* ------------------------------------------------------------------------------------ *
+ *  Distance ruler                                                                      *
+ * ------------------------------------------------------------------------------------ */
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+const TOKEN_HALF = 36.5;      //Tokens are 73px pictures, so a square's centre is pos + 36.5
+const RULER_SHOW_MS = 10000;  //How long a finished ruler stays before fading
+const RULER_FADE_MS = 1000;   //Length of the fade itself
+const RULER_COLOURS = {"blue" : "#3d7bff", "golden" : "#e0b030", "green" : "#2fbf4a", "grey" : "#a0a0a0",
+                       "orange" : "#ff8c1a", "pink" : "#ff6fb5", "purple" : "#a855f7", "red" : "#e53935"};
+
+let myRuler = null;       //{start: {c, r}, end: {c, r}, at} while this player is measuring
+let rulerTimers = {};     //player -> {at, fade, remove} timers for finished rulers
+let fadedRulers = {};     //player -> the "at" of the ruler this screen has already faded out
+
+/**
+ * Feet between two squares: 5ft per square, diagonals alternate 5ft / 10ft
+ * (the first diagonal is 5, the second 10, the third 5...).
+ */
+export function rulerFeet(a, b)
+{
+    let dx = Math.abs(a.c - b.c);
+    let dy = Math.abs(a.r - b.r);
+    let diagonals = Math.min(dx, dy);
+    let straight = Math.max(dx, dy) - diagonals;
+    return 5 * straight + 5 * diagonals + 5 * Math.floor(diagonals / 2);
+}
+
+/**
+ * The map square under the mouse for a map event, as {c, r} (0-25), or null if the mouse
+ * isn't over the map picture or a token. On a token (or Dup copy) it's that token's square.
+ */
+function squareFromEvent(e)
+{
+    let x, y;
+    let target = e.target;
+
+    if(target && target.id == "grid")
+    {
+        let zoom = window.wholeChar?.[window.player]?.["zoomLevel"] || 100; //Same conversion as the click bubbles
+        x = e.offsetX * (100 / zoom);
+        y = e.offsetY * (100 / zoom);
+    }
+
+    else if(target && target.classList && target.classList.contains("tokens") && target.style.left != "")
+    {
+        x = parseFloat(target.style.left) + TOKEN_HALF;
+        y = parseFloat(target.style.top) + TOKEN_HALF;
+    }
+
+    else
+    {
+        return null;
+    }
+
+    let toIndex = (v) => Math.max(0, Math.min(25, Math.floor((v - map.pos[0]) / map.movement)));
+    return {c : toIndex(x), r : toIndex(y)};
+}
+
+/**
+ * The CSS colour for this player's ruler: their token's border colour, like the click
+ * bubbles (blue if the border is invisible or unknown).
+ */
+function myRulerColour()
+{
+    let tokenId = window.wholeChar?.[window.player]?.["currentToken"];
+    let border = window.wholeDB?.[tokenId]?.["border"];
+    return RULER_COLOURS[border] ?? RULER_COLOURS["blue"];
+}
+
+/**
+ * Saves this player's ruler so everyone's map draws it. done = second click made.
+ */
+function saveMyRuler(done)
+{
+    if(!myRuler){return;}
+    let ruler = {"player" : window.player, "start" : myRuler.start, "end" : myRuler.end,
+        "colour" : myRulerColour(), "done" : done, "at" : myRuler.at};
+    if(done){ruler["doneAt"] = Date.now();}
+    setDoc(`rulers/${window.player}`, ruler);
+}
+
+/**
+ * Right-click on the map: the first one starts a ruler at that square, the second one
+ * finishes it there. The browser menu is blocked on the map.
+ */
+function handleRulerClick(e)
+{
+    e.preventDefault();
+    let square = squareFromEvent(e);
+    if(!square){return;}
+
+    if(!myRuler)
+    {
+        myRuler = {"start" : square, "end" : square, "at" : Date.now()};
+        saveMyRuler(false);
+    }
+
+    else
+    {
+        myRuler.end = square;
+        saveMyRuler(true);
+
+        //Tidy up the database once it has faded (unless a new ruler has replaced it)
+        let at = myRuler.at;
+        let player = window.player;
+        setTimeout(() =>
+        {
+            if(window.wholeRulers?.[player]?.["at"] == at){deleteDoc(`rulers/${player}`);}
+        }, RULER_SHOW_MS + RULER_FADE_MS + 500);
+
+        myRuler = null;
+    }
+}
+
+/**
+ * While measuring, the end of the line follows the mouse square by square (it's only
+ * saved when the square changes, not on every mouse movement).
+ */
+function handleRulerMove(e)
+{
+    if(!myRuler){return;}
+    let square = squareFromEvent(e);
+    if(!square || (square.c == myRuler.end.c && square.r == myRuler.end.r)){return;}
+
+    myRuler.end = square;
+    saveMyRuler(false);
+}
+
+/**
+ * Esc cancels a ruler that's still being measured.
+ */
+function handleRulerKey(e)
+{
+    if(e.key == "Escape" && myRuler)
+    {
+        myRuler = null;
+        deleteDoc(`rulers/${window.player}`);
+    }
+}
+
+/**
+ * The SVG layer the rulers are drawn on. It sits right after the map picture and is marked
+ * "update", so addTokens() keeps it when it redraws the tokens.
+ */
+function getRulerLayer()
+{
+    let layer = document.getElementById("rulerLayer");
+
+    if(!layer)
+    {
+        layer = document.createElementNS(SVG_NS, "svg");
+        layer.id = "rulerLayer";
+        layer.classList.add("update");
+        let size = map.trueMapSize;
+        layer.setAttribute("width", size);
+        layer.setAttribute("height", size);
+        layer.setAttribute("viewBox", `0 0 ${size} ${size}`);
+        document.getElementById("grid").after(layer);
+    }
+
+    return layer;
+}
+
+/**
+ * Draws every player's ruler from window.wholeRulers: a line between the two square
+ * centres, a dot at each end and the distance in feet. Finished rulers fade out after
+ * 10 seconds on every screen.
+ */
+function drawRulers()
+{
+    let rulers = window.wholeRulers ?? {};
+    let layer = getRulerLayer();
+
+    //Remove rulers that are gone, or that have been replaced by a new measurement
+    for(let group of Array.from(layer.children))
+    {
+        let player = group.dataset.player;
+        if(!rulers[player] || String(rulers[player].at) != group.dataset.at){group.remove();}
+    }
+
+    for(let player of Object.keys(rulers))
+    {
+        let ruler = rulers[player];
+        if(!ruler || !ruler.start || !ruler.end){continue;}
+        if(fadedRulers[player] == ruler.at){continue;} //Already shown and faded on this screen
+
+        //A finished ruler left behind (e.g. its player reloaded before it was cleared)
+        if(ruler.done && Math.abs(Date.now() - (ruler.doneAt ?? ruler.at)) > 60 * 1000)
+        {
+            if(player == window.player){deleteDoc(`rulers/${player}`);}
+            continue;
+        }
+
+        let group = Array.from(layer.children).find((g) => g.dataset.player == player);
+
+        if(!group)
+        {
+            group = document.createElementNS(SVG_NS, "g");
+            group.dataset.player = player;
+            group.dataset.at = String(ruler.at);
+            group.classList.add("ruler");
+            layer.appendChild(group);
+        }
+
+        let colour = ruler.colour ?? RULER_COLOURS["blue"];
+        let x1 = map.pos[ruler.start.c] + TOKEN_HALF, y1 = map.pos[ruler.start.r] + TOKEN_HALF;
+        let x2 = map.pos[ruler.end.c] + TOKEN_HALF, y2 = map.pos[ruler.end.r] + TOKEN_HALF;
+        let feet = rulerFeet(ruler.start, ruler.end);
+
+        //Distance tag just past the end of the line (clear of the token there), kept on the map
+        let text = `${feet} ft`;
+        let tagW = 22 * text.length + 26, tagH = 46;
+        let angle = (x1 == x2 && y1 == y2) ? -Math.PI / 4 : Math.atan2(y2 - y1, x2 - x1);
+        let reach = 44 + Math.abs(Math.cos(angle)) * tagW / 2 + Math.abs(Math.sin(angle)) * tagH / 2;
+        let size = map.trueMapSize;
+        let labelX = Math.max(tagW / 2, Math.min(size - tagW / 2, x2 + Math.cos(angle) * reach));
+        let labelY = Math.max(tagH / 2, Math.min(size - tagH / 2, y2 + Math.sin(angle) * reach));
+
+        group.innerHTML =
+            `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#000" stroke-opacity=".55" stroke-width="10" stroke-linecap="round"/>` +
+            `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colour}" stroke-width="6" stroke-linecap="round"/>` +
+            `<circle cx="${x1}" cy="${y1}" r="9" fill="${colour}" stroke="#000" stroke-width="2"/>` +
+            `<circle cx="${x2}" cy="${y2}" r="9" fill="${colour}" stroke="#000" stroke-width="2"/>` +
+            `<rect x="${labelX - tagW / 2}" y="${labelY - tagH / 2}" width="${tagW}" height="${tagH}" rx="12" fill="#1b1512" fill-opacity=".88" stroke="${colour}" stroke-width="4"/>` +
+            `<text x="${labelX}" y="${labelY + 2}" text-anchor="middle" dominant-baseline="middle" class="rulerLabel" fill="#fff">${text}</text>`;
+
+        //Finished: fade out 10 seconds after this screen first saw it finished
+        let timers = rulerTimers[player];
+        if(timers && timers.at != ruler.at){clearTimeout(timers.fade); clearTimeout(timers.remove); delete rulerTimers[player];}
+
+        if(ruler.done && !rulerTimers[player])
+        {
+            rulerTimers[player] = {"at" : ruler.at,
+                "fade" : setTimeout(() => group.classList.add("rulerFading"), RULER_SHOW_MS),
+                "remove" : setTimeout(() => {group.remove(); delete rulerTimers[player]; fadedRulers[player] = ruler.at;}, RULER_SHOW_MS + RULER_FADE_MS)};
+        }
+    }
+}
+
+div.addEventListener("contextmenu", handleRulerClick);
+div.addEventListener("mousemove", handleRulerMove);
+document.addEventListener("keydown", handleRulerKey);
+
 function placeTokens(x, y, prop)
 {
     prop.style.left = x + "px";
