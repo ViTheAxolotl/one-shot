@@ -897,6 +897,7 @@ function drawDupCopy(char, character, rotate, x, y)
         }
 
         stuffs[d].classList.add("dupCopy");
+        stuffs[d].onclick = clickMapUnderCopy; //Acts like clicking the map there: drops a bubble
         pendingDupCopies.push(stuffs[d]); //Added to the map after the real token (see addCharacter)
     }
 }
@@ -907,6 +908,20 @@ function drawDupCopy(char, character, rotate, x, y)
  * pictures with that class, so the real token's pictures must come first on the page.
  */
 let pendingDupCopies = [];
+
+/**
+ * Clicking a Dup copy: pass the click on to the map picture at the same screen point, so it
+ * drops a bubble exactly like clicking empty map there (the browser works out the spot,
+ * zoom included). Copies aren't tokens of their own, so they don't select anything.
+ */
+function clickMapUnderCopy(e)
+{
+    let grid = document.getElementById("grid");
+    if(!grid){return;}
+
+    e.stopPropagation();
+    grid.dispatchEvent(new MouseEvent("click", {clientX : e.clientX, clientY : e.clientY, screenX : e.screenX, screenY : e.screenY, bubbles : true, cancelable : true, view : window}));
+}
 
 
 /**
