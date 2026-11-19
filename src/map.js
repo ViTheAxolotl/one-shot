@@ -682,6 +682,10 @@ function addCharacter(character, update)
         div.appendChild(char[i]);
     }
 
+    //Dup copies go in after the real token, so the token's own pictures are found first
+    for(let copy of pendingDupCopies){div.appendChild(copy);}
+    pendingDupCopies = [];
+
     if(char[0].classList.contains("customImg")) //Center
     {
         let offset = (parseFloat(char[1].offsetWidth) / 2) - (parseFloat(char[0].offsetWidth) / 2);
@@ -890,9 +894,17 @@ function drawDupCopy(char, character, rotate, x, y)
                 break;
         }
 
-        div.appendChild(stuffs[d]);
+        stuffs[d].classList.add("dupCopy");
+        pendingDupCopies.push(stuffs[d]); //Added to the map after the real token (see addCharacter)
     }
 }
+
+/**
+ * Copies made by Dup X / Dup Y / Dup XY wait here until addCharacter has added the real
+ * token. The copies share the token's class, and Change Token, moving etc. use the first
+ * pictures with that class, so the real token's pictures must come first on the page.
+ */
+let pendingDupCopies = [];
 
 
 /**
