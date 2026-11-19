@@ -26,7 +26,7 @@
  *
  * Distance ruler: right-click a square, move the mouse (a line and running distance follow
  * it), right-click another square to finish. Everyone sees it, in the measuring player's
- * border colour, and it fades 10 seconds after the second click. Esc cancels. Stored at
+ * border colour, and it fades 5 seconds after the second click. Esc cancels. Stored at
  * rulers/<player>. Distance uses 5ft squares with diagonals alternating 5ft / 10ft.
  */
 
@@ -1098,7 +1098,7 @@ function handleViewTokens(t)
 function changeInstructions()
 {
     let labels = ["Map", "Stats", "Actions", "Favorites"];
-    let fill = ["The map will change once a character moves, if you click on a character you can see it enlarged. If you click on one of your own summons you will become it. Click an empty spot to drop a bubble everyone can see.<br><br><b>Measuring distance:</b> right-click a square, move the mouse, then right-click another square. Everyone sees the line and distance in your token's colour for 10 seconds. Each square is 5ft; diagonals alternate 5ft and 10ft. Press Esc to cancel.", "The stats section contains controls to change the maps status. To move your token you can use the D-Pad or hold Ctrl and the arrow key. You can also change your token through keywords in the status:", "Here is all the spells and abilities for your characters. You can search or scroll to find the spell/ability you wish to use. Once you find it click on it, from here you can use the ability or add it to your favorites. Abilities that have a {@ will preform actions on cast. Then it will display the results on the display section on the webpage.", "In this section it will show your spells and actions you have favorited, this can be used to organize your abilities. If you click on one of the abilities it will let you edit them. You can also create custom abilites and spells from here. If you wish to create a button to better organise your abilites, all you need to do is select edit on the ability and change the Tag into what you want."];
+    let fill = ["The map will change once a character moves, if you click on a character you can see it enlarged. If you click on one of your own summons you will become it. Click an empty spot to drop a bubble everyone can see.<br><br><b>Measuring distance:</b> right-click a square, move the mouse, then right-click another square. Everyone sees the line and distance in your token's border colour for 5 seconds. Each square is 5ft; diagonals alternate 5ft and 10ft. Press Esc to cancel.", "The stats section contains controls to change the maps status. To move your token you can use the D-Pad or hold Ctrl and the arrow key. You can also change your token through keywords in the status:", "Here is all the spells and abilities for your characters. You can search or scroll to find the spell/ability you wish to use. Once you find it click on it, from here you can use the ability or add it to your favorites. Abilities that have a {@ will preform actions on cast. Then it will display the results on the display section on the webpage.", "In this section it will show your spells and actions you have favorited, this can be used to organize your abilities. If you click on one of the abilities it will let you edit them. You can also create custom abilites and spells from here. If you wish to create a button to better organise your abilites, all you need to do is select edit on the ability and change the Tag into what you want."];
     let keyWords = {"Large" : "This will make your token a large creature taking up a 2 x 2 square.", "Huge" : "This will make your token a huge creature taking up a 3 x 3 square.", "Gargantuan" : "This will make your token an Gargantuan creature taking up a 4 x 4 square.", "Top" : "This will make your token on top of other tokens.", "Bottom" : "This will make your token underneath others.", "Invisible" : "This will make only you be able to see your token.",
         "Rotate" : "Rotates your token by any number of degrees, e.g. <b>Rotate 45</b> or <b>Rotate -30</b> (Rot 45 works too). Positive turns clockwise.",
         "FlipX / FlipY" : "Mirrors your token left-to-right (<b>FlipX</b>) or top-to-bottom (<b>FlipY</b>). You can use both, and combine them with Rotate.",
@@ -1204,10 +1204,11 @@ function hideCover()
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const TOKEN_HALF = 36.5;      //Tokens are 73px pictures, so a square's centre is pos + 36.5
-const RULER_SHOW_MS = 10000;  //How long a finished ruler stays before fading
+const RULER_SHOW_MS = 5000;   //How long a finished ruler stays before fading
 const RULER_FADE_MS = 1000;   //Length of the fade itself
-const RULER_COLOURS = {"blue" : "#3d7bff", "golden" : "#e0b030", "green" : "#2fbf4a", "grey" : "#a0a0a0",
-                       "orange" : "#ff8c1a", "pink" : "#ff6fb5", "purple" : "#a855f7", "red" : "#e53935"};
+//The ring colour of each border picture (images in files/borders)
+const RULER_COLOURS = {"blue" : "#181368", "golden" : "#a28d05", "green" : "#007119", "grey" : "#5e5e5e",
+                       "orange" : "#b97500", "pink" : "#b514ad", "purple" : "#4f0071", "red" : "#bf0000"};
 
 let myRuler = null;       //{start: {c, r}, end: {c, r}, at} while this player is measuring
 let rulerTimers = {};     //player -> {at, fade, remove} timers for finished rulers
@@ -1365,7 +1366,7 @@ function getRulerLayer()
 /**
  * Draws every player's ruler from window.wholeRulers: a line between the two square
  * centres, a dot at each end and the distance in feet. Finished rulers fade out after
- * 10 seconds on every screen.
+ * 5 seconds on every screen.
  */
 function drawRulers()
 {
@@ -1425,7 +1426,7 @@ function drawRulers()
             `<rect x="${labelX - tagW / 2}" y="${labelY - tagH / 2}" width="${tagW}" height="${tagH}" rx="12" fill="#1b1512" fill-opacity=".88" stroke="${colour}" stroke-width="4"/>` +
             `<text x="${labelX}" y="${labelY + 2}" text-anchor="middle" dominant-baseline="middle" class="rulerLabel" fill="#fff">${text}</text>`;
 
-        //Finished: fade out 10 seconds after this screen first saw it finished
+        //Finished: fade out 5 seconds after this screen first saw it finished
         let timers = rulerTimers[player];
         if(timers && timers.at != ruler.at){clearTimeout(timers.fade); clearTimeout(timers.remove); delete rulerTimers[player];}
 
