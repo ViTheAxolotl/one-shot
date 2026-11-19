@@ -1419,7 +1419,7 @@ function drawRulers()
         let labelY = Math.max(tagH / 2, Math.min(size - tagH / 2, y2 + Math.sin(angle) * reach));
 
         group.innerHTML =
-            `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#000" stroke-opacity=".55" stroke-width="10" stroke-linecap="round"/>` +
+            `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#000" stroke-width="10" stroke-linecap="round"/>` +
             `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colour}" stroke-width="6" stroke-linecap="round"/>` +
             `<circle cx="${x1}" cy="${y1}" r="9" fill="${colour}" stroke="#000" stroke-width="2"/>` +
             `<circle cx="${x2}" cy="${y2}" r="9" fill="${colour}" stroke="#000" stroke-width="2"/>` +
