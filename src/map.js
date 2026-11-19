@@ -813,8 +813,10 @@ function dup(xOrY, char, character, locations, title)
     // Loop to spawn duplicates extending outward from the base token position
     for(let i = 1; i <= num; i++) {
         // Adjust the offset step to correct the rightward bias
-        let currentOffset = (baseIndex - 1) + i; 
-        if (currentOffset >= 0 && currentOffset < posArray.length) {
+        let currentOffset = (baseIndex - 1) + i;
+        //i = 1 is the token's own square: the real token is already there, and a copy on
+        //top of it would catch clicks meant for the token
+        if (currentOffset != baseIndex && currentOffset >= 0 && currentOffset < posArray.length) {
             setupDup(char, character, xOrY, locations, rotate, currentOffset);
         }
     }
