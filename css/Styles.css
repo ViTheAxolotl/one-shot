@@ -696,6 +696,24 @@ table, .itemSearch, #itemImg
    wall or other Dup copy isn't hidden under it. Clicks pass straight through them. */
 .bubbles { z-index: 1600; pointer-events: none; }
 
+/* Distance ruler (right-click a square, then another): drawn over everything on the map,
+   never catches clicks, fades out when finished */
+#rulerLayer
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1650;
+    pointer-events: none;
+    overflow: visible;
+}
+#rulerLayer .ruler { transition: opacity 1s ease; }
+#rulerLayer .ruler.rulerFading { opacity: 0; }
+#rulerLayer .rulerLabel
+{
+    font: 700 30px var(--font-display, Georgia, serif);
+}
+
 .arrows
 {
     touch-action: manipulation;
