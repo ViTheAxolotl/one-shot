@@ -110,7 +110,6 @@ function navBarSetup()
             <ul class="navbar-nav me-auto my-2 my-lg-0 " style="--bs-scroll-height: 100px;"> 
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="${mainLocation}index.html">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="${mainLocation}selection.html">Change Token</a></li>
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="https://sheets.axol-apps.com/index.html">Standalone Character Sheets</a></li>
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="https://www.axol-apps.com">Axol-Apps</a></li>    
 
                 ${log}
