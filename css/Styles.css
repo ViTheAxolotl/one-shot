@@ -692,6 +692,10 @@ table, .itemSearch, #itemImg
 .border_ { z-index: 1000; }
 .hp      { z-index: 900; }
 
+/* Click "bubbles" go above every token (Top tokens reach 1550), so a bubble dropped on a
+   wall or other Dup copy isn't hidden under it. Clicks pass straight through them. */
+.bubbles { z-index: 1600; pointer-events: none; }
+
 .arrows
 {
     touch-action: manipulation;
