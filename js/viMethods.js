@@ -23,14 +23,14 @@ import { getStorage, uploadBytes, getDownloadURL, ref as sRef } from "https://ww
 // Firebase project settings. Every page that imports this file shares this one connection.
 const firebaseApp = initializeApp
 ({
-    apiKey: "AIzaSyDvuBp4EboXMRbkdp6_YBGn7tq08jAYmvA",
-    authDomain: "one-shot-14fa0.firebaseapp.com",
-    projectId: "one-shot-14fa0",
-    storageBucket: "one-shot-14fa0.firebasestorage.app",
-    messagingSenderId: "222065387269",
-    appId: "1:222065387269:web:f2d0d3d6b2120a279bf96c",
-    measurementId: "G-T98814SJ58",
-    storageBucket: "gs://one-shot-14fa0.firebasestorage.app"
+    apiKey: "AIzaSyArcsmJkXSeuIHMysYtIzRdjIDlKNQA25Y",
+    authDomain: "forgottenrealmsmap.firebaseapp.com",
+    projectId: "forgottenrealmsmap",
+    storageBucket: "forgottenrealmsmap.appspot.com",
+    messagingSenderId: "697902154695",
+    appId: "1:697902154695:web:ffa5c47817f3097c89cfe2",
+    measurementId: "G-Q2W494NRDT",
+    storageBucket: "gs://forgottenrealmsmap.firebasestorage.app"
 }); //Connects to database
 
 export let auth = getAuth(); //Logs into accounts
@@ -167,10 +167,12 @@ export function toTitleCase(word)
     if(word.includes(" ")) //More than one word
     {
         word = word.split(" "); 
+        
         for(let singleWord of word)
         {
             if(singleWord != ""){finalWord += `${singleWord[0].toUpperCase() + singleWord.slice(1)} `;} //Capitilize each word in the varible
         }
+        
         finalWord = finalWord.slice(0, finalWord.length - 1);
     }
 
@@ -437,4 +439,73 @@ function sendMessageToDisplay(message)
     }
 
     setDoc(`display/${current}`, message);
+}
+
+/* ------------------------------------------------------------------------------------ *
+ *  Token picture categories                                                            *
+ *                                                                                      *
+ *  Every token picture is still listed in files/tokens/<name> (its link), which is     *
+ *  where tokens look up their picture. Categories are a separate label list:           *
+ *      files/tokenCategories/<name> = "Furniture"                                      *
+ *  A picture with no label counts as "Uncategorized".                                  *
+ * ------------------------------------------------------------------------------------ */
+
+export const UNCATEGORIZED = "Uncategorized";
+export const CHARACTER_CATEGORY = "Characters";
+export const ALL_CATEGORIES = "All";
+
+/**
+ * The category of one token picture (from the files/ data, e.g. window.imgs).
+ */
+export function tokenCategory(imgs, name)
+{
+    let category = imgs?.["tokenCategories"]?.[name];
+    return (typeof category == "string" && category.trim() != "") ? category : UNCATEGORIZED;
+}
+
+/**
+ * Every category in use, sorted A-Z, with "Uncategorized" last if any picture has no label.
+ */
+export function tokenCategoryList(imgs)
+{
+    let categories = new Set();
+    for(let name of Object.keys(imgs?.["tokens"] ?? {})){categories.add(tokenCategory(imgs, name));}
+
+    let list = Array.from(categories).filter((c) => c != UNCATEGORIZED).sort((a, b) => a.localeCompare(b));
+    if(categories.has(UNCATEGORIZED)){list.push(UNCATEGORIZED);}
+    return list;
+}
+
+/**
+ * Builds the category dropdown shown above a picture grid: "All" plus every category.
+ * Choosing one hides the grid's pictures from other categories. Each picture in the grid
+ * needs data-category set. Starts on `start` (a category) if given; call select.onchange()
+ * once the pictures are in the grid to apply it.
+ * Returns the <select>.
+ */
+export function makeCategoryFilter(imgs, grid, start)
+{
+    let select = document.createElement("select");
+    select.classList = "categoryFilter";
+    select.title = "Show one category";
+
+    for(let category of [ALL_CATEGORIES, ...tokenCategoryList(imgs)])
+    {
+        let option = document.createElement("option");
+        option.value = category;
+        option.text = category;
+        select.appendChild(option);
+    }
+
+    select.onchange = function ()
+    {
+        for(let item of grid.querySelectorAll("[data-category]"))
+        {
+            item.style.display = (select.value == ALL_CATEGORIES || item.dataset.category == select.value) ? "" : "none";
+        }
+    };
+
+    select.onclick = (e) => e.stopPropagation(); //Don't let the click reach the grid underneath
+    select.value = (start && Array.from(select.options).some((o) => o.value == start)) ? start : ALL_CATEGORIES;
+    return select;
 }
