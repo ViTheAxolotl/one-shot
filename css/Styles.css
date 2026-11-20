@@ -1353,6 +1353,68 @@ table, .itemSearch, #itemImg
 .toField h6 { margin: 0; }
 .toRow .rowButton { margin: 0 0 0 8px; }
 
+/* Token category dropdown at the top of a picture grid: full width of the grid, and it
+   stays in view while the pictures scroll under it */
+.ddown-content .categoryFilter, .imgPicker .categoryFilter
+{
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    position: sticky;
+    top: -8px;
+    z-index: 2;
+    margin: -8px -8px 4px;
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: 1em;
+    color: var(--ink, #2b1d12);
+    background-color: var(--parchment, #f1e4c6);
+    border: 1px solid var(--brass-dim);
+    border-radius: var(--radius) var(--radius) 0 0;
+    box-shadow: 0 3px 6px #00000055;
+    cursor: pointer;
+}
+
+/* Token Categories screen (DM site) */
+.categoryHelp { margin: 4px 0 8px; }
+.categoryTopLine
+{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 10px;
+    margin: 6px 0;
+}
+.categoryTopLine select { min-width: 170px; padding: 5px; }
+.categoryCount { opacity: .85; min-width: 90px; }
+.imgPicker.categoryGrid
+{
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    max-height: 420px;
+    align-items: start;
+}
+.categoryGrid figure
+{
+    margin: 0;
+    padding: 5px 3px;
+    width: 100%;
+    text-align: center;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.categoryGrid figure:hover { background-color: rgba(201, 162, 74, .2); }
+.categoryGrid figure.picked { outline: 2px solid var(--brass, #c9a24a); background-color: rgba(201, 162, 74, .3); }
+.categoryGrid figure img { width: 64px; max-width: 64px; height: 64px; object-fit: contain; padding: 0; }
+.categoryGrid figcaption
+{
+    font-size: .78em;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.categoryGrid figcaption small { display: block; opacity: .65; font-size: .9em; }
+
 /* Button that opens a picker in the DM token form */
 .pickerBtn
 {
