@@ -22,7 +22,7 @@
  */
 
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
-import { toTitleCase, auth, database, setDoc, deleteDoc, returnHpImage, placeBefore, createLabel, wait, storage } from '../js/viMethods.js';
+import { toTitleCase, auth, database, setDoc, deleteDoc, returnHpImage, placeBefore, createLabel, wait, storage, tokenCategory, tokenCategoryList, makeCategoryFilter, UNCATEGORIZED, CHARACTER_CATEGORY, ALL_CATEGORIES } from '../js/viMethods.js';
 import { uploadBytes, getDownloadURL, ref as sRef } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 import imageCompression from 'https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.mjs';
 
@@ -127,6 +127,11 @@ function init()
             case "openPage":
                 fiveButtons.push(button);
                 button.onclick = handleOpenPage;
+                break;
+
+            case "categories":
+                fiveButtons.push(button);
+                button.onclick = handleTokenCategories;
                 break;
         }
     }
@@ -435,7 +440,22 @@ function makeImagePicker(fieldName, kind, input)
         img.loading = "lazy";
         img.onerror = function () {this.remove();}; //Skip pictures whose file is gone
         img.onclick = function () {setValue(key); panel.classList.remove("open");};
+        if(kind == "tokens"){img.dataset.category = tokenCategory(window.top.parent.imgs, key);}
         panel.appendChild(img);
+    }
+
+    //Token pictures get a category dropdown at the top of the grid. It opens on the
+    //current picture's category until you pick a different category yourself.
+    let filter = null;
+    let filterTouched = false;
+    let filterChange = () => {};
+
+    if(kind == "tokens")
+    {
+        filter = makeCategoryFilter(window.top.parent.imgs, panel, ALL_CATEGORIES);
+        filterChange = filter.onchange; //Shows only the chosen category
+        filter.onchange = function () {filterChange(); filterTouched = true;}; //Only runs when you change it
+        panel.prepend(filter);
     }
 
     function setValue(key)
@@ -463,6 +483,11 @@ function makeImagePicker(fieldName, kind, input)
         for(let other of document.getElementsByClassName("imgPicker")){other.classList.remove("open");}
         if(opening)
         {
+            if(filter && !filterTouched)
+            {
+                filter.value = input.value ? tokenCategory(window.top.parent.imgs, input.value) : ALL_CATEGORIES;
+                filterChange();
+            }
             panel.classList.add("open");
             let picked = panel.querySelector(".picked");
             if(picked){picked.scrollIntoView({block: "nearest"});}
@@ -1632,6 +1657,22 @@ function handleUploadImage()
     assetFileInput.accept = "image/*"; // Handshakes with system to filter to graphics
     assetFileInput.style.margin = "10px";
 
+    // --- CATEGORY (token pictures only): an existing one, or type a new one ---
+    let categoryRow = document.createElement("div");
+    categoryRow.id = "dm-category-row";
+
+    let categoryLabel = document.createElement("label");
+    categoryLabel.innerHTML = "Category: ";
+    categoryLabel.style.fontWeight = "bold";
+    categoryLabel.style.margin = "10px";
+
+    let categorySelect = makeCategoryChoice("dm-category-select", "dm-category-new");
+    categoryRow.appendChild(categoryLabel);
+    categoryRow.appendChild(categorySelect.select);
+    categoryRow.appendChild(categorySelect.newName);
+
+    assetSelect.onchange = () => {categoryRow.style.display = assetSelect.value == "token" ? "" : "none";};
+
     // --- STEP 6: UPLOAD EXECUTION TRIGGER (<button>) ---
     let uploadBtn = document.createElement("button");
     uploadBtn.id = "dm-upload-btn";
@@ -1659,6 +1700,8 @@ function handleUploadImage()
     formWrapper.appendChild(assetFileInput);
     formWrapper.appendChild(document.createElement("br"));
 
+    formWrapper.appendChild(categoryRow);
+
     // Append the whole setup box to your global 'story' div workspace element 
     div.appendChild(formWrapper);
 
@@ -1670,6 +1713,183 @@ function handleUploadImage()
  * Uploads the chosen picture: compresses it, stores it in Firebase Storage, and records
  * its link under files/<type>/<name>. Items also ask for a description.
  */
+/**
+ * "Token Categories": sort token pictures into categories. Show one category (or All),
+ * click pictures to select them (click again to unselect), choose where they go
+ * (an existing category or "+ New category…") and press Upload.
+ * Saves files/tokenCategories/<picture> = <category> for each selected picture.
+ */
+function handleTokenCategories()
+{
+    hideButtons();
+    drawTokenCategories(ALL_CATEGORIES);
+}
+
+/**
+ * Draws (or redraws) the Token Categories screen, showing `showing` in the filter.
+ */
+function drawTokenCategories(showing)
+{
+    document.getElementById("categoryScreen")?.remove();
+    let screen = document.createElement("div");
+    screen.id = "categoryScreen";
+    let imgs = window.top.parent.imgs;
+    let tokens = imgs["tokens"] ?? {};
+    let names = Object.keys(tokens).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: "base"}));
+
+    let help = document.createElement("p");
+    help.classList = "categoryHelp";
+    help.innerHTML = "Click pictures to select them, choose a category for them below, then press <b>Upload</b>.";
+
+    //Top line: which category to show, how many are selected, select all / clear
+    let topLine = document.createElement("div");
+    topLine.classList = "categoryTopLine";
+    let showLabel = createLabel("Show");
+    let count = document.createElement("span");
+    count.classList = "categoryCount";
+
+    let grid = document.createElement("div");
+    grid.classList = "imgPicker open categoryGrid";
+
+    function updateCount()
+    {
+        let picked = grid.querySelectorAll("figure.picked").length;
+        count.innerHTML = picked == 1 ? "1 selected" : `${picked} selected`;
+    }
+
+    for(let name of names)
+    {
+        let cell = document.createElement("figure");
+        let img = document.createElement("img");
+        let caption = document.createElement("figcaption");
+        let category = tokenCategory(imgs, name);
+
+        cell.dataset.key = name;
+        cell.dataset.category = category;
+        cell.title = `${name} (${category})`;
+        img.src = tokens[name];
+        img.alt = name;
+        img.loading = "lazy";
+        caption.innerHTML = `${name}<small>${category}</small>`;
+
+        cell.appendChild(img);
+        cell.appendChild(caption);
+        cell.onclick = function () {cell.classList.toggle("picked"); updateCount();};
+        grid.appendChild(cell);
+    }
+
+    let filter = makeCategoryFilter(imgs, grid, showing);
+    let selectShown = makeRowButton("Select all shown", () =>
+    {
+        for(let cell of grid.querySelectorAll("figure")){if(cell.style.display != "none"){cell.classList.add("picked");}}
+        updateCount();
+    });
+    let clear = makeRowButton("Clear", () => {grid.querySelectorAll("figure.picked").forEach((c) => c.classList.remove("picked")); updateCount();});
+
+    topLine.appendChild(showLabel);
+    topLine.appendChild(filter);
+    topLine.appendChild(count);
+    topLine.appendChild(selectShown);
+    topLine.appendChild(clear);
+
+    //Bottom line: where the selected pictures go
+    let moveLine = document.createElement("div");
+    moveLine.classList = "categoryTopLine";
+    let moveChoice = makeCategoryChoice("cat-move-select", "cat-move-new");
+    moveLine.appendChild(createLabel("Move selected to"));
+    moveLine.appendChild(moveChoice.select);
+    moveLine.appendChild(moveChoice.newName);
+
+    let upload = document.createElement("button");
+    upload.innerHTML = "Upload";
+    upload.onclick = function ()
+    {
+        let picked = Array.from(grid.querySelectorAll("figure.picked"));
+        if(picked.length == 0){alert("Select some pictures first."); return;}
+
+        let category = readCategoryChoice("cat-move-select", "cat-move-new");
+        if(category == null){return;}
+
+        imgs["tokenCategories"] = imgs["tokenCategories"] ?? {};
+        for(let cell of picked)
+        {
+            setDoc(`files/tokenCategories/${cell.dataset.key}`, category);
+            imgs["tokenCategories"][cell.dataset.key] = category; //Show it straight away
+        }
+
+        drawTokenCategories(filter.value); //Redraw so new categories show in the dropdowns
+    };
+
+    screen.appendChild(help);
+    screen.appendChild(topLine);
+    screen.appendChild(grid);
+    screen.appendChild(moveLine);
+    div.appendChild(screen);
+    filter.onchange();
+    updateCount();
+    screen.appendChild(addActions(upload)); //Keep the buttons inside the screen so a redraw replaces them
+}
+
+/**
+ * A category dropdown for choosing where pictures go: every existing category,
+ * then "+ New category…", which shows a box to type a new name.
+ * Returns {select, newName}; read the choice with readCategoryChoice().
+ */
+function makeCategoryChoice(selectId, newId, start)
+{
+    let select = document.createElement("select");
+    select.id = selectId;
+    select.style.margin = "10px";
+    select.style.padding = "5px";
+
+    let categories = tokenCategoryList(window.top.parent.imgs);
+    if(!categories.includes(UNCATEGORIZED)){categories.push(UNCATEGORIZED);}
+
+    for(let category of categories)
+    {
+        let option = document.createElement("option");
+        option.value = category;
+        option.text = category;
+        select.appendChild(option);
+    }
+
+    let newOption = document.createElement("option");
+    newOption.value = "__new__";
+    newOption.text = "+ New category…";
+    select.appendChild(newOption);
+
+    let newName = document.createElement("input");
+    newName.type = "text";
+    newName.id = newId;
+    newName.placeholder = "New category name";
+    newName.style.margin = "10px";
+    newName.style.padding = "5px";
+    newName.style.display = "none";
+
+    select.onchange = () => {newName.style.display = select.value == "__new__" ? "" : "none"; if(select.value == "__new__"){newName.focus();}};
+    select.value = start ?? UNCATEGORIZED;
+
+    return {select, newName};
+}
+
+/**
+ * The category chosen with makeCategoryChoice(), or null (with a message) if
+ * "+ New category…" was picked and no name typed. New names are tidied:
+ * "dungeon props" -> "Dungeon Props", and match an existing category whatever its capitals.
+ */
+function readCategoryChoice(selectId, newId)
+{
+    let select = document.getElementById(selectId);
+    if(select.value != "__new__"){return select.value;}
+
+    let typed = document.getElementById(newId).value.replace(/[.#$\[\]\/]/g, " ").replace(/\s+/g, " ").trim();
+    if(typed == ""){alert("Type a name for the new category."); return null;}
+
+    typed = typed.split(" ").map((word) => word[0].toUpperCase() + word.slice(1)).join(" ");
+    let existing = tokenCategoryList(window.top.parent.imgs).find((c) => c.toLowerCase() == typed.toLowerCase());
+    return existing ?? typed;
+}
+
 /**
  * Resolves to the picture file's real size in pixels: {width, height}.
  */
@@ -1706,9 +1926,13 @@ async function uploadImage()
         useWebWorker: true
     };
 
+    let category = null;
+
     switch (type)
     {
         case "token":
+            category = readCategoryChoice("dm-category-select", "dm-category-new");
+            if(category == null){return;} //"New category" picked but no name typed
             dbPath = `files/tokens/${name}-`;
             storagePath = `images/map/tokens/${name}-`;
             options.maxWidthOrHeight = 73;
@@ -1763,6 +1987,7 @@ async function uploadImage()
         }
 
         setDoc(dbPath, toUpload);
+        if(type == "token"){setDoc(`files/tokenCategories/${name}-`, category);}
         alert("Upload Complete");
     } 
     
