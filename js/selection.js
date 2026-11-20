@@ -17,7 +17,7 @@
 "use strict";
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js';
-import { toTitleCase, auth, database, setDoc, clenseInput, deleteDoc, reload, placeBefore } from './viMethods.js';
+import { toTitleCase, auth, database, setDoc, clenseInput, deleteDoc, reload, placeBefore, tokenCategory, CHARACTER_CATEGORY } from './viMethods.js';
 
 let player;
 let wholeChars = {};
@@ -167,12 +167,19 @@ function openWindow()
 }
 
 /**
- * Adds a clickable picture for each standard token this player can use.
+ * Adds a clickable picture for each standard token this player can use: their own
+ * picture (<Name>-) first, then every picture in the "Characters" category.
  */
 function addCharacters()
 {
+    let characters = Object.keys(imgs["tokens"] ?? {})
+        .filter((name) => tokenCategory(imgs, name) == CHARACTER_CATEGORY && !people.includes(name))
+        .sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: "base"}));
+    people.push(...characters);
+
     for(let char of people)
     {
+        if(!imgs["tokens"]?.[char]){continue;} //No picture uploaded under this name
         let person = document.createElement("img");
         person.id = char;
         person.src = imgs["tokens"][char];
