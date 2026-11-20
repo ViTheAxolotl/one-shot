@@ -23,7 +23,7 @@
 
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
 import { toTitleCase, auth, database, setDoc, deleteDoc, returnHpImage, placeBefore, createLabel, wait, storage, tokenCategory, tokenCategoryList, makeCategoryFilter, UNCATEGORIZED, CHARACTER_CATEGORY, ALL_CATEGORIES } from '../js/viMethods.js';
-import { uploadBytes, getDownloadURL, ref as sRef } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
+import { uploadBytes, getDownloadURL, deleteObject, ref as sRef } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 import imageCompression from 'https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.mjs';
 
 const QUEST_PLACEHOLDER = "Placeholder"; //Hidden quest that keeps playerChar/Vi/quests from being empty
@@ -129,9 +129,9 @@ function init()
                 button.onclick = handleOpenPage;
                 break;
 
-            case "categories":
+            case "manageTokens":
                 fiveButtons.push(button);
-                button.onclick = handleTokenCategories;
+                button.onclick = handleManageTokens;
                 break;
         }
     }
@@ -1714,12 +1714,14 @@ function handleUploadImage()
  * its link under files/<type>/<name>. Items also ask for a description.
  */
 /**
- * "Token Categories": sort token pictures into categories. Show one category (or All),
- * click pictures to select them (click again to unselect), choose where they go
- * (an existing category or "+ New category…") and press Upload.
- * Saves files/tokenCategories/<picture> = <category> for each selected picture.
+ * "Manage Tokens": sort token pictures into categories, or delete them. Show one category
+ * (or All), click pictures to select them (click again to unselect), then either
+ *   - choose where they go (an existing category or "+ New category…") and press Upload,
+ *     which saves files/tokenCategories/<picture> = <category>, or
+ *   - press Delete twice, which deletes each picture's image file from Firebase Storage
+ *     and removes it from files/tokens and files/tokenCategories.
  */
-function handleTokenCategories()
+function handleManageTokens()
 {
     hideButtons();
     drawTokenCategories(ALL_CATEGORIES);
@@ -1739,7 +1741,7 @@ function drawTokenCategories(showing)
 
     let help = document.createElement("p");
     help.classList = "categoryHelp";
-    help.innerHTML = "Click pictures to select them, choose a category for them below, then press <b>Upload</b>.";
+    help.innerHTML = "Click pictures to select them. To move them, choose a category below and press <b>Upload</b>. To remove them for good, press <b>Delete</b> twice.";
 
     //Top line: which category to show, how many are selected, select all / clear
     let topLine = document.createElement("div");
@@ -1820,6 +1822,56 @@ function drawTokenCategories(showing)
         drawTokenCategories(filter.value); //Redraw so new categories show in the dropdowns
     };
 
+    //Delete: the first click arms it ("Click again to delete 3"), a second click within
+    //4 seconds deletes. Selecting or unselecting a picture disarms it.
+    let deleteBtn = document.createElement("button");
+    deleteBtn.innerHTML = "Delete";
+    deleteBtn.classList.add("deleteBtn");
+    let armedTimer = null;
+
+    function disarm()
+    {
+        clearTimeout(armedTimer);
+        armedTimer = null;
+        deleteBtn.classList.remove("armed");
+        deleteBtn.innerHTML = "Delete";
+    }
+
+    grid.addEventListener("click", disarm);
+    topLine.addEventListener("click", (e) => {if(e.target.tagName == "BUTTON"){disarm();}}); //Select all shown / Clear
+
+    deleteBtn.onclick = async function ()
+    {
+        let names = Array.from(grid.querySelectorAll("figure.picked")).map((c) => c.dataset.key).filter((n) => n != PROTECTED_TOKEN);
+
+        if(names.length == 0)
+        {
+            deleteBtn.innerHTML = grid.querySelector(`figure.picked[data-key="${PROTECTED_TOKEN}"]`) ? `${PROTECTED_TOKEN} can't be deleted` : "Select pictures first";
+            clearTimeout(armedTimer);
+            armedTimer = setTimeout(disarm, 2500);
+            return;
+        }
+
+        if(!deleteBtn.classList.contains("armed"))
+        {
+            let inUse = tokensUsingPictures(names);
+            deleteBtn.classList.add("armed");
+            deleteBtn.innerHTML = `Click again to delete ${names.length}` + (inUse > 0 ? ` (${inUse} in use)` : "");
+            clearTimeout(armedTimer);
+            armedTimer = setTimeout(disarm, 4000);
+            return;
+        }
+
+        disarm();
+        deleteBtn.disabled = true;
+        deleteBtn.innerHTML = "Deleting…";
+        let failed = await deleteTokenPictures(names);
+        deleteBtn.disabled = false;
+
+        if(failed.length > 0){alert(`Couldn't delete: ${failed.join(", ")}. Check the console for details.`);}
+        drawTokenCategories(filter.value);
+    };
+
     screen.appendChild(help);
     screen.appendChild(topLine);
     screen.appendChild(grid);
@@ -1827,7 +1879,69 @@ function drawTokenCategories(showing)
     div.appendChild(screen);
     filter.onchange();
     updateCount();
-    screen.appendChild(addActions(upload)); //Keep the buttons inside the screen so a redraw replaces them
+    screen.appendChild(addActions(upload, deleteBtn)); //Keep the buttons inside the screen so a redraw replaces them
+}
+
+/** The site needs this picture (hidden tokens use it), so Manage Tokens never deletes it. */
+const PROTECTED_TOKEN = "invisible-";
+
+/**
+ * How many tokens on the current map, in presets or in summons use any of these pictures
+ * (they'll show the Unknown picture once it's deleted).
+ */
+function tokensUsingPictures(names)
+{
+    let count = 0;
+    let lists = [window.top.parent.wholeDB, window.top.parent.wholePre, window.top.parent.wholeSummons];
+
+    for(let list of lists)
+    {
+        for(let token of Object.values(list ?? {}))
+        {
+            if(token && typeof token == "object" && names.includes(token.name)){count++;}
+        }
+    }
+
+    return count;
+}
+
+/**
+ * Deletes token pictures for good: the image file in Firebase Storage (found from its
+ * link), then its entries in files/tokens and files/tokenCategories. If the file can't be
+ * deleted (other than already being gone), the picture is left listed so nothing is
+ * orphaned. Returns the names that failed.
+ */
+async function deleteTokenPictures(names)
+{
+    let imgs = window.top.parent.imgs;
+    let failed = [];
+
+    for(let name of names)
+    {
+        let link = imgs["tokens"]?.[name];
+
+        try
+        {
+            if(typeof link == "string" && link.includes("firebasestorage")){await deleteObject(sRef(storage, link));}
+        }
+
+        catch(error)
+        {
+            if(error?.code != "storage/object-not-found") //Already gone is fine
+            {
+                console.error(`Deleting the image for ${name} failed:`, error);
+                failed.push(name);
+                continue;
+            }
+        }
+
+        deleteDoc(`files/tokens/${name}`);
+        deleteDoc(`files/tokenCategories/${name}`);
+        delete imgs["tokens"]?.[name];        //Show it straight away
+        delete imgs["tokenCategories"]?.[name];
+    }
+
+    return failed;
 }
 
 /**
