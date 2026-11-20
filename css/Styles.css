@@ -1415,6 +1415,14 @@ table, .itemSearch, #itemImg
 }
 .categoryGrid figcaption small { display: block; opacity: .65; font-size: .9em; }
 
+/* Manage Tokens: Delete turns red once armed (the next click deletes) */
+.actionRow .deleteBtn.armed
+{
+    background: linear-gradient(#b3261e, #7f1712);
+    border-color: #ff8a80;
+    color: #fff;
+}
+
 /* Button that opens a picker in the DM token form */
 .pickerBtn
 {
