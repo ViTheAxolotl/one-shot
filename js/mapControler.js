@@ -27,7 +27,7 @@
 "use strict";
 
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js';
-import { toTitleCase, database, createCard, setDoc, deleteDoc, placeBefore, createLabel, clenseInput, reload, setMapValue, quickAction, setQuickAction, skillDecrypt, sendDiscordMessage, storage} from './viMethods.js';
+import { toTitleCase, database, createCard, setDoc, deleteDoc, placeBefore, createLabel, clenseInput, reload, setMapValue, quickAction, setQuickAction, skillDecrypt, sendDiscordMessage, storage, tokenCategory, makeCategoryFilter, CHARACTER_CATEGORY} from './viMethods.js';
 import { uploadBytes, getDownloadURL, ref as sRef } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 import imageCompression from 'https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.mjs';
 
@@ -2618,13 +2618,15 @@ function handleChangeToken()
                 for(let token of Object.keys(window.wholeCustom ?? {}))
                 {
                     let custom = window.wholeCustom[token];
-                    if(token != "hold" && custom?.src && custom?.name){choices.push({name : custom.name, src : custom.src});}
+                    if(token != "hold" && custom?.src && custom?.name){choices.push({name : custom.name, src : custom.src, category : CHARACTER_CATEGORY});}
                 }
 
                 for(let token of Object.keys(window.imgs["tokens"] ?? {}))
                 {
-                    if(token != "invisible-"){choices.push({name : token, src : window.imgs["tokens"][token]});}
+                    if(token != "invisible-"){choices.push({name : token, src : window.imgs["tokens"][token], category : tokenCategory(window.imgs, token)});}
                 }
+
+                choices.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true, sensitivity: "base"}));
 
                 dropBtn.innerHTML = window.wholeDB[currentCharacter[0].id]["name"];
                 break;
@@ -2650,7 +2652,17 @@ function handleChangeToken()
             img.title = choice.name; //Name on hover
             img.onerror = function () {this.remove();}; //Skip pictures whose file is gone (showed as broken icons)
             if(choice.name == dropBtn.innerHTML){img.classList.add("picked");} //Highlight the current one
+            if(choice.category){img.dataset.category = choice.category;}
             selectDiv.appendChild(img); 
+        }
+
+        //Character pictures: a category dropdown at the top, opening on the current picture's category
+        if(i == 0)
+        {
+            let current = choices.find((c) => c.name == dropBtn.innerHTML);
+            let filter = makeCategoryFilter(window.imgs, selectDiv, current?.category);
+            selectDiv.prepend(filter);
+            filter.onchange();
         }
     }
 
@@ -2912,6 +2924,7 @@ async function handleCreateCustom()
 
         // Update database maps pointing to our newly uploaded asset link
         setDoc(dbPath, downloadURL);
+        setDoc(`files/tokenCategories/${nickname}`, CHARACTER_CATEGORY); //Player uploads are characters
         
         alert("Custom Token Successfully Uploaded! Now reloading to be able to apply");
         reload(.5);
